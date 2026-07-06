@@ -1,0 +1,1807 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>职业兴趣测评 · 自在生涯工作室</title>
+<script src="https://cdn.bootcdn.net/ajax/libs/Chart.js/4.4.0/chart.umd.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<style>
+:root {
+  --primary: #6366f1;
+  --primary-dark: #4338ca;
+  --primary-light: #EEF0FF;
+  --accent: #818cf8;
+  --bg: #F0F4FF;
+  --card: #FFFFFF;
+  --text-primary: #1a1a2e;
+  --text-secondary: #7C8594;
+  --text-light: #B0B8C8;
+  --border: #E8ECF2;
+  --radius-sm: 14px;
+  --radius-md: 20px;
+  --radius-lg: 24px;
+  --green: #10B981;
+  --orange: #F59E0B;
+  --red: #EF4444;
+  --blue: #3B82F6;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background: var(--bg);
+  display: flex; justify-content: center; align-items: center;
+  min-height: 100vh; padding: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+.phone {
+  width: 390px; height: 844px;
+  background: var(--bg);
+  border-radius: 42px; overflow: hidden;
+  box-shadow: 0 20px 60px rgba(99,102,241,0.12), 0 0 0 1px rgba(99,102,241,0.08);
+  display: flex; flex-direction: column;
+}
+.page-body {
+  flex: 1; overflow-y: auto; padding: 8px 16px 12px;
+  display: flex; flex-direction: column; gap: 0;
+}
+.page-body::-webkit-scrollbar { width: 0; }
+
+/* Header */
+.page-header { text-align: center; padding: 6px 0 4px; }
+.page-title { font-size: 18px; font-weight: 800; color: var(--text-primary); }
+.page-subtitle { font-size: 11px; color: var(--text-secondary); margin-top: 1px; }
+
+/* Progress */
+.prog-wrap { margin-bottom: 2px; }
+.prog-info { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; }
+.prog-bar { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+.prog-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--accent)); border-radius: 3px; transition: width 0.4s; }
+
+/* ====== SELECTION SCREEN ====== */
+.select-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+  padding: 4px 0;
+}
+.select-wrap .test-card {
+  flex: 0 0 auto;
+  min-height: 0;
+  padding: 10px 14px;
+  gap: 10px;
+  align-items: flex-start;
+}
+.test-card {
+  background: var(--card); border-radius: var(--radius-md);
+  padding: 16px 18px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+  cursor: pointer; transition: all 0.2s; display: flex; gap: 14px;
+  border: 2px solid transparent; align-items: flex-start;
+}
+.test-card:active { transform: scale(0.97); }
+.test-card:hover { border-color: var(--primary); box-shadow: 0 4px 20px rgba(99,102,241,0.12); }
+.select-wrap .test-icon {
+  width: 44px; height: 44px; border-radius: 12px; font-size: 22px;
+  margin-top: 2px;
+}
+.test-icon {
+  width: 50px; height: 50px; border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; flex-shrink: 0;
+}
+.select-wrap .test-info { justify-content: flex-start; min-height: 0; }
+.test-info { flex: 1; display: flex; flex-direction: column; }
+.select-wrap .test-name { font-size: 16px; margin-bottom: 3px; }
+.test-name { font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 2px; }
+.select-wrap .test-quick { font-size: 12px; margin-bottom: 3px; }
+.test-quick { font-size: 12px; color: var(--accent); font-weight: 600; margin-bottom: 4px; }
+.select-wrap .test-desc {
+  font-size: 12px; line-height: 1.45;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+.test-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+.select-wrap .test-meta { font-size: 11px; margin-top: 4px; padding-top: 0; }
+.test-meta { font-size: 12px; color: var(--text-light); margin-top: auto; padding-top: 4px; }
+
+/* ====== QUESTION SCREEN ====== */
+.q-test-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 12px; border-radius: 14px;
+  font-size: 12px; font-weight: 600; color: var(--primary);
+  background: var(--primary-light); margin-bottom: 8px;
+}
+.q-card {
+  background: var(--card); border-radius: var(--radius-md); padding: 22px 18px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.q-card.enter { animation: slideEnter 0.3s ease forwards; }
+.q-card.exit  { animation: slideExit 0.2s ease forwards; }
+@keyframes slideEnter {
+  from { opacity: 0; transform: translateX(24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes slideExit {
+  from { opacity: 1; transform: translateX(0); }
+  to   { opacity: 0; transform: translateX(-24px); }
+}
+.q-num { font-size: 12px; color: var(--accent); font-weight: 700; margin-bottom: 10px; }
+.q-text { font-size: 16px; color: var(--text-primary); font-weight: 600; line-height: 1.7; margin-bottom: 20px; }
+.q-options { display: flex; flex-direction: column; gap: 10px; }
+.q-opt {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer; transition: all 0.2s;
+  font-size: 14px; color: var(--text-secondary);
+  background: var(--card);
+}
+.q-opt:active { transform: scale(0.98); }
+.q-opt.sel {
+  border-color: var(--primary); background: var(--primary-light);
+  color: var(--primary); font-weight: 600;
+}
+.q-radio {
+  width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--border);
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+.q-opt.sel .q-radio { border-color: var(--primary); background: var(--primary); }
+.q-opt.sel .q-radio::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #fff; }
+
+.q-nav-row { display: flex; gap: 10px; align-items: center; }
+.btn-back {
+  flex: 0 0 auto; padding: 12px 20px; border-radius: 24px;
+  font-size: 14px; font-weight: 600; border: 1.5px solid var(--border);
+  background: var(--card); color: var(--text-secondary); cursor: pointer;
+}
+.q-indicator {
+  flex: 1; text-align: center; font-size: 12px; color: var(--text-light);
+  display: flex; align-items: center; justify-content: center; gap: 4px;
+}
+.q-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--border); }
+.q-dot.done { background: var(--primary); }
+.q-dot.current { width: 8px; height: 8px; background: var(--primary); box-shadow: 0 0 0 3px rgba(99,102,241,0.2); }
+
+/* ====== RESULTS ====== */
+.result-hero {
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+  border-radius: var(--radius-lg); padding: 28px 20px;
+  text-align: center; color: #fff;
+}
+.result-hero-icon { font-size: 44px; margin-bottom: 8px; }
+.result-hero-type { font-size: 14px; opacity: 0.85; margin-bottom: 4px; }
+.result-hero-code { font-size: 34px; font-weight: 900; letter-spacing: 8px; margin-bottom: 4px; }
+.result-hero-name { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
+.result-hero-desc { font-size: 13px; opacity: 0.9; line-height: 1.7; }
+
+.score-card {
+  background: var(--card); border-radius: var(--radius-md); padding: 20px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+}
+.score-title { font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 14px; }
+.score-item { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.score-label { width: 70px; font-size: 13px; color: var(--text-secondary); flex-shrink: 0; font-weight: 500; }
+.score-bar-wrap { flex: 1; height: 10px; background: var(--border); border-radius: 5px; overflow: hidden; }
+.score-bar { height: 100%; border-radius: 5px; transition: width 1s ease; }
+.score-val { width: 38px; text-align: right; font-size: 13px; font-weight: 700; color: var(--text-primary); flex-shrink: 0; }
+
+/* 16personalities style dimension bars */
+.dim-section { margin-bottom: 20px; }
+.dim-section:last-child { margin-bottom: 0; }
+.dim-section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.dim-section-label { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+.dim-section-bar-wrap { height: 16px; background: var(--border); border-radius: 8px; position: relative; overflow: hidden; }
+.dim-section-bar { height: 100%; border-radius: 8px; transition: width 1s ease; }
+.dim-section-dot { position: absolute; top: 50%; transform: translate(-50%, -50%); width: 20px; height: 20px; border-radius: 50%; background: white; border: 3px solid; box-shadow: 0 2px 6px rgba(0,0,0,0.15); z-index: 2; transition: left 1s ease; }
+.dim-section-footer { display: flex; justify-content: space-between; margin-top: 4px; font-size: 12px; color: var(--text-light); }
+
+/* MBTI classic dual-bar */
+.mbti-section { margin-bottom: 20px; }
+.mbti-section:last-child { margin-bottom: 0; }
+.mbti-section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.mbti-section-label { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+.mbti-section-pct { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+.mbti-bar-full { height: 16px; border-radius: 8px; overflow: hidden; display: flex; position: relative; }
+.mbti-bar-left { height: 100%; border-radius: 8px 0 0 8px; transition: flex 0.8s ease; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; }
+.mbti-bar-right { height: 100%; border-radius: 0 8px 8px 0; transition: flex 0.8s ease; display: flex; align-items: center; padding-left: 8px; }
+.mbti-bar-text { font-size: 11px; font-weight: 700; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.15); white-space: nowrap; }
+.mbti-section-footer { display: flex; justify-content: space-between; margin-top: 4px; font-size: 12px; color: var(--text-light); }
+
+/* Big Five classic bar */
+.bf-score-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.bf-score-row:last-child { margin-bottom: 0; }
+.bf-score-name { font-size: 13px; font-weight: 600; color: var(--text-primary); width: 80px; flex-shrink: 0; }
+.bf-bar-wrap { flex: 1; height: 18px; background: #f0f0f5; border-radius: 9px; overflow: hidden; position: relative; }
+.bf-bar-fill { height: 100%; border-radius: 9px; transition: width 1s ease; }
+.bf-bar-zone { position: absolute; top: 0; height: 100%; border-right: 1px dashed rgba(0,0,0,0.1); }
+.bf-score-val { font-size: 13px; font-weight: 700; color: var(--text-primary); width: 36px; flex-shrink: 0; text-align: right; }
+.bf-score-tag { font-size: 11px; font-weight: 500; flex-shrink: 0; padding: 2px 8px; border-radius: 8px; text-align: center; white-space: nowrap; }
+.bf-score-tag.high { background: #DCFCE7; color: #166534; }
+.bf-score-tag.mid { background: #FEF3C7; color: #92400E; }
+.bf-score-tag.low { background: #FEE2E2; color: #991B1B; }
+
+/* DISC colored bar — clean 2-line layout */
+.disc-item { margin-bottom: 16px; }
+.disc-item:last-child { margin-bottom: 0; }
+.disc-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.disc-item-name { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--text-primary); }
+.disc-item-en { font-size: 12px; color: var(--text-secondary); font-weight: 400; }
+.disc-item-pct { font-size: 15px; font-weight: 700; color: var(--text-primary); }
+.disc-bar-wrap { height: 12px; background: #f0f0f5; border-radius: 6px; overflow: hidden; }
+.disc-bar-fill { height: 100%; border-radius: 6px; transition: width 1s ease; }
+.disc-dot-sm { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.disc-dot-sm.disc-D { background: #0ea5e9; }
+.disc-dot-sm.disc-I { background: #f59e0b; }
+.disc-dot-sm.disc-S { background: #10b981; }
+.disc-dot-sm.disc-C { background: #6366f1; }
+
+.chart-card {
+  background: var(--card); border-radius: var(--radius-md); padding: 20px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+}
+.chart-title { font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 14px; }
+.chart-wrap { height: 260px; position: relative; }
+
+.trait-card {
+  background: var(--card); border-radius: var(--radius-md); padding: 20px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+}
+.trait-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.trait-tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 7px 14px; border-radius: 16px;
+  font-size: 12px; font-weight: 600;
+  border: 1.5px solid;
+}
+.trait-pos { background: #DCFCE7; border-color: #86EFAC; color: #166534; }
+.trait-neg { background: #FEE2E2; border-color: #FCA5A5; color: #991B1B; }
+.trait-neu { background: #FEF3C7; border-color: #FCD34D; color: #92400E; }
+
+/* DISC color dots */
+.disc-dot { display: inline-block; width: 14px; height: 14px; border-radius: 50%; margin-right: 4px; vertical-align: middle; }
+.disc-D { background: #EF4444; }
+.disc-I { background: #F59E0B; }
+.disc-S { background: #10B981; }
+.disc-C { background: #3B82F6; }
+
+.btn-row { display: flex; gap: 10px; }
+.btn-primary {
+  flex: 1; padding: 14px; border-radius: 25px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: #fff; font-size: 15px; font-weight: 700; border: none;
+  cursor: pointer; box-shadow: 0 4px 16px rgba(99,102,241,0.3);
+  transition: all 0.2s; font-family: inherit;
+}
+.btn-primary:active { transform: scale(0.96); }
+.btn-outline {
+  flex: 1; padding: 14px; border-radius: 25px;
+  background: var(--card); color: var(--primary);
+  font-size: 14px; font-weight: 600;
+  border: 1.5px solid var(--primary); cursor: pointer;
+  transition: all 0.2s; font-family: inherit;
+}
+.btn-outline:active { background: var(--primary-light); }
+
+/* Export button */
+.btn-export {
+  flex: 1; padding: 14px; border-radius: 25px;
+  background: linear-gradient(135deg, #10B981, #059669);
+  color: #fff; font-size: 14px; font-weight: 700; border: none;
+  cursor: pointer; box-shadow: 0 4px 16px rgba(16,185,129,0.3);
+  transition: all 0.2s; font-family: inherit;
+}
+.btn-export:active { transform: scale(0.96); }
+.btn-export:disabled { opacity: 0.6; cursor: wait; }
+
+/* Report container for export */
+.report-export-wrap { position: relative; }
+.report-stamp {
+  position: absolute; top: 12px; right: 12px;
+  font-size: 10px; color: var(--text-light); z-index: 1;
+}
+
+/* Student info bar on report */
+.report-info-bar {
+  background: var(--primary-light); border-radius: var(--radius-sm);
+  padding: 10px 14px; display: flex; gap: 12px; flex-wrap: wrap;
+  font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;
+}
+.report-info-bar span { font-weight: 600; color: var(--primary); }
+
+/* Bottom Nav */
+.bottom-nav {
+  height: 58px; background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-around;
+  flex-shrink: 0; z-index: 100; padding: 0 4px;
+}
+.nav-item {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  text-decoration: none; cursor: pointer; flex: 1; padding: 6px 0;
+  color: var(--text-light); font-size: 10px; font-weight: 500;
+}
+.nav-item svg { width: 22px; height: 22px; }
+.nav-item.active { color: var(--primary); }
+
+.toast-el {
+  position: fixed; top: 30px; left: 50%; transform: translateX(-50%) translateY(-120px);
+  background: var(--text-primary); color: #fff; padding: 11px 22px; border-radius: 14px;
+  font-size: 14px; z-index: 9999; pointer-events: none;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  transition: transform .35s cubic-bezier(.175,.885,.32,1.275); white-space: nowrap;
+}
+
+/* ====== INVITE CODE GATE ====== */
+.invite-card {
+  background: var(--card); border-radius: var(--radius-md); padding: 28px 22px 22px;
+  box-shadow: 0 4px 20px rgba(99,102,241,0.1);
+  text-align: center; position: relative;
+  border: 2px dashed var(--primary);
+}
+.invite-icon { font-size: 42px; margin-bottom: 8px; }
+.invite-title { font-size: 16px; font-weight: 800; color: var(--text-primary); margin-bottom: 6px; }
+.invite-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 18px; padding: 0 8px; }
+.invite-input {
+  width: 100%; padding: 13px 16px; border: 2px solid var(--border);
+  border-radius: 14px; font-size: 15px; text-align: center; font-family: inherit;
+  color: var(--text-primary); background: var(--bg); outline: none;
+  transition: border-color 0.2s; letter-spacing: 2px;
+}
+.invite-input:focus { border-color: var(--primary); }
+.invite-input.error { border-color: var(--red); animation: shake 0.4s ease; }
+.invite-error { color: var(--red); font-size: 12px; margin-top: 8px; min-height: 18px; }
+.invite-btn {
+  width: 100%; padding: 14px; border-radius: 25px; margin-top: 12px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: #fff; font-size: 15px; font-weight: 700; border: none;
+  cursor: pointer; box-shadow: 0 4px 16px rgba(99,102,241,0.3);
+  transition: all 0.2s; font-family: inherit;
+}
+.invite-btn:active { transform: scale(0.96); }
+.invite-hint {
+  margin-top: 12px; font-size: 11px; color: var(--text-light);
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-6px); }
+  80% { transform: translateX(6px); }
+}
+</style>
+<script src="https://beacon.cdn.qq.com/sdk/4.5.9/beacon_web.min.js"></script>
+<script>
+(function(){
+  try{
+    var beacon=new BeaconAction({
+      appkey:'0WEB06U85YBSLJNL',
+      versionCode:'1.0.0',
+      channelID:'share',
+      delay:1000,
+      sessionDuration:30*60*1000,
+      isOversea:false,
+      needReportRqdEvent:false
+    });
+    beacon.onDirectUserAction('preview_page_view',{
+      'url':location.href,
+      'referrer':document.referrer,
+      'title':document.title,
+      'sandbox_id':'fa36b86aff3c44c5a750cdf276e0da0c'
+    });
+  }catch(e){}
+})();
+</script></head>
+<body>
+
+<div class="phone">
+  <div class="page-body" id="pageBody"></div>
+
+  <nav class="bottom-nav">
+    <a class="nav-item" href="index.html">
+      <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      <span>首页</span>
+    </a>
+    <a class="nav-item active" href="assessment.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+      <span>测评</span>
+    </a>
+    <a class="nav-item" href="consult-flow.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      <span>咨询</span>
+    </a>
+    <a class="nav-item" href="goals.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+      <span>目标</span>
+    </a>
+    <a class="nav-item" href="resume.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span>我的</span>
+    </a>
+  </nav>
+</div>
+
+<div class="toast-el" id="toastEl"></div>
+
+<script src="js/config.js"></script>
+<script>
+// ============================================================
+//  GLOBAL STATE
+// ============================================================
+var state = {
+  view: 'info',     // info | select | quiz | result
+  testKey: '',       // bigfive | holland | disc | mbti
+  currentQ: 0,
+  answers: {},
+  autoTimer: null,
+  chartInstance: null,
+  studentInfo: null  // { name, studentId, className }
+};
+
+// ============================================================
+//  TEST DEFINITIONS
+// ============================================================
+var TESTS = {
+  // ---- HOLLAND RIASEC 霍兰德 ----
+  holland: {
+    id: 'holland',
+    name: '霍兰德职业兴趣测试',
+    icon: '🧭',
+    iconBg: '#DCFCE7',
+    shortDesc: 'RIASEC六维模型',
+    desc: '基于霍兰德职业兴趣理论，从现实型、研究型、艺术型、社会型、企业型、常规型六个维度评估你的职业兴趣偏好，帮你找到最适合的职业方向。',
+    meta: '30 题 · 约 5 分钟',
+    dimensions: ['R','I','A','S','E','C'],
+    dimNames: {R:'现实型 Realistic',I:'研究型 Investigative',A:'艺术型 Artistic',S:'社会型 Social',E:'企业型 Enterprising',C:'常规型 Conventional'},
+    dimIcons: {R:'🔧',I:'🔬',A:'🎨',S:'🤝',E:'💼',C:'📊'},
+    dimColors: {R:'#10B981',I:'#3B82F6',A:'#8B5CF6',S:'#F59E0B',E:'#EF4444',C:'#14B8A6'},
+    questions: [
+      {dim:'R',q:'我喜欢动手修理或组装物品'},
+      {dim:'I',q:'我喜欢钻研科学问题或做实验'},
+      {dim:'A',q:'我喜欢通过绘画、音乐或写作表达创意'},
+      {dim:'S',q:'我喜欢帮助他人解决问题'},
+      {dim:'E',q:'我喜欢领导和组织团队活动'},
+      {dim:'C',q:'我喜欢按流程和规范整理数据文档'},
+      {dim:'R',q:'相比办公室工作，我更喜欢户外动手工作'},
+      {dim:'I',q:'遇到复杂问题我会查资料深入分析'},
+      {dim:'A',q:'我经常有天马行空的想象和创意'},
+      {dim:'S',q:'我享受与他人交流和建立关系'},
+      {dim:'E',q:'我在竞争中感到兴奋，想脱颖而出'},
+      {dim:'C',q:'我做事注重细节和准确性'},
+      {dim:'R',q:'我喜欢使用工具亲手制作东西'},
+      {dim:'I',q:'我喜欢阅读科普文章或学术论文'},
+      {dim:'A',q:'我对美有独特的感知和追求'},
+      {dim:'S',q:'我善于倾听并给予他人安慰'},
+      {dim:'E',q:'我敢于在公开场合发表演讲'},
+      {dim:'C',q:'我擅长管理任务清单和时间安排'},
+      {dim:'R',q:'我对机械原理和动手操作很感兴趣'},
+      {dim:'I',q:'我享受独立思考和深度研究'},
+      {dim:'A',q:'我不喜欢被条条框框限制创造力'},
+      {dim:'S',q:'在团队协作中我最有成就感'},
+      {dim:'E',q:'我对商业和创业话题充满热情'},
+      {dim:'C',q:'我喜欢系统性地整理和归档信息'},
+      {dim:'R',q:'我认为动手实践比理论学习更重要'},
+      {dim:'I',q:'我喜欢从数据中发现规律和趋势'},
+      {dim:'A',q:'我经常被说想法与众不同'},
+      {dim:'S',q:'我经常主动关心身边的人'},
+      {dim:'E',q:'在讨论中我总想主导和推动决策'},
+      {dim:'C',q:'我觉得做事应该有明确标准和规范'}
+    ],
+    reverseItems: []
+  },
+
+  // ---- MBTI 性格测试 ----
+  mbti: {
+    id: 'mbti',
+    name: 'MBTI性格测试',
+    icon: '🧩',
+    iconBg: '#FCE7F3',
+    shortDesc: '16种人格类型',
+    desc: '基于荣格心理类型理论，从精力来源(E/I)、认知方式(S/N)、决策方式(T/F)、生活态度(J/P)四个维度评估你的性格类型。',
+    meta: '32 题 · 约 5 分钟',
+    dimensions: ['EI','SN','TF','JP'],
+    dimNames: {
+      EI:'外倾(E) vs 内倾(I)',
+      SN:'感觉(S) vs 直觉(N)',
+      TF:'思维(T) vs 情感(F)',
+      JP:'判断(J) vs 感知(P)'
+    },
+    dimIcons: {EI:'🌍',SN:'🔍',TF:'⚖️',JP:'📅'},
+    dimColors: {EI:'#6366f1',SN:'#3B82F6',TF:'#8B5CF6',JP:'#EC4899'},
+    questions: [
+      {dim:'EI',q:'在聚会中我通常主动与人交谈，而不是等待别人来找我'},
+      {dim:'SN',q:'我更关注具体的事实和细节，而非抽象的概念'},
+      {dim:'TF',q:'做决定时我更依赖逻辑分析而非个人感受'},
+      {dim:'JP',q:'我喜欢提前计划，而不是随机应变'},
+      {dim:'EI',q:'独处太久会让我感到无聊和不安'},
+      {dim:'SN',q:'我更相信实际经验而非直觉预感'},
+      {dim:'TF',q:'我认为公平比和谐更重要'},
+      {dim:'JP',q:'列出待办清单会让我感到安心'},
+      {dim:'EI',q:'我更喜欢通过与人讨论来理清思路'},
+      {dim:'SN',q:'我喜欢尝试新方法，而不是按老规矩办事'},
+      {dim:'TF',q:'批评别人时我不会太在意对方的感受'},
+      {dim:'JP',q:'我喜欢按计划行事，不喜欢临时变动'},
+      {dim:'EI',q:'社交活动让我精力充沛而非疲惫'},
+      {dim:'SN',q:'我经常做白日梦，想象未来的可能性'},
+      {dim:'TF',q:'在争论中我更在意谁对谁错'},
+      {dim:'JP',q:'截止日期能激励我更高效地工作'},
+      {dim:'EI',q:'与一群人相处后我需要独处恢复能量'},
+      {dim:'SN',q:'我更喜欢遵循已验证的方法而非冒风险尝试'},
+      {dim:'TF',q:'看到别人犯错我会忍不住指出'},
+      {dim:'JP',q:'我的桌面和文件总是整理得很有条理'},
+      {dim:'EI',q:'我更享受一对一的深入交流而非大型聚会'},
+      {dim:'SN',q:'我经常思考事物的本质而非表面'},
+      {dim:'TF',q:'比起逻辑，我更看重人与人之间的情感连接'},
+      {dim:'JP',q:'我喜欢保留多种选择而不是急于决定'},
+      {dim:'EI',q:'认识新朋友让我感到兴奋'},
+      {dim:'SN',q:'我相信数据多于直觉'},
+      {dim:'TF',q:'我倾向于客观分析而非主观感受'},
+      {dim:'JP',q:'完成一项任务后我才开始下一项'},
+      {dim:'EI',q:'我需要安静的环境来深度思考'},
+      {dim:'SN',q:'我经常看到事物的潜在可能性而非现状'},
+      {dim:'TF',q:'我重视效率，有时会忽略人情世故'},
+      {dim:'JP',q:'我喜欢有条不紊的生活方式'}
+    ],
+    reverseItems: [10,14,17,21,23,29]
+  },
+
+  // ---- BIG FIVE (OCEAN) 大五人格 ----
+  bigfive: {
+    id: 'bigfive',
+    name: '大五人格测试',
+    icon: '🧬',
+    iconBg: '#EEF0FF',
+    shortDesc: 'OCEAN五维模型',
+    desc: '基于心理学界最权威的大五人格模型（OCEAN），从开放性、尽责性、外向性、宜人性、情绪稳定性五个维度全面评估你的人格特质。',
+    meta: '32 题 · 约 5 分钟',
+    dimensions: ['O','C','E','A','N'],
+    dimNames: {O:'开放性 Openness',C:'尽责性 Conscientiousness',E:'外向性 Extraversion',A:'宜人性 Agreeableness',N:'情绪稳定性 Stability'},
+    dimIcons: {O:'🌌',C:'📋',E:'🎤',A:'🤝',N:'🧘'},
+    dimColors: {O:'#6366f1',C:'#3B82F6',E:'#F59E0B',A:'#10B981',N:'#8B5CF6'},
+    questions: [
+      {dim:'O',q:'我对抽象的概念和理论非常感兴趣'},
+      {dim:'C',q:'我总是把东西整理得井井有条'},
+      {dim:'E',q:'在聚会中我喜欢成为大家关注的焦点'},
+      {dim:'A',q:'我乐于帮助遇到困难的人'},
+      {dim:'N',q:'我很少因为小事而感到焦虑或紧张'},
+      {dim:'O',q:'我喜欢尝试新事物和体验不同的文化'},
+      {dim:'C',q:'我会按时完成承诺的事情'},
+      {dim:'E',q:'我喜欢和很多人在一起而不是独处'},
+      {dim:'A',q:'我很少和他人发生争执'},
+      {dim:'N',q:'我时常感到情绪波动'},
+      {dim:'O',q:'我有着丰富的想象力和创造力'},
+      {dim:'C',q:'做决定前我会仔细考虑各种可能性'},
+      {dim:'E',q:'我很容易和陌生人开始聊天'},
+      {dim:'A',q:'我相信大多数人都是善良的'},
+      {dim:'N',q:'面对压力我能保持冷静'},
+      {dim:'O',q:'我喜欢欣赏艺术、音乐或文学作品'},
+      {dim:'C',q:'我会制定详细计划并按计划执行'},
+      {dim:'E',q:'我喜欢快节奏和充满刺激的生活'},
+      {dim:'A',q:'我善于察觉他人的情绪和需要'},
+      {dim:'N',q:'我常常担心未来会发生不好的事'},
+      {dim:'O',q:'我经常思考人生的意义和哲学问题'},
+      {dim:'C',q:'我追求卓越，对自己要求很高'},
+      {dim:'E',q:'我在人群中感到精力充沛'},
+      {dim:'A',q:'我会为了避免冲突而妥协'},
+      {dim:'N',q:'我能很快从挫折中恢复过来'},
+      {dim:'O',q:'我喜欢挑战传统观念和既有规则'},
+      {dim:'C',q:'我做事很有条理，不会丢三落四'},
+      {dim:'E',q:'我说话时喜欢用手势来增强表达'},
+      {dim:'A',q:'我真诚地关心他人的幸福'},
+      {dim:'N',q:'我容易因为别人的评价而影响情绪'},
+      {dim:'O',q:'我对科学发现和新技术充满好奇'},
+      {dim:'C',q:'即使没人监督我也能自觉完成任务'}
+    ],
+    reverseItems: [5,10,15,25]
+  },
+
+  // ---- DISC 性格色彩 ----
+  disc: {
+    id: 'disc',
+    name: 'DISC性格色彩测试',
+    icon: '🎨',
+    iconBg: '#FEF3C7',
+    shortDesc: '红黄绿蓝四色人格',
+    desc: '基于DISC行为风格理论，从支配型(D-红)、影响型(I-黄)、稳健型(S-绿)、谨慎型(C-蓝)四个维度分析你的行为风格和沟通偏好。',
+    meta: '32 题 · 约 5 分钟',
+    dimensions: ['D','I','S','C'],
+    dimNames: {D:'支配型 Dominance',I:'影响型 Influence',S:'稳健型 Steadiness',C:'谨慎型 Compliance'},
+    dimIcons: {D:'🔴',I:'🟡',S:'🟢',C:'🔵'},
+    dimColors: {D:'#EF4444',I:'#F59E0B',S:'#10B981',C:'#3B82F6'},
+    questions: [
+      {dim:'D',q:'我喜欢掌控局面并快速做出决定'},
+      {dim:'I',q:'我善于在社交场合活跃气氛'},
+      {dim:'S',q:'我做事喜欢按部就班，不喜欢突然的变化'},
+      {dim:'C',q:'做决定前我会收集大量信息反复核实'},
+      {dim:'D',q:'我喜欢挑战和竞争，渴望成为最优秀的'},
+      {dim:'I',q:'我经常用故事和比喻来吸引听众'},
+      {dim:'S',q:'我很有耐心，愿意花时间倾听他人'},
+      {dim:'C',q:'我追求完美，对细节有极高的要求'},
+      {dim:'D',q:'面对困难我倾向于直面挑战而非回避'},
+      {dim:'I',q:'我很容易和陌生人建立友好关系'},
+      {dim:'S',q:'我不喜欢冲突，会尽量维持和谐'},
+      {dim:'C',q:'我喜欢按规则和流程办事'},
+      {dim:'D',q:'说话直接，不喜欢拐弯抹角'},
+      {dim:'I',q:'我乐观开朗，总能发现事物积极的一面'},
+      {dim:'S',q:'我是个忠诚可靠的朋友和同事'},
+      {dim:'C',q:'我善于发现计划中的漏洞和风险'},
+      {dim:'D',q:'我追求结果，不喜欢拖泥带水'},
+      {dim:'I',q:'我喜欢鼓励和激励身边的人'},
+      {dim:'S',q:'在团队中我更愿意配合而非主导'},
+      {dim:'C',q:'我做事严谨，注重数据和事实'},
+      {dim:'D',q:'我敢于冒险，不怕失败'},
+      {dim:'I',q:'我在人群中总是充满活力和热情'},
+      {dim:'S',q:'我说话温和，不喜欢咄咄逼人'},
+      {dim:'C',q:'我喜欢用逻辑和分析来解决问题'},
+      {dim:'D',q:'我对自己和他人都有很高的期望'},
+      {dim:'I',q:'我能很快适应新环境和新朋友'},
+      {dim:'S',q:'我做事稳重可靠，让人放心'},
+      {dim:'C',q:'我不轻易下结论，需要充分证据'},
+      {dim:'D',q:'我愿意承担别人不敢接的任务'},
+      {dim:'I',q:'我的热情经常感染到身边的人'},
+      {dim:'S',q:'我更喜欢稳定可预测的工作环境'},
+      {dim:'C',q:'我会反复检查自己的工作确保无误'}
+    ],
+    reverseItems: []
+  },
+};
+
+// ============================================================
+//  ANSWER OPTIONS
+// ============================================================
+var ANSWER_OPTS = ['完全不符合','不太符合','一般','比较符合','完全符合'];
+
+// ============================================================
+//  RENDER: STUDENT INFO FORM
+// ============================================================
+function renderStudentInfo() {
+  state.view = 'info';
+  document.getElementById('pageBody').innerHTML =
+    '<div class="page-header">'+
+      '<div class="page-title">职业兴趣测评</div>'+
+      '<div class="page-subtitle">请先填写基本信息，结果将自动提交给老师</div>'+
+    '</div>'+
+    '<div class="test-card" style="flex-direction:column;gap:14px;cursor:default;">'+
+      '<div style="width:100%;">'+
+        '<label style="font-size:13px;font-weight:600;color:var(--text-primary);display:block;margin-bottom:6px;">姓名 <span style="color:var(--red);">*</span></label>'+
+        '<input type="text" id="si-name" placeholder="请输入姓名" style="width:100%;padding:12px 14px;border:2px solid var(--border);border-radius:12px;font-size:15px;color:var(--text-primary);background:var(--bg);outline:none;transition:border-color .2s;" onfocus="this.style.borderColor=\'var(--primary)\'" onblur="this.style.borderColor=\'var(--border)\'">'+
+      '</div>'+
+      '<div style="width:100%;">'+
+        '<label style="font-size:13px;font-weight:600;color:var(--text-primary);display:block;margin-bottom:6px;">学校 <span style="color:var(--red);">*</span></label>'+
+        '<input type="text" id="si-school" placeholder="请输入学校全称（仅限本校）" style="width:100%;padding:12px 14px;border:2px solid var(--border);border-radius:12px;font-size:15px;color:var(--text-primary);background:var(--bg);outline:none;transition:border-color .2s;" onfocus="this.style.borderColor=\'var(--primary)\'" onblur="this.style.borderColor=\'var(--border)\'">'+
+        '<div style="font-size:12px;color:var(--text-light);margin-top:4px;">💡 仅限本校学生使用，请输入正确的学校名称</div>'+
+      '</div>'+
+      '<div style="width:100%;">'+
+        '<label style="font-size:13px;font-weight:600;color:var(--text-primary);display:block;margin-bottom:6px;">学号 <span style="color:var(--red);">*</span></label>'+
+        '<input type="text" id="si-sid" placeholder="请输入学号" style="width:100%;padding:12px 14px;border:2px solid var(--border);border-radius:12px;font-size:15px;color:var(--text-primary);background:var(--bg);outline:none;transition:border-color .2s;" onfocus="this.style.borderColor=\'var(--primary)\'" onblur="this.style.borderColor=\'var(--border)\'">'+
+      '</div>'+
+      '<div style="width:100%;">'+
+        '<label style="font-size:13px;font-weight:600;color:var(--text-primary);display:block;margin-bottom:6px;">班级 <span style="color:var(--red);">*</span></label>'+
+        '<input type="text" id="si-class" placeholder="如：2023级计算机1班" style="width:100%;padding:12px 14px;border:2px solid var(--border);border-radius:12px;font-size:15px;color:var(--text-primary);background:var(--bg);outline:none;transition:border-color .2s;" onfocus="this.style.borderColor=\'var(--primary)\'" onblur="this.style.borderColor=\'var(--border)\'">'+
+      '</div>'+
+      '<button onclick="submitStudentInfo()" style="width:100%;padding:14px;border:none;border-radius:24px;background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;font-size:16px;font-weight:700;cursor:pointer;transition:transform .15s;box-shadow:0 4px 16px rgba(99,102,241,0.3);margin-top:4px;" onmouseover="this.style.transform=\'scale(1.01)\'" onmouseout="this.style.transform=\'scale(1)\'">'+
+        '开始测评 →'+
+      '</button>'+
+    '</div>';
+  document.getElementById('pageBody').scrollTop = 0;
+
+  // 从 profile.html 的 resumeData / 登录态自动预填
+  try {
+    var resumeData = JSON.parse(localStorage.getItem('resumeData') || '{}');
+    var userInfo = JSON.parse(localStorage.getItem('app_user_info') || '{}');
+    var nameInput = document.getElementById('si-name');
+    var schoolInput = document.getElementById('si-school');
+    var sidInput = document.getElementById('si-sid');
+    var classInput = document.getElementById('si-class');
+    if (resumeData.basic) {
+      if (resumeData.basic.name && nameInput) nameInput.value = resumeData.basic.name;
+      if (resumeData.basic.sid && sidInput) sidInput.value = resumeData.basic.sid;
+      if (resumeData.basic.school && schoolInput) schoolInput.value = resumeData.basic.school;
+      if (resumeData.basic.className && classInput) classInput.value = resumeData.basic.className;
+    }
+    if (userInfo.name && nameInput && !nameInput.value) nameInput.value = userInfo.name;
+    if (userInfo.sid && sidInput && !sidInput.value) sidInput.value = userInfo.sid;
+    if (userInfo.school && schoolInput && !schoolInput.value) schoolInput.value = userInfo.school;
+    if (userInfo.className && classInput && !classInput.value) classInput.value = userInfo.className;
+    // 若学校为空，默认填入本校
+    if (schoolInput && !schoolInput.value) schoolInput.value = '广州职业技术大学';
+  } catch(e) {}
+}
+
+function submitStudentInfo() {
+  var name = (document.getElementById('si-name').value || '').trim();
+  var school = (document.getElementById('si-school').value || '').trim();
+  var sid = (document.getElementById('si-sid').value || '').trim();
+  var cls = (document.getElementById('si-class').value || '').trim();
+  if (!name) { showToast('请输入姓名'); return; }
+  if (!school) { showToast('请输入学校'); return; }
+  if (!sid) { showToast('请输入学号'); return; }
+  if (!cls) { showToast('请输入班级'); return; }
+  // 验证学校是否为本校
+  if (typeof verifySchool === 'function' && !verifySchool(school)) {
+    showToast('❌ 仅限本校学生使用，请确认学校名称');
+    var schoolInput = document.getElementById('si-school');
+    schoolInput.classList.add('error');
+    schoolInput.focus();
+    schoolInput.select();
+    setTimeout(function() { schoolInput.classList.remove('error'); }, 600);
+    return;
+  }
+  state.studentInfo = { name: name, school: school, studentId: sid, className: cls };
+  state._schoolVerified = true;  // 开始时已验证，后续不再验证
+  // 持久化，下次不用重复填写
+  try { localStorage.setItem('assessment_student_info', JSON.stringify(state.studentInfo)); } catch(e) {}
+  renderSelect();
+}
+
+// ============================================================
+//  RENDER: TEST SELECTION
+// ============================================================
+function renderSelect() {
+  state.view = 'select';
+  var cards = Object.values(TESTS).map(function(t) {
+    return '<div class="test-card" onclick="startTest(\''+t.id+'\')" style="border-left:4px solid '+t.dimColors[t.dimensions[0]]+';">'+
+      '<div class="test-icon" style="background:'+t.iconBg+'">'+t.icon+'</div>'+
+      '<div class="test-info">'+
+        '<div class="test-name">'+t.name+'</div>'+
+        '<div class="test-quick">'+t.shortDesc+'</div>'+
+        '<div class="test-desc">'+t.desc+'</div>'+
+        '<div class="test-meta">'+t.meta+'</div>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+
+  document.getElementById('pageBody').innerHTML =
+    '<div class="page-header">'+
+      '<div class="page-title">职业兴趣测评</div>'+
+      '<div class="page-subtitle">选择一种测试，探索你的职业性格</div>'+
+    '</div>'+
+    '<div class="select-wrap">' + cards + '</div>';
+}
+
+// ============================================================
+//  START TEST
+// ============================================================
+function startTest(testKey) {
+  state.testKey = testKey;
+  state.currentQ = 0;
+  state.answers = {};
+  state.view = 'quiz';
+  state._locking = false;
+  state._submitted = false;  // 重置提交标记，允许新测试提交
+  clearTimeout(state.autoTimer);
+  renderQuestion(false);
+}
+
+// ============================================================
+//  RENDER QUESTION
+//  animate=true: card slides in; false: appears instantly (first render)
+// ============================================================
+function renderQuestion(animate) {
+  clearTimeout(state.autoTimer);
+  var test = TESTS[state.testKey];
+  var total = test.questions.length;
+  var q = test.questions[state.currentQ];
+  var selected = state.answers[state.currentQ];
+  var progress = Math.round((state.currentQ / total) * 100);
+  var body = document.getElementById('pageBody');
+
+  var optsHtml = ANSWER_OPTS.map(function(t, i) {
+    return '<div class="q-opt'+(selected===i?' sel':'')+'" onclick="selectAnswer('+i+')">'+
+      '<div class="q-radio"></div><span>'+t+'</span></div>';
+  }).join('');
+
+  // Dot indicators
+  var dotsHtml = '';
+  for (var i = 0; i < total; i++) {
+    var cls = 'q-dot';
+    if (state.answers[i] !== undefined && i !== state.currentQ) cls += ' done';
+    if (i === state.currentQ) cls += ' current';
+    dotsHtml += '<span class="'+cls+'"></span>';
+  }
+
+  // Card animation class
+  var cardAnimClass = animate ? ' enter' : '';
+
+  body.innerHTML =
+    '<div class="page-header">'+
+      '<div class="page-title">'+test.name+'</div>'+
+      '<div class="page-subtitle">第 '+(state.currentQ+1)+' / '+total+' 题</div>'+
+    '</div>'+
+    '<div class="prog-wrap">'+
+      '<div class="prog-info"><span>完成进度</span><span id="progPct">'+progress+'%</span></div>'+
+      '<div class="prog-bar"><div class="prog-fill" id="progFill" style="width:'+progress+'%"></div></div>'+
+    '</div>'+
+    '<div class="q-card'+cardAnimClass+'" id="quizCard">'+
+      '<div class="q-num">Q'+(state.currentQ+1)+'</div>'+
+      '<div class="q-text">'+q.q+'</div>'+
+      '<div class="q-options" id="optsWrap">'+optsHtml+'</div>'+
+    '</div>'+
+    '<div class="q-nav-row">'+
+      (state.currentQ>0 ? '<button class="btn-back" onclick="prevQ()">← 上一题</button>' : '<div></div>')+
+      '<div class="q-indicator" id="dotInd">'+dotsHtml+'</div>'+
+    '</div>';
+
+  body.scrollTop = 0;
+
+  // Clean up enter class after animation completes
+  if (animate) {
+    setTimeout(function() {
+      var card = document.getElementById('quizCard');
+      if (card) card.classList.remove('enter');
+    }, 320);
+  }
+}
+
+// ============================================================
+//  PROGRESSIVE UPDATE (no full re-render for small changes)
+// ============================================================
+function updateProgress(current, total) {
+  var progress = Math.round((current / total) * 100);
+  var fill = document.getElementById('progFill');
+  var pct  = document.getElementById('progPct');
+  if (fill) fill.style.width = progress + '%';
+  if (pct)  pct.textContent = progress + '%';
+}
+
+function updateDots(total) {
+  var dotInd = document.getElementById('dotInd');
+  if (!dotInd) return;
+  var html = '';
+  for (var i = 0; i < total; i++) {
+    var cls = 'q-dot';
+    if (state.answers[i] !== undefined && i !== state.currentQ) cls += ' done';
+    if (i === state.currentQ) cls += ' current';
+    html += '<span class="'+cls+'"></span>';
+  }
+  dotInd.innerHTML = html;
+}
+
+// ============================================================
+//  SELECT ANSWER → smooth highlight + auto-advance
+// ============================================================
+function selectAnswer(idx) {
+  if (state._locking) return; // Prevent double-tap during transition
+  clearTimeout(state.autoTimer);
+
+  // Save answer
+  state.answers[state.currentQ] = idx;
+
+  // Instant visual highlight — no full re-render!
+  var opts = document.querySelectorAll('#optsWrap .q-opt');
+  opts.forEach(function(opt, i) {
+    if (i === idx) opt.classList.add('sel');
+    else opt.classList.remove('sel');
+  });
+
+  var test = TESTS[state.testKey];
+  var total = test.questions.length;
+
+  // Update dots: mark current as done
+  var dots = document.querySelectorAll('#dotInd .q-dot');
+  if (dots[state.currentQ]) {
+    dots[state.currentQ].classList.remove('current');
+    dots[state.currentQ].classList.add('done');
+  }
+
+  if (state.currentQ < total - 1) {
+    // Auto-advance after a smooth pause
+    state.autoTimer = setTimeout(function() {
+      transitionNext();
+    }, 350);
+  } else {
+    // Last question → results; lock to prevent double submission
+    state._locking = true;
+    state.autoTimer = setTimeout(function() {
+      var card = document.getElementById('quizCard');
+      if (card) { card.classList.add('exit'); }
+      setTimeout(function() { calcResults(); }, 200);
+    }, 350);
+  }
+}
+
+// ============================================================
+//  SMOOTH TRANSITION TO NEXT QUESTION
+// ============================================================
+function transitionNext() {
+  state._locking = true;
+  var card = document.getElementById('quizCard');
+
+  if (card) {
+    card.classList.add('exit');
+    // Wait for exit animation, then rebuild with enter animation
+    setTimeout(function() {
+      state.currentQ++;
+      renderQuestion(true);
+      state._locking = false;
+    }, 180);
+  } else {
+    state.currentQ++;
+    renderQuestion(false);
+    state._locking = false;
+  }
+}
+
+// ============================================================
+//  PREVIOUS QUESTION — slide in reverse
+// ============================================================
+function prevQ() {
+  if (state._locking) return;
+  clearTimeout(state.autoTimer);
+  if (state.currentQ > 0) {
+    state._locking = true;
+    state.currentQ--;
+    renderQuestion(false); // instant when going back (no animation needed)
+    state._locking = false;
+  }
+}
+
+// ============================================================
+//  CALCULATE RESULTS
+// ============================================================
+function calcResults() {
+  state.view = 'result';
+  var test = TESTS[state.testKey];
+  var scores = {};
+  var counts = {};
+  test.dimensions.forEach(function(d) { scores[d]=0; counts[d]=0; });
+
+  test.questions.forEach(function(q, i) {
+    var rawScore = state.answers[i] !== undefined ? state.answers[i] : 2;
+    // Handle reverse items
+    if (test.reverseItems.indexOf(i) !== -1) {
+      rawScore = 4 - rawScore;
+    }
+    scores[q.dim] += rawScore;
+    counts[q.dim] += 1;
+  });
+
+  // Normalize to 0-100%
+  var maxScore = {};
+  test.dimensions.forEach(function(d) {
+    maxScore[d] = Math.round((scores[d] / (counts[d] * 4)) * 100);
+  });
+
+  state.scores = maxScore;
+
+  // Submit to Supabase (teacher can see results)
+  submitToSupabase(maxScore);
+
+  // 同步保存到本地，供"我的"页面"我的测评"展示
+  saveAssessmentResult(maxScore);
+
+  // School already verified at info stage — directly unlock full report
+  unlockFullReport(maxScore);
+}
+
+// ============================================================
+//  BIG FIVE REPORT
+// ============================================================
+function renderBigFive(scores) {
+  var test = TESTS.bigfive;
+  var sorted = test.dimensions.map(function(d) { return {dim:d, score:scores[d]}; }).sort(function(a,b){return b.score-a.score;});
+  var traitInfo = getBigFiveTraits();
+
+  var heroDim = sorted[0].dim;
+  var descHigh = sorted[0].score >= 50;
+  var heroTags = descHigh ? traitInfo[heroDim].highTags : traitInfo[heroDim].lowTags;
+  var heroHtml = buildHero(scores, test);
+
+  var tagsHtml = heroTags.map(function(t) { return '<span class="trait-tag trait-pos">'+t+'</span>'; }).join(' ');
+  var secondDim = sorted[1].dim;
+  var secondTags = sorted[1].score >= 50 ? traitInfo[secondDim].highTags.slice(0,2) : traitInfo[secondDim].lowTags.slice(0,2);
+  var secondHtml = secondTags.map(function(t) { return '<span class="trait-tag trait-neu">'+t+'</span>'; }).join(' ');
+
+  // Big Five: classic percentile bar chart
+  var bfNames = {O:'开放性', C:'尽责性', E:'外向性', A:'宜人性', N:'情绪稳定性'};
+  var bfZones = {O:{lo:'保守务实',hi:'天马行空'}, C:{lo:'灵活随性',hi:'运筹帷幄'}, E:{lo:'内向沉静',hi:'外向活跃'}, A:{lo:'理性为先',hi:'情感细腻'}, N:{lo:'从容淡定',hi:'情绪敏感'}};
+  var bfColors = test.dimColors || {O:'#6366f1', C:'#f59e0b', E:'#10b981', A:'#ef4444', N:'#8b5cf6'};
+
+  var scoresHtml = test.dimensions.map(function(d){
+    var s = scores[d];
+    var z = bfZones[d];
+    var tagCls = s >= 61 ? 'high' : (s >= 41 ? 'mid' : 'low');
+    var tagText = s >= 61 ? z.hi : (s >= 41 ? '中等' : z.lo);
+    return '<div class="bf-score-row">'+
+      '<span class="bf-score-name">'+bfNames[d]+'</span>'+
+      '<div class="bf-bar-wrap">'+
+        '<div class="bf-bar-fill" style="width:'+s+'%;background:'+bfColors[d]+'"></div>'+
+      '</div>'+
+      '<span class="bf-score-val">'+s+'%</span>'+
+      '<span class="bf-score-tag '+tagCls+'">'+tagText+'</span>'+
+    '</div>';
+  }).join('');
+
+  document.getElementById('pageBody').innerHTML =
+    '<div class="page-header"><div class="page-title">大五人格报告</div><div class="page-subtitle">OCEAN 五维人格分析</div></div>'+
+    '<div class="report-export-wrap" id="reportExportWrap">'+
+    buildReportInfoBar()+
+    heroHtml+
+    '<div class="score-card"><div class="score-title">人格特质特征</div>'+scoresHtml+'</div>'+
+    '<div class="trait-card"><div class="score-title">突出特质 — '+test.dimNames[heroDim].split(' ')[0]+'</div><div class="trait-row">'+tagsHtml+'</div></div>'+
+    '<div class="trait-card"><div class="score-title">次要特质 — '+test.dimNames[secondDim].split(' ')[0]+'</div><div class="trait-row">'+secondHtml+'</div></div>'+
+    '</div>'+
+    buildExportBtnRow();
+}
+
+// ============================================================
+//  HOLLAND REPORT
+// ============================================================
+function renderHolland(scores) {
+  var test = TESTS.holland;
+  var sorted = test.dimensions.map(function(d){return {dim:d,score:scores[d]};}).sort(function(a,b){return b.score-a.score;});
+  var top3 = sorted.slice(0,3).map(function(e){return e.dim;});
+  var code = top3.join('');
+  var typeNames = getHollandTypeNames();
+  var typeName = typeNames[code];
+  if (!typeName) {
+    var dims = top3.map(function(d){return test.dimNames[d].split(' ')[0];});
+    typeName = dims[0] + '·' + dims[1] + '·' + dims[2] + '型';
+  }
+
+  var heroHtml = buildHero(scores, test);
+  var scoresHtml = buildScoresHtml(scores, test);
+
+  document.getElementById('pageBody').innerHTML =
+    '<div class="page-header"><div class="page-title">霍兰德报告</div><div class="page-subtitle">RIASEC 职业兴趣分析</div></div>'+
+    '<div class="report-export-wrap" id="reportExportWrap">'+
+    buildReportInfoBar()+
+    heroHtml+
+    '<div class="chart-card"><div class="chart-title">📊 六维雷达图</div><div class="chart-wrap"><canvas id="radarChart"></canvas></div></div>'+
+    '<div class="score-card"><div class="score-title">📋 职业兴趣特征</div>'+scoresHtml+'</div>'+
+    '</div>'+
+    buildExportBtnRow();
+
+  setTimeout(function() {
+    var ctx = document.getElementById('radarChart');
+    if (!ctx) return;
+    if (state.chartInstance) state.chartInstance.destroy();
+    var labels = test.dimensions.map(function(d){return test.dimNames[d].split(' ')[0];});
+    var data = test.dimensions.map(function(d){return scores[d];});
+    state.chartInstance = new Chart(ctx, {
+      type: 'radar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: '你的得分', data: data,
+          backgroundColor: 'rgba(99,102,241,0.2)',
+          borderColor: '#6366f1', borderWidth: 2,
+          pointBackgroundColor: '#6366f1', pointBorderColor: '#fff',
+          pointBorderWidth: 2, pointRadius: 5
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          r: {
+            beginAtZero: true, max: 100,
+            ticks: { stepSize: 20, backdropColor: 'transparent', font:{size:10} },
+            pointLabels: { font:{size:13,weight:'600'}, color:'#1a1a2e' },
+            grid: { color:'#E8ECF2' }, angleLines: { color:'#E8ECF2' }
+          }
+        }
+      }
+    });
+  }, 300);
+}
+
+// ============================================================
+//  DISC REPORT
+// ============================================================
+function renderDisc(scores) {
+  var test = TESTS.disc;
+  var sorted = test.dimensions.map(function(d){return {dim:d,score:scores[d]};}).sort(function(a,b){return b.score-a.score;});
+  var discNames = getDiscNames();
+  var discDescs = getDiscDescs();
+
+  var top = sorted[0];
+  var isHigh = top.score >= 50;
+  var tags = isHigh ? discDescs[top.dim].highTags : discDescs[top.dim].lowTags;
+
+  var heroHtml = buildHero(scores, test);
+
+  var tagsHtml = tags.map(function(t){return '<span class="trait-tag trait-pos">'+t+'</span>';}).join(' ');
+  var second = sorted[1];
+  var secondDesc = (second.score>=50 ? discDescs[second.dim].highTags : discDescs[second.dim].lowTags).slice(0,2);
+  var secondHtml = secondDesc.map(function(t){return '<span class="trait-tag trait-neu">'+t+'</span>';}).join(' ');
+
+  // DISC: colored bar chart — clean 2-line layout
+  var discEn = {D:'Dominance', I:'Influence', S:'Steadiness', C:'Compliance'};
+  var scoresHtml = sorted.map(function(e){
+    var color = test.dimColors[e.dim];
+    var name = test.dimNames[e.dim].split(' ')[0];
+    var en = discEn[e.dim] || '';
+    return '<div class="disc-item">'+
+      '<div class="disc-item-header">'+
+        '<span class="disc-item-name">'+
+          '<span class="disc-dot-sm disc-'+e.dim+'"></span>'+name+
+          (en ? ' <span class="disc-item-en">'+en+'</span>' : '')+
+        '</span>'+
+        '<span class="disc-item-pct">'+e.score+'%</span>'+
+      '</div>'+
+      '<div class="disc-bar-wrap">'+
+        '<div class="disc-bar-fill" style="width:'+e.score+'%;background:'+color+'"></div>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+
+  document.getElementById('pageBody').innerHTML =
+    '<div class="page-header"><div class="page-title">DISC报告</div><div class="page-subtitle">红黄绿蓝 · 性格色彩分析</div></div>'+
+    '<div class="report-export-wrap" id="reportExportWrap">'+
+    buildReportInfoBar()+
+    heroHtml+
+    '<div class="score-card"><div class="score-title">性格色彩特征</div>'+scoresHtml+'</div>'+
+    '<div class="trait-card"><div class="score-title">主色调特质</div><div class="trait-row">'+tagsHtml+'</div></div>'+
+    '<div class="trait-card"><div class="score-title">辅色调特质 — '+discNames[second.dim].split('·')[0]+'</div><div class="trait-row">'+secondHtml+'</div></div>'+
+    '</div>'+
+    buildExportBtnRow();
+}
+
+// ============================================================
+//  MBTI REPORT
+// ============================================================
+function renderMbti(scores) {
+  var test = TESTS.mbti;
+
+  var EorI = scores.EI >= 50 ? 'E' : 'I';
+  var SorN = scores.SN >= 50 ? 'S' : 'N';
+  var TorF = scores.TF >= 50 ? 'T' : 'F';
+  var JorP = scores.JP >= 50 ? 'J' : 'P';
+  var mbtiType = EorI + SorN + TorF + JorP;
+  var info = getMbtiInfo(mbtiType);
+
+  var heroHtml = buildHero(scores, test);
+
+  // MBTI: classic dual-color split bars — 2-line layout
+  var mbtiDims = [
+    {key:'EI', header:'能量', left:'外倾', right:'内倾', leftColor:'#3B82F6', rightColor:'#F59E0B'},
+    {key:'SN', header:'心智', left:'感觉', right:'直觉', leftColor:'#F59E0B', rightColor:'#3B82F6'},
+    {key:'TF', header:'天性', left:'思维', right:'情感', leftColor:'#10B981', rightColor:'#EF4444'},
+    {key:'JP', header:'应对', left:'判断', right:'感知', leftColor:'#8B5CF6', rightColor:'#EC4899'}
+  ];
+
+  var scoresHtml = mbtiDims.map(function(d){
+    var s = Math.round(scores[d.key]);
+    var sL = s;
+    var sR = 100 - s;
+    var isLeft = s >= 50;
+    var activeLabel = isLeft ? d.left : d.right;
+    var activeColor = isLeft ? d.leftColor : d.rightColor;
+    return '<div class="mbti-section">'+
+      '<div class="mbti-section-header">'+
+        '<span class="mbti-section-label">'+d.header+': <span style="color:'+activeColor+'">'+activeLabel+'</span></span>'+
+        '<span class="mbti-section-pct" style="color:'+activeColor+'">'+s+'%</span>'+
+      '</div>'+
+      '<div class="mbti-bar-full">'+
+        '<div class="mbti-bar-left" style="flex:'+sL+';background:'+d.leftColor+'">'+
+          (sL>=25 ? '<span class="mbti-bar-text">'+sL+'%</span>' : '')+
+        '</div>'+
+        '<div class="mbti-bar-right" style="flex:'+sR+';background:'+d.rightColor+'">'+
+          (sR>=25 ? '<span class="mbti-bar-text">'+sR+'%</span>' : '')+
+        '</div>'+
+      '</div>'+
+      '<div class="mbti-section-footer">'+
+        '<span>'+d.left+'</span>'+
+        '<span>'+d.right+'</span>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+
+  document.getElementById('pageBody').innerHTML =
+    '<div class="page-header"><div class="page-title">MBTI报告</div><div class="page-subtitle">16种人格 · '+info.name+'</div></div>'+
+    '<div class="report-export-wrap" id="reportExportWrap">'+
+    buildReportInfoBar()+
+    heroHtml+
+    '<div class="score-card"><div class="score-title">维度倾向</div>'+scoresHtml+'</div>'+
+    '</div>'+
+    buildExportBtnRow();
+}
+
+// ============================================================
+//  UTILITY
+// ============================================================
+function goBack() {
+  clearTimeout(state.autoTimer);
+  if (state.chartInstance) { state.chartInstance.destroy(); state.chartInstance = null; }
+  state.view = 'select';
+  state.answers = {};
+  state.currentQ = 0;
+  renderSelect();
+  document.getElementById('pageBody').scrollTop = 0;
+}
+
+function restartTest() {
+  clearTimeout(state.autoTimer);
+  if (state.chartInstance) { state.chartInstance.destroy(); state.chartInstance = null; }
+  state.answers = {};
+  state.currentQ = 0;
+  state.view = 'quiz';
+  state._locking = false;
+  state._submitted = false;  // 重置提交标记
+  renderQuestion(false);
+  document.getElementById('pageBody').scrollTop = 0;
+}
+
+function showToast(msg) {
+  var el = document.getElementById('toastEl');
+  el.textContent = msg;
+  el.style.transform = 'translateX(-50%) translateY(0)';
+  clearTimeout(window._tt);
+  window._tt = setTimeout(function(){el.style.transform='translateX(-50%) translateY(-120px)';},2000);
+}
+
+// ============================================================
+//  EXPORT REPORT AS IMAGE
+// ============================================================
+function exportReport() {
+  // If not yet verified, show verification overlay first
+  if (!state._schoolVerified) {
+    renderExportVerifyOverlay();
+    return;
+  }
+
+  var btn = document.getElementById('exportBtn');
+  if (btn) { btn.disabled = true; btn.textContent = '正在生成...'; }
+
+  var target = document.getElementById('reportExportWrap') || document.getElementById('pageBody');
+  if (!target) return;
+
+  // Temporarily hide buttons during capture
+  var btnRow = target.querySelector('.btn-row');
+  var btnRowDisplay = btnRow ? btnRow.style.display : '';
+  if (btnRow) btnRow.style.display = 'none';
+
+  html2canvas(target, {
+    scale: 2,
+    backgroundColor: '#F0F4FF',
+    useCORS: true,
+    logging: false,
+    scrollY: 0,
+    windowWidth: 390
+  }).then(function(canvas) {
+    // Restore buttons
+    if (btnRow) btnRow.style.display = btnRowDisplay;
+
+    // Download as PNG
+    var testName = TESTS[state.testKey] ? TESTS[state.testKey].name : '测评';
+    var studentSchool = (state.studentInfo && state.studentInfo.school) || '';
+    var fileName = testName + '_' + (studentSchool || '报告') + '_' + new Date().toLocaleDateString('zh-CN').replace(/\//g, '') + '.png';
+
+    var link = document.createElement('a');
+    link.download = fileName;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+
+    if (btn) { btn.disabled = false; btn.textContent = '导出报告'; }
+    showToast('✅ 报告已导出！');
+  }).catch(function(err) {
+    console.error('Export failed:', err);
+    if (btnRow) btnRow.style.display = btnRowDisplay;
+    if (btn) { btn.disabled = false; btn.textContent = '导出报告'; }
+    showToast('❌ 导出失败，请重试');
+  });
+}
+
+// ============================================================
+//  EXPORT VERIFICATION OVERLAY (shown on top of report)
+// ============================================================
+function renderExportVerifyOverlay() {
+  // Remove existing overlay if any
+  var existing = document.getElementById('exportVerifyOverlay');
+  if (existing) existing.remove();
+
+  var currentSchool = (state.studentInfo && state.studentInfo.school) || '';
+  var overlay = document.createElement('div');
+  overlay.id = 'exportVerifyOverlay';
+  overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;';
+  overlay.innerHTML =
+    '<div style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);" onclick="closeVerifyOverlay()"></div>'+
+    '<div class="invite-card" style="position:relative;z-index:2;max-width:90%;margin:0 16px;">'+
+      '<div class="invite-icon">🎓</div>'+
+      '<div class="invite-title">验证本校学生身份</div>'+
+      '<div class="invite-desc">请输入你的<b>学校全称</b>，验证成功后即可导出测评报告</div>'+
+      '<input type="text" class="invite-input" id="exportSchoolInput" placeholder="请输入学校全称" value="'+currentSchool+'" maxlength="30" autocomplete="off" onkeydown="if(event.key===\'Enter\')doExportVerify()">'+
+      '<div class="invite-error" id="exportVerifyError"></div>'+
+      '<button class="invite-btn" onclick="doExportVerify()">验证身份并导出报告</button>'+
+      '<div class="invite-hint">💡 仅需验证一次，验证后可直接导出</div>'+
+    '</div>';
+  document.body.appendChild(overlay);
+  setTimeout(function() {
+    var inp = document.getElementById('exportSchoolInput');
+    if (inp) inp.focus();
+  }, 100);
+}
+
+function closeVerifyOverlay() {
+  var overlay = document.getElementById('exportVerifyOverlay');
+  if (overlay) overlay.remove();
+}
+
+function doExportVerify() {
+  var input = document.getElementById('exportSchoolInput');
+  var errorEl = document.getElementById('exportVerifyError');
+  var schoolName = (input.value || '').trim();
+
+  if (!schoolName) {
+    errorEl.textContent = '❌ 请输入学校名称';
+    input.classList.add('error');
+    input.focus();
+    setTimeout(function() { input.classList.remove('error'); }, 500);
+    return;
+  }
+
+  if (typeof verifySchool === 'function' && verifySchool(schoolName)) {
+    // Store verified school info
+    state._schoolVerified = true;
+    if (!state.studentInfo) state.studentInfo = {};
+    state.studentInfo.school = schoolName;
+
+    // Close overlay with animation
+    var card = document.getElementById('exportVerifyOverlay');
+    if (card) {
+      card.style.transition = 'opacity 0.35s ease';
+      card.style.opacity = '0';
+      setTimeout(function() {
+        closeVerifyOverlay();
+        // Now proceed with actual export
+        exportReport();
+      }, 350);
+    }
+  } else {
+    errorEl.textContent = '❌ 该学校不在本校名单中，请确认学校名称或联系老师';
+    input.classList.add('error');
+    input.focus();
+    input.select();
+    setTimeout(function() { input.classList.remove('error'); }, 500);
+  }
+}
+
+// ============================================================
+//  BUILD REPORT INFO BAR (student info shown on report)
+// ============================================================
+function buildReportInfoBar() {
+  if (!state.studentInfo) return '';
+  var s = state.studentInfo;
+  return '<div class="report-info-bar">'+
+    '姓名：<span>'+escapeHtml(s.name)+'</span>'+
+    (s.school ? ' ｜ 学校：<span>'+escapeHtml(s.school)+'</span>' : '')+
+    (s.studentId ? ' ｜ 学号：<span>'+escapeHtml(s.studentId)+'</span>' : '')+
+    (s.className ? ' ｜ 班级：<span>'+escapeHtml(s.className)+'</span>' : '')+
+    ' ｜ 时间：<span>'+new Date().toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})+'</span>'+
+  '</div>';
+}
+
+function escapeHtml(text) {
+  var div = document.createElement('div');
+  div.textContent = text || '';
+  return div.innerHTML;
+}
+
+// ============================================================
+//  BUILD EXPORT BUTTON ROW (shared by all reports)
+// ============================================================
+function buildExportBtnRow() {
+  return '<div class="btn-row">'+
+    '<button class="btn-outline" onclick="goBack()">选其他测试</button>'+
+    '<button class="btn-export" id="exportBtn" onclick="exportReport()">导出报告</button>'+
+    '<button class="btn-primary" onclick="restartTest()">重新测试</button>'+
+  '</div>';
+}
+
+// ============================================================
+//  SCHOOL VERIFICATION GATE
+// ============================================================
+function renderSchoolGate() {
+  var currentSchool = (state.studentInfo && state.studentInfo.school) || '';
+  return '<div class="invite-card" id="inviteCard">'+
+    '<div class="invite-icon">🎓</div>'+
+    '<div class="invite-title">验证本校学生身份</div>'+
+    '<div class="invite-desc">完成测评！请确认你的学校信息，验证为<b>本校学生</b>后即可查看<b>完整测评报告</b>和<b>导出结果</b></div>'+
+    '<input type="text" class="invite-input" id="schoolVerifyInput" placeholder="请输入学校全称" value="'+currentSchool+'" maxlength="30" autocomplete="off" onkeydown="if(event.key===\'Enter\')verifySchoolCode()">'+
+    '<div class="invite-error" id="inviteError"></div>'+
+    '<button class="invite-btn" onclick="verifySchoolCode()">🎓 验证身份并查看报告</button>'+
+    '<div class="invite-hint">💡 仅需验证一次，本次测评期间有效</div>'+
+  '</div>';
+}
+
+function verifySchoolCode() {
+  var input = document.getElementById('schoolVerifyInput');
+  var errorEl = document.getElementById('inviteError');
+  var schoolName = (input.value || '').trim();
+
+  if (!schoolName) {
+    errorEl.textContent = '❌ 请输入学校名称';
+    input.classList.add('error');
+    input.focus();
+    setTimeout(function() { input.classList.remove('error'); }, 500);
+    return;
+  }
+
+  if (typeof verifySchool === 'function' && verifySchool(schoolName)) {
+    // Ensure studentInfo exists even if user skipped info form
+    if (!state.studentInfo) state.studentInfo = {};
+    state.studentInfo.school = schoolName;
+    state._schoolVerified = true;  // Skip export verification later
+    // Also try to restore from localStorage if missing other fields
+    try {
+      var saved = localStorage.getItem('assessment_student_info');
+      if (saved) {
+        var parsed = JSON.parse(saved);
+        state.studentInfo.name = state.studentInfo.name || parsed.name || '';
+        state.studentInfo.studentId = state.studentInfo.studentId || parsed.studentId || '';
+        state.studentInfo.className = state.studentInfo.className || parsed.className || '';
+      }
+    } catch(e) {}
+    // Retry submission now that we have student info
+    if (state.scores) submitToSupabase(state.scores);
+    // Fade out the gate
+    var card = document.getElementById('inviteCard');
+    if (card) {
+      card.style.transition = 'all 0.4s ease';
+      card.style.opacity = '0';
+      card.style.transform = 'scale(0.95)';
+    }
+    setTimeout(function() {
+      unlockFullReport(state.scores);
+    }, 400);
+  } else {
+    errorEl.textContent = '❌ 该学校不在本校名单中，请确认学校名称或联系老师';
+    input.classList.add('error');
+    input.focus();
+    input.select();
+    setTimeout(function() { input.classList.remove('error'); }, 500);
+  }
+}
+
+function renderPartialReport(scores) {
+  var test = TESTS[state.testKey];
+  var body = document.getElementById('pageBody');
+
+  var subtitle = '';
+  switch (state.testKey) {
+    case 'bigfive': subtitle = 'OCEAN 五维人格分析'; break;
+    case 'holland': subtitle = 'RIASEC 职业兴趣分析'; break;
+    case 'disc': subtitle = '红黄绿蓝 · 性格色彩分析'; break;
+    case 'mbti': subtitle = '16种人格类型测试'; break;
+  }
+
+  // Only show verification gate — no score preview
+  var gateHtml = renderSchoolGate();
+
+  body.innerHTML =
+    '<div class="page-header"><div class="page-title">'+test.name+'</div><div class="page-subtitle">'+subtitle+'</div></div>'+
+    '<div class="complete-banner" style="text-align:center;padding:30px 20px 10px;">'+
+      '<div style="font-size:48px;margin-bottom:12px;">🎉</div>'+
+      '<div style="font-size:18px;font-weight:700;color:var(--text-primary);margin-bottom:6px;">恭喜完成测评！</div>'+
+      '<div style="font-size:14px;color:var(--text-secondary);">验证本校学生身份后即可查看完整报告</div>'+
+    '</div>'+
+    gateHtml +
+    '<div class="btn-row" style="margin-top:4px"><button class="btn-outline" onclick="goBack()">选其他测试</button><button class="btn-primary" onclick="restartTest()">重新测试</button></div>';
+
+  body.scrollTop = 0;
+}
+
+// ============================================================
+//  BUILD HERO (shared by partial & full report)
+// ============================================================
+function buildHero(scores, test) {
+  var sorted = test.dimensions.map(function(d){return {dim:d,score:scores[d]};}).sort(function(a,b){return b.score-a.score;});
+  var heroDim = sorted[0].dim;
+
+  switch (state.testKey) {
+    case 'bigfive': {
+      var traitInfo = getBigFiveTraits();
+      var descHigh = sorted[0].score >= 50;
+      return '<div class="result-hero">'+
+        '<div class="result-hero-icon">'+test.dimIcons[heroDim]+'</div>'+
+        '<div class="result-hero-type">你最突出的人格维度</div>'+
+        '<div class="result-hero-name">'+test.dimNames[heroDim]+'</div>'+
+        '<div class="result-hero-desc">'+(descHigh ? traitInfo[heroDim].high : traitInfo[heroDim].low)+'</div>'+
+      '</div>';
+    }
+    case 'holland': {
+      var top3 = sorted.slice(0,3).map(function(e){return e.dim;});
+      var code = top3.join('');
+  var typeNames = getHollandTypeNames();
+  var typeName = typeNames[code];
+  if (!typeName) {
+    var dims = top3.map(function(d){return test.dimNames[d].split(' ')[0];});
+    typeName = dims[0] + '·' + dims[1] + '·' + dims[2] + '型';
+  }
+      return '<div class="result-hero">'+
+        '<div class="result-hero-type">你的霍兰德职业代码</div>'+
+        '<div class="result-hero-code">'+code+'</div>'+
+        '<div class="result-hero-name">'+typeName+'</div>'+
+        '<div class="result-hero-desc">你最适合的领域集中在：'+test.dimNames[top3[0]].split(' ')[0]+'、'+test.dimNames[top3[1]].split(' ')[0]+'、'+test.dimNames[top3[2]].split(' ')[0]+'</div>'+
+      '</div>';
+    }
+    case 'disc': {
+      var discNames = getDiscNames();
+      var discDescs = getDiscDescs();
+      var top = sorted[0];
+      var isHigh = top.score >= 50;
+      var desc = isHigh ? discDescs[top.dim].high : discDescs[top.dim].low;
+      return '<div class="result-hero">'+
+        '<div class="result-hero-icon"><span class="disc-dot disc-'+top.dim+'" style="width:44px;height:44px;"></span></div>'+
+        '<div class="result-hero-name">'+discNames[top.dim]+'</div>'+
+        '<div class="result-hero-desc">'+desc+'</div>'+
+      '</div>';
+    }
+    case 'mbti': {
+      var EorI = scores.EI >= 50 ? 'E' : 'I';
+      var SorN = scores.SN >= 50 ? 'S' : 'N';
+      var TorF = scores.TF >= 50 ? 'T' : 'F';
+      var JorP = scores.JP >= 50 ? 'J' : 'P';
+      var mbtiType = EorI + SorN + TorF + JorP;
+      var info = getMbtiInfo(mbtiType);
+      return '<div class="result-hero">'+
+        '<div class="result-hero-icon">🧩</div>'+
+        '<div class="result-hero-type">你的 MBTI 人格类型</div>'+
+        '<div class="result-hero-code">'+mbtiType+'</div>'+
+        '<div class="result-hero-name">'+info.name+'</div>'+
+        '<div class="result-hero-desc">'+info.desc+'</div>'+
+      '</div>';
+    }
+    default: return '';
+  }
+}
+
+// ============================================================
+//  BUILD SCORES HTML
+// ============================================================
+function buildScoresHtml(scores, test) {
+  var sorted = test.dimensions.map(function(d){return {dim:d,score:scores[d]};}).sort(function(a,b){return b.score-a.score;});
+
+  // Holland: 16personalities style with circle dot markers
+  var colors = test.dimColors || {};
+  var hollandEnds = {
+    R: {left:'动手实操', right:'创意想象'},
+    I: {left:'逻辑分析', right:'感性体验'},
+    A: {left:'务实严谨', right:'自由创作'},
+    S: {left:'独立工作', right:'助人合作'},
+    E: {left:'执行落实', right:'引领影响'},
+    C: {left:'灵活创新', right:'规范有序'}
+  };
+  return sorted.map(function(e) {
+    var color = colors[e.dim] || '#6366f1';
+    var name = test.dimNames[e.dim].split(' ')[0];
+    var isHigh = e.score >= 50;
+    var actTend = isHigh ? '较高' : '较低';
+    var ends = hollandEnds[e.dim] || {left:'较低', right:'较高'};
+    return '<div class="dim-section">'+
+      '<div class="dim-section-header">'+
+        '<span class="dim-section-label">'+name+': <span style="color:'+color+'">'+e.score+'% '+actTend+'</span></span>'+
+      '</div>'+
+      '<div class="dim-section-bar-wrap">'+
+        '<div class="dim-section-bar" style="width:'+e.score+'%;background:'+color+'"></div>'+
+        '<div class="dim-section-dot" style="left:'+e.score+'%;border-color:'+color+'"></div>'+
+      '</div>'+
+      '<div class="dim-section-footer">'+
+        '<span>'+ends.left+'</span><span>'+ends.right+'</span>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+// ============================================================
+//  UNLOCK FULL REPORT
+// ============================================================
+function unlockFullReport(scores) {
+  switch (state.testKey) {
+    case 'bigfive': renderBigFive(scores); break;
+    case 'holland': renderHolland(scores); break;
+    case 'disc': renderDisc(scores); break;
+    case 'mbti': renderMbti(scores); break;
+  }
+  document.getElementById('pageBody').scrollTop = 0;
+  showToast('✅ 完整报告已解锁！');
+}
+
+// ============================================================
+//  SHARED DATA HELPERS (avoid code duplication)
+// ============================================================
+function getBigFiveTraits() {
+  return {
+    O: {high:'富有创造力、好奇心强、喜欢新体验', low:'务实传统、喜欢稳定和常规', highTags:['🎨 想象力丰富','🌍 喜欢冒险','📚 求知欲强'], lowTags:['📋 务实','🏠 喜欢熟悉的环境','📐 偏好常规']},
+    C: {high:'自律有条理、追求成就、可靠负责', low:'灵活随性、不喜欢严格计划', highTags:['✅ 自律','📅 有条理','🎯 追求卓越'], lowTags:['🌿 随性','🔄 灵活','⏰ 不喜欢约束']},
+    E: {high:'外向健谈、精力充沛、喜欢社交', low:'内敛安静、喜欢独处和深度思考', highTags:['🗣 善交际','🎉 精力充沛','👥 喜欢人群'], lowTags:['🧘 安静内敛','📖 喜欢独处','🤫 深思熟虑']},
+    A: {high:'友善合作、富有同理心、信任他人', low:'理性客观、有主见、不易被影响', highTags:['💚 友善','🤗 有同理心','🤝 乐于合作'], lowTags:['🧠 理性','💪 有主见','🛡 不轻易妥协']},
+    N: {high:'情绪稳定、抗压能力强、心态平和', low:'敏感细腻、容易焦虑、情绪波动', highTags:['🧘 心态平和','🛡 抗压能力强','😊 不易焦虑'], lowTags:['😰 容易紧张','💭 思虑较多','🌊 情绪起伏']}
+  };
+}
+
+function getHollandTypeNames() {
+  return {
+    RIA:'技术研发型',RIS:'数据分析师型',RIE:'工程管理型',RIC:'质量控制型',RAS:'环境工程型',RSE:'户外管理型',
+    RSC:'实务操作型',RCI:'数据核算型',RCE:'技术支持型',RES:'现场执行型',REI:'产品研发型',REC:'工程技术型',
+    RAE:'工程创意型',RAI:'工程创新型',REA:'项目执行型',RSI:'服务技术型',RSA:'工程技术型',RAC:'数据工艺型',
+    IAR:'科技创新型',IAS:'学术研究型',ISE:'咨询分析型',ISC:'生物信息型',IRA:'研发工程师型',IRS:'数据科学家型',
+    ISR:'系统分析型',ICR:'信息处理型',IAE:'科技创意型',IEA:'科研管理型',IES:'数据分析型',IEC:'技术管理型',
+    AIR:'创意设计型',AIS:'文化传媒型',ASE:'艺术管理型',ASC:'视觉传达型',AIE:'创意策划型',ASI:'人文教育型',
+    ARS:'艺术创作型',AES:'娱乐传媒型',AER:'创意实践型',AEI:'创新策划型',ARI:'工艺设计型',ARE:'艺术运营型',
+    AEC:'创意管理型',ARC:'设计工艺型',ACR:'艺术技术型',
+    SAI:'教育辅导型',SEA:'人力资源型',SEC:'社会服务型',SIA:'心理咨询型',SCE:'行政管理型',SRI:'康复治疗型',
+    SIC:'教育服务型',SER:'客户服务型',SAE:'公共关系型',SAR:'人文创意型',SIR:'科研教育型',
+    EAS:'市场营销型',ESC:'商务管理型',ECR:'项目运营型',EIS:'投资银行型',ERA:'创业管理型',EIA:'企业培训型',
+    ESI:'销售管理型',ESR:'业务拓展型',ERC:'运营总监型',EAR:'品牌创意型',EAI:'市场创新型',ECA:'商务分析型',EAC:'营销管理型',
+    CSE:'行政管理型',CIR:'数据管理型',CRE:'财务审计型',CSI:'合规风控型',CAE:'运营管理型',CIE:'供应链管理型',
+    CSR:'事务管理型',CES:'行政助理型',CAR:'数据创意型',CEI:'财务策划型',CRI:'信息管理型'
+  };
+}
+
+function getDiscNames() {
+  return {D:'支配型·红色',I:'影响型·黄色',S:'稳健型·绿色',C:'谨慎型·蓝色'};
+}
+
+function getDiscDescs() {
+  return {
+    D: {high:'你是一位天生的领导者，目标明确、行动果断。喜欢掌控局面，追求效率和结果。',low:'你更倾向于配合而非主导，做决定前会充分考虑。',highTags:['💪 目标导向','⚡ 行动力强','🎯 追求结果','🔥 勇于挑战'],lowTags:['🤝 善于配合','⏳ 三思后行','🎧 乐于倾听','🌿 随和灵活']},
+    I: {high:'你是人群中的焦点，热情开朗、善于表达。用乐观和感染力带动身边的人。',low:'你更偏向于深度交流而非广泛社交。',highTags:['🎤 善于表达','😄 热情开朗','🌟 感染力强','🤹 社交达人'],lowTags:['🤫 低调内敛','📖 喜欢深度交流','🧘 沉稳冷静','💭 思考深入']},
+    S: {high:'你是团队中最可靠的存在，温和耐心、忠诚稳重。善于倾听，追求和谐稳定的关系。',low:'你更倾向于快速响应变化而非追求绝对稳定。',highTags:['🤲 温和耐心','🛡 忠诚可靠','🌿 追求和谐','🎧 善于倾听'],lowTags:['⚡ 适应力强','🔄 拥抱变化','🚀 效率优先','🎯 目标导向']},
+    C: {high:'你追求精确和品质，做事严谨、逻辑清晰。注重数据和事实，是团队的质量守护者。',low:'你更关注大局而非细节，能快速做出判断。',highTags:['🔍 严谨细致','📊 数据导向','✅ 追求品质','🧠 逻辑清晰'],lowTags:['🌍 关注大局','⚡ 快速决策','🎨 灵活应变','💡 创新思维']}
+  };
+}
+
+function getMbtiInfo(type) {
+  var map = {
+    ISTJ:{name:'物流师',desc:'务实、严谨、可靠。你重视传统和秩序，做事有条不紊，是团队中最值得信赖的支柱。',careers:['审计师','法官','军警','会计','数据分析师']},
+    ISFJ:{name:'守护者',desc:'温暖、细心、奉献。你默默地关心他人，用行动而非言语表达爱，是可靠的守护者。',careers:['护士','教师','社工','行政专员','图书管理员']},
+    INFJ:{name:'提倡者',desc:'深邃、理想、富有洞察力。你拥有强大的直觉和共情能力，致力于让世界变得更美好。',careers:['心理咨询师','作家','教育顾问','HR总监','非营利组织负责人']},
+    INTJ:{name:'建筑师',desc:'战略、独立、远见。你善于系统思考，是天生的战略家，总能看见别人看不到的未来。',careers:['科学家','工程师','管理咨询','教授','CTO']},
+    ISTP:{name:'鉴赏家',desc:'冷静、务实、灵活。你动手能力极强，善于在危机中保持冷静并找到解决方案。',careers:['机械师','飞行员','外科医生','工程师','犯罪调查员']},
+    ISFP:{name:'探险家',desc:'温和、艺术、自由。你用独特的美学感知世界，享受当下的每一刻。',careers:['设计师','摄影师','美容师','花艺师','音乐家']},
+    INFP:{name:'调停者',desc:'理想、善良、创造。你内心充满热情，追求意义和价值，相信每个人都可以变得更好。',careers:['作家','心理咨询师','UX设计师','编辑','非营利工作者']},
+    INTP:{name:'逻辑学家',desc:'理性、创新、好奇。你对知识的渴望永无止境，享受解构复杂问题的乐趣。',careers:['程序员','数学家','哲学家','研究员','发明家']},
+    ESTP:{name:'企业家',desc:'大胆、务实、行动派。你活在当下，享受冒险和刺激，是解决实际问题的能手。',careers:['创业者','销售','急救员','运动员','经纪人']},
+    ESFP:{name:'表演者',desc:'热情、活泼、享乐。你是天生的表演者，用笑容感染身边每一个人。',careers:['演员','导游','活动策划','公关','主持人']},
+    ENFP:{name:'竞选者',desc:'热情、创意、社交。你充满奇思妙想，善于发现每个人的闪光点。',careers:['记者','市场营销','创业者','培训师','外交官']},
+    ENTP:{name:'辩论家',desc:'机智、好奇、善辩。你享受智力上的挑战，总能从不同角度看问题。',careers:['律师','企业家','产品经理','投资顾问','建筑师']},
+    ESTJ:{name:'总经理',desc:'高效、务实、领导。你是天生的组织者，善于带领团队达成目标。',careers:['CEO','军官','校长','法官','项目经理']},
+    ESFJ:{name:'执政官',desc:'热心、负责、合群。你注重人际关系和谐，是社区和团队的粘合剂。',careers:['销售经理','教师','医疗管理','活动策划','公关']},
+    ENFJ:{name:'主人公',desc:'魅力、利他、激励。你天生具有领导气质，能激发他人的潜能。',careers:['政治家','培训师','心理咨询师','人力资源总监','校长']},
+    ENTJ:{name:'指挥官',desc:'果断、远见、强势。你是天生的领袖，擅长制定战略并果断执行。',careers:['CEO','企业高管','法官','军事指挥官','管理咨询']}
+  };
+  return map[type] || {name:'未知',desc:'独特的人格',careers:['多领域探索']};
+}
+
+// ============================================================
+//  SAVE RESULT TO LOCAL STORAGE (for "我的" page)
+// ============================================================
+function saveAssessmentResult(scores) {
+  try {
+    var test = TESTS[state.testKey];
+    var now = new Date().toISOString();
+    var sorted = test.dimensions.map(function(d){return {dim:d,score:scores[d]};}).sort(function(a,b){return b.score-a.score;});
+    var payload = { type: state.testKey, name: test.name, completedAt: now, scores: scores };
+
+    if (state.testKey === 'holland') {
+      payload.code = sorted.slice(0,3).map(function(e){return e.dim;}).join('');
+      var typeNames = getHollandTypeNames();
+      payload.summary = typeNames[payload.code];
+      if (!payload.summary) {
+        var dims = sorted.slice(0,3).map(function(e){return test.dimNames[e.dim].split(' ')[0];});
+        payload.summary = dims[0] + '·' + dims[1] + '·' + dims[2] + '型';
+      }
+      localStorage.setItem('holland_result', JSON.stringify(payload));
+    } else if (state.testKey === 'mbti') {
+      payload.type = (scores.EI>=50?'E':'I') + (scores.SN>=50?'S':'N') + (scores.TF>=50?'T':'F') + (scores.JP>=50?'J':'P');
+      payload.summary = getMbtiInfo(payload.type).name;
+      localStorage.setItem('mbti_result', JSON.stringify(payload));
+    } else if (state.testKey === 'disc') {
+      payload.type = sorted[0].dim;
+      payload.summary = getDiscNames()[sorted[0].dim];
+      localStorage.setItem('disc_result', JSON.stringify(payload));
+    } else if (state.testKey === 'bigfive') {
+      payload.summary = test.dimNames[sorted[0].dim];
+      localStorage.setItem('bigfive_result', JSON.stringify(payload));
+    }
+  } catch(e) { console.warn('saveAssessmentResult failed', e); }
+}
+
+// ============================================================
+//  SUPABASE DATA SUBMISSION (uses config.js saveSubmission)
+// ============================================================
+function submitToSupabase(scores) {
+  if (!state.studentInfo) return;
+  // 防止重复提交（同一套测试只提交一次）
+  if (state._submitted) { console.log('[submitToSupabase] 已提交，跳过重复'); return; }
+  state._submitted = true;
+  
+  if (typeof saveSubmission !== 'function') {
+    console.warn('saveSubmission 函数未加载，跳过提交');
+    showToast('⚠️ 配置未加载，结果仅保存在本地');
+    return;
+  }
+  var test = TESTS[state.testKey];
+
+  // Build a result code/summary based on test type
+  var resultCode = '';
+  var resultSummary = '';
+  var sorted = test.dimensions.map(function(d){return {dim:d,score:scores[d]};}).sort(function(a,b){return b.score-a.score;});
+
+  if (state.testKey === 'holland') {
+    resultCode = sorted.slice(0,3).map(function(e){return e.dim;}).join('');
+    var typeNames = getHollandTypeNames();
+    resultSummary = typeNames[resultCode];
+    if (!resultSummary) {
+      var dims = sorted.slice(0,3).map(function(e){return test.dimNames[e.dim].split(' ')[0];});
+      resultSummary = dims[0] + '·' + dims[1] + '·' + dims[2] + '型';
+    }
+  } else if (state.testKey === 'mbti') {
+    resultCode = (scores.EI>=50?'E':'I') + (scores.SN>=50?'S':'N') + (scores.TF>=50?'T':'F') + (scores.JP>=50?'J':'P');
+    var info = getMbtiInfo(resultCode);
+    resultSummary = info.name;
+  } else if (state.testKey === 'disc') {
+    resultCode = sorted[0].dim;
+    var discNames = getDiscNames();
+    resultSummary = discNames[sorted[0].dim];
+  } else {
+    resultCode = sorted[0].dim;
+    resultSummary = test.dimNames[sorted[0].dim];
+  }
+
+  var si = state.studentInfo || {};
+  var payload = {
+    name: si.name || '',
+    school: si.school || '',
+    student_id: si.studentId || '',
+    class_name: si.className || '',
+    test_type: state.testKey,
+    test_name: test.name,
+    answers: state.answers,
+    scores: scores,
+    result_code: resultCode,
+    result_summary: resultSummary
+  };
+
+  // 如果 db 未初始化，尝试重新初始化
+  if (typeof isDbReady === 'function' && !isDbReady() && typeof initSupabase === 'function') {
+    initSupabase();
+  }
+
+  saveSubmission(payload).then(function(result) {
+    if (result && result.savedToCloud) {
+      console.log('✅ 测评结果已提交给老师');
+      showToast('✅ 测评结果已同步到教师端');
+    } else {
+      console.warn('测评结果已保存到本地，未同步到云端');
+      showToast('⚠️ 结果已保存本地，但未同步到云端，请检查网络');
+    }
+  }).catch(function(err) {
+    console.warn('提交失败(不影响查看结果):', err);
+    showToast('❌ 同步失败：' + (err.message || '请检查网络'));
+  });
+}
+
+// ============================================================
+//  INIT
+// ============================================================
+state._locking = false;
+// 调用 config.js 的 initSupabase()，设置全局 db 变量
+if (typeof initSupabase === 'function') {
+  initSupabase();
+} else {
+  console.warn('config.js 未加载，Supabase 无法初始化');
+}
+// 优先恢复已保存的学生信息，没有则先填写
+(function(){
+  try {
+    var saved = localStorage.getItem('assessment_student_info');
+    if (saved) {
+      state.studentInfo = JSON.parse(saved);
+      state._schoolVerified = true;  // 已保存的信息在填写时已验证过学校
+      renderSelect();
+    }
+    else { renderStudentInfo(); }
+  } catch(e) { renderStudentInfo(); }
+})();
+</script>
+</body>
+</html>

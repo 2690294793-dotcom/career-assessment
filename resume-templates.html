@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>规划方案 · 自在生涯工作室</title>
+<style>
+:root {
+  --bg: #faf5ff;
+  --card: #FFFFFF;
+  --text-primary: #1e1b4b;
+  --text-secondary: #6B7280;
+  --text-light: #9CA3AF;
+  --border: #E5E7EB;
+  --primary: #7e22ce;
+  --primary-dark: #4c1d95;
+  --primary-light: #faf5ff;
+  --accent: #a855f7;
+  --radius-sm: 14px;
+  --radius-md: 20px;
+}
+* { margin:0; padding:0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background: var(--bg);
+  display: flex; justify-content: center; align-items: center;
+  min-height: 100vh; padding: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+
+.phone-frame {
+  width: 390px; height: 844px;
+  background: linear-gradient(180deg, #ede9fe 0%, #faf5ff 35%, #ffffff 100%);
+  border-radius: 42px; overflow: hidden;
+  box-shadow: 0 20px 60px rgba(76,29,149,0.15), 0 0 0 1px rgba(126,34,206,0.08);
+  display: flex; flex-direction: column;
+}
+
+/* Nav Header */
+.nav-header {
+  height: 52px; padding: 0 18px;
+  display: flex; align-items: center; justify-content: space-between;
+  background: transparent; flex-shrink: 0;
+}
+.nav-back {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: #fff; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; color: var(--text-primary);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  text-decoration: none;
+}
+.nav-title { font-size: 17px; font-weight: 700; color: var(--text-primary); }
+.nav-placeholder { width: 32px; }
+
+/* Scroll Area */
+.scroll-area {
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  -webkit-overflow-scrolling: touch; padding: 0 18px 16px;
+}
+.scroll-area::-webkit-scrollbar { width: 0; }
+
+/* Page Header */
+.page-header { text-align: center; padding: 8px 0 16px; }
+.page-header h1 {
+  font-size: 24px; font-weight: 800;
+  background: linear-gradient(135deg, #4c1d95, #7e22ce);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.page-header p { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+
+/* Input Form */
+.form-card {
+  background: #fff; border-radius: var(--radius-md);
+  padding: 18px 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+  margin-bottom: 16px;
+}
+.form-section-title {
+  font-size: 15px; font-weight: 700; color: var(--primary);
+  margin-bottom: 14px; display: flex; align-items: center; gap: 6px;
+}
+.input-row { margin-bottom: 12px; }
+.input-row label {
+  display: block; font-size: 12px; font-weight: 600;
+  color: var(--text-primary); margin-bottom: 5px;
+}
+.input-row label .req { color: #ef4444; }
+.input-row input, .input-row select, .input-row textarea {
+  width: 100%; padding: 11px 14px;
+  border: 2px solid var(--border); border-radius: 12px;
+  font-size: 14px; font-family: inherit; color: var(--text-primary);
+  background: #fafafa; outline: none; transition: border-color .2s, background .2s;
+}
+.input-row input:focus, .input-row select:focus, .input-row textarea:focus {
+  border-color: var(--primary); background: #fff;
+}
+.input-row textarea { resize: vertical; min-height: 60px; }
+.input-row select {
+  appearance: none; -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%239CA3AF' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center;
+  padding-right: 36px;
+}
+.inline-2 { display: flex; gap: 10px; }
+.inline-2 .input-row { flex: 1; }
+
+.generate-btn {
+  width: 100%; padding: 14px; border: none; border-radius: 24px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: #fff; font-size: 16px; font-weight: 700; cursor: pointer;
+  font-family: inherit; transition: transform .15s;
+  box-shadow: 0 4px 16px rgba(126,34,206,0.3); margin-top: 4px;
+}
+.generate-btn:active { transform: scale(0.98); }
+
+/* Plan Result */
+.plan-result { display: none; margin-bottom: 16px; }
+.plan-result.show { display: block; animation: fadeIn .4s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.plan-header {
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+  border-radius: var(--radius-md); padding: 20px 18px;
+  color: #fff; margin-bottom: 14px; text-align: center;
+}
+.plan-header .plan-title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+.plan-header .plan-subtitle { font-size: 12px; opacity: 0.85; }
+.plan-header .plan-date { font-size: 11px; opacity: 0.6; margin-top: 8px; }
+
+.plan-section {
+  background: #fff; border-radius: var(--radius-md);
+  padding: 16px; margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.plan-section-header {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 15px; font-weight: 700; color: var(--text-primary);
+  margin-bottom: 12px;
+}
+.plan-section-header .psi {
+  width: 32px; height: 32px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; flex-shrink: 0;
+}
+.psi.purple { background: #ede9fe; }
+.psi.blue { background: #dbeafe; }
+.psi.green { background: #dcfce7; }
+.psi.amber { background: #fef3c7; }
+.psi.rose { background: #fce7f3; }
+
+.plan-item {
+  display: flex; gap: 10px; padding: 8px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+.plan-item:last-child { border-bottom: none; }
+.plan-item-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--accent); margin-top: 6px; flex-shrink: 0;
+}
+.plan-item-body { flex: 1; }
+.plan-item-title { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+.plan-item-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin-top: 2px; }
+
+.plan-actions {
+  display: flex; gap: 10px; margin-top: 4px;
+}
+.save-plan-btn {
+  flex: 1; padding: 13px; border: none; border-radius: 20px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: #fff; font-size: 15px; font-weight: 700; cursor: pointer;
+  font-family: inherit; box-shadow: 0 4px 14px rgba(126,34,206,0.25);
+  transition: transform .15s;
+}
+.save-plan-btn:active { transform: scale(0.98); }
+.regen-btn {
+  padding: 13px 20px; border: 2px solid var(--border); border-radius: 20px;
+  background: #fff; color: var(--text-secondary); font-size: 15px; font-weight: 600;
+  cursor: pointer; font-family: inherit; transition: all .2s;
+}
+.regen-btn:active { background: #f9fafb; }
+
+/* Saved Plans */
+.saved-section { margin-top: 6px; }
+.saved-section-title {
+  font-size: 15px; font-weight: 700; color: var(--text-primary);
+  margin-bottom: 10px; display: flex; align-items: center; gap: 6px;
+}
+.saved-empty {
+  text-align: center; padding: 30px 20px;
+  color: var(--text-light);
+}
+.saved-empty .se-icon { font-size: 36px; margin-bottom: 8px; }
+.saved-empty p { font-size: 13px; }
+.saved-card {
+  background: #fff; border-radius: var(--radius-md);
+  padding: 14px 16px; margin-bottom: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  border-left: 4px solid var(--primary);
+  transition: transform .15s;
+}
+.saved-card:active { transform: scale(0.98); }
+.saved-card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 6px;
+}
+.saved-card-name { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+.saved-card-date { font-size: 11px; color: var(--text-light); }
+.saved-card-info { font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 6px; }
+.saved-card-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+.saved-tag {
+  font-size: 10px; padding: 2px 8px; border-radius: 8px;
+  background: #ede9fe; color: var(--primary); font-weight: 600;
+}
+.saved-card-actions { display: flex; gap: 8px; margin-top: 8px; }
+.saved-view-btn {
+  flex: 1; padding: 8px; border: 1.5px solid var(--primary); border-radius: 14px;
+  background: transparent; color: var(--primary); font-size: 12px; font-weight: 600;
+  cursor: pointer; font-family: inherit;
+}
+.saved-del-btn {
+  padding: 8px 14px; border: 1.5px solid #fecaca; border-radius: 14px;
+  background: transparent; color: #ef4444; font-size: 12px; font-weight: 600;
+  cursor: pointer; font-family: inherit;
+}
+
+/* Bottom Nav */
+.bottom-nav {
+  height: 58px; background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-around;
+  z-index: 100; flex-shrink: 0; padding: 0 4px;
+}
+.nav-item {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  text-decoration: none; cursor: pointer; flex: 1; padding: 6px 0;
+  -webkit-tap-highlight-color: transparent;
+  color: var(--text-light); transition: color 0.2s;
+}
+.nav-item svg { width: 22px; height: 22px; }
+.nav-item span { font-size: 10px; font-weight: 500; }
+.nav-item.active { color: var(--primary); }
+
+/* Toast */
+.toast-el {
+  position: fixed; top: 30px; left: 50%; transform: translateX(-50%) translateY(-120px);
+  background: var(--text-primary); color: #fff; padding: 11px 22px; border-radius: 14px;
+  font-size: 14px; font-weight: 500; z-index: 9999;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15); pointer-events: none;
+  transition: transform .35s cubic-bezier(.175,.885,.32,1.275); white-space: nowrap;
+}
+
+/* Plan Detail Overlay */
+.detail-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 500;
+  display: none; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity 0.3s;
+}
+.detail-overlay.show { display: flex; opacity: 1; }
+.detail-box {
+  width: 340px; max-height: 78vh; overflow-y: auto;
+  background: #fff; border-radius: 22px; padding: 20px 18px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2); position: relative;
+}
+.detail-close {
+  position: absolute; top: 12px; right: 14px;
+  width: 28px; height: 28px; border-radius: 50%;
+  background: #f1f5f9; border: none; cursor: pointer;
+  font-size: 16px; color: var(--text-secondary);
+  display: flex; align-items: center; justify-content: center;
+}
+.detail-title { font-size: 17px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+.detail-sub { font-size: 12px; color: var(--text-secondary); margin-bottom: 14px; }
+</style>
+<script src="https://beacon.cdn.qq.com/sdk/4.5.9/beacon_web.min.js"></script>
+<script>
+(function(){
+  try{
+    var beacon=new BeaconAction({
+      appkey:'0WEB06U85YBSLJNL',
+      versionCode:'1.0.0',
+      channelID:'share',
+      delay:1000,
+      sessionDuration:30*60*1000,
+      isOversea:false,
+      needReportRqdEvent:false
+    });
+    beacon.onDirectUserAction('preview_page_view',{
+      'url':location.href,
+      'referrer':document.referrer,
+      'title':document.title,
+      'sandbox_id':'fa36b86aff3c44c5a750cdf276e0da0c'
+    });
+  }catch(e){}
+})();
+</script></head>
+<body>
+
+<div class="phone-frame">
+
+  <!-- Nav Header -->
+  <div class="nav-header">
+    <a class="nav-back" href="index.html">←</a>
+    <span class="nav-title">规划方案</span>
+    <div class="nav-placeholder"></div>
+  </div>
+
+  <!-- Scroll -->
+  <div class="scroll-area">
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <h1>智能职业规划</h1>
+      <p>输入你的信息，一键生成专属规划方案</p>
+    </div>
+
+    <!-- Input Form -->
+    <div class="form-card">
+      <div class="form-section-title">📝 填写基本信息</div>
+      <div class="input-row">
+        <label>姓名 <span class="req">*</span></label>
+        <input type="text" id="inpName" placeholder="请输入姓名">
+      </div>
+      <div class="inline-2">
+        <div class="input-row">
+          <label>专业 <span class="req">*</span></label>
+          <input type="text" id="inpMajor" placeholder="如：计算机科学">
+        </div>
+        <div class="input-row">
+          <label>年级 <span class="req">*</span></label>
+          <select id="inpGrade">
+            <option value="">请选择</option>
+            <option value="大一">大一</option>
+            <option value="大二">大二</option>
+            <option value="大三">大三</option>
+            <option value="大四">大四</option>
+            <option value="研究生">研究生</option>
+          </select>
+        </div>
+      </div>
+      <div class="input-row">
+        <label>目标职业方向 <span class="req">*</span></label>
+        <select id="inpCareer">
+          <option value="">请选择目标方向</option>
+          <option value="互联网产品">互联网产品（产品经理）</option>
+          <option value="软件开发">软件开发（前端/后端/移动端）</option>
+          <option value="数据分析">数据分析 / 数据科学</option>
+          <option value="市场营销">市场营销 / 品牌运营</option>
+          <option value="金融">金融 / 投行 / 量化</option>
+          <option value="设计">UI/UX设计 / 视觉设计</option>
+          <option value="人力资源">人力资源 / 行政管理</option>
+          <option value="教育培训">教育培训 / 学术研究</option>
+          <option value="公务员">公务员 / 事业单位</option>
+          <option value="创业">自主创业</option>
+        </select>
+      </div>
+      <div class="input-row">
+        <label>兴趣特长（选填）</label>
+        <input type="text" id="inpInterests" placeholder="如：写作、摄影、编程、演讲">
+      </div>
+      <div class="input-row">
+        <label>个人优势 / 自我评价（选填）</label>
+        <textarea id="inpStrengths" placeholder="简述你的优势，如：逻辑思维强、善于沟通、有领导经验等"></textarea>
+      </div>
+      <button class="generate-btn" onclick="generatePlan()">✨ 生成规划方案</button>
+    </div>
+
+    <!-- Plan Result -->
+    <div class="plan-result" id="planResult">
+      <div class="plan-header">
+        <div class="plan-title" id="planTitle">你的专属职业规划</div>
+        <div class="plan-subtitle" id="planSubtitle">基于你的信息定制生成</div>
+        <div class="plan-date" id="planDate"></div>
+      </div>
+      <div id="planContent"></div>
+      <div class="plan-actions">
+        <button class="regen-btn" onclick="regenerate()">↻ 重新生成</button>
+        <button class="save-plan-btn" onclick="savePlan()">💾 保存方案</button>
+      </div>
+    </div>
+
+    <!-- Saved Plans -->
+    <div class="saved-section">
+      <div class="saved-section-title">📂 已保存的方案</div>
+      <div id="savedList"></div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Nav -->
+  <nav class="bottom-nav">
+    <a class="nav-item" href="index.html">
+      <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      <span>首页</span>
+    </a>
+    <a class="nav-item" href="assessment.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+      <span>测评</span>
+    </a>
+    <a class="nav-item" href="consult-flow.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      <span>咨询</span>
+    </a>
+    <a class="nav-item" href="goals.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+      <span>目标</span>
+    </a>
+    <a class="nav-item" href="resume.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span>我的</span>
+    </a>
+  </nav>
+
+</div>
+
+<!-- Detail Overlay -->
+<div class="detail-overlay" id="detailOverlay" onclick="closeDetail(event)">
+  <div class="detail-box" id="detailBox"></div>
+</div>
+
+<div class="toast-el" id="toastEl"></div>
+
+<script>
+// ============ 规划生成引擎 ============
+var CAREER_DB = {
+  '互联网产品': {
+    icon: '📱', color: 'purple',
+    roadmap: [
+      {title:'产品助理 / 实习生', desc:'从需求文档撰写、竞品分析入手，熟悉产品工作全流程'},
+      {title:'产品经理', desc:'独立负责功能模块，主导需求评审、项目跟进与上线复盘'},
+      {title:'高级产品经理', desc:'负责完整产品线，制定产品策略与路线图'},
+      {title:'产品总监', desc:'管理产品团队，把控产品方向与商业模式'}
+    ],
+    timeline: function(grade) {
+      var base = [];
+      if (grade === '大一' || grade === '大二') {
+        base.push({title:'探索期', desc:'参加产品社团、阅读《人人都是产品经理》、关注36氪/虎嗅'});
+        base.push({title:'技能积累', desc:'学习Axure/Figma原型工具、SQL基础、数据分析入门'});
+        base.push({title:'第一份实习', desc:'大二暑假争取产品实习，积累真实项目经验'});
+      } else if (grade === '大三') {
+        base.push({title:'冲刺实习', desc:'3-5月投递暑期实习，重点准备产品面试题'});
+        base.push({title:'秋招准备', desc:'6-8月打磨简历，模拟面试，准备作品集'});
+        base.push({title:'秋招冲刺', desc:'9-11月密集投递，争取产品岗offer'});
+      } else {
+        base.push({title:'春招补录', desc:'3-5月关注补录机会，同时准备毕业设计'});
+        base.push({title:'入职准备', desc:'提前学习目标公司业务，做好入职过渡'});
+      }
+      return base;
+    },
+    skills: [
+      {title:'需求分析', desc:'用户调研、需求拆解、优先级排序（MoSCoW法）'},
+      {title:'原型设计', desc:'Axure / Figma / 墨刀，能独立完成高保真原型'},
+      {title:'数据分析', desc:'SQL查询、Excel透视表、埋点设计、A/B测试'},
+      {title:'项目管理', desc:'敏捷开发流程、Jira使用、跨团队沟通协调'}
+    ],
+    strategy: [
+      {title:'目标公司', desc:'优先投递：字节、腾讯、美团、阿里、小红书等互联网公司'},
+      {title:'简历重点', desc:'突出产品实习经历、个人项目（如产品分析报告、原型作品）'},
+      {title:'面试准备', desc:'准备3个产品案例（STAR法则）、竞品分析、产品改进建议'},
+      {title:'加分项', desc:'运营个人产品博客、参加黑客松、有独立产品作品'}
+    ]
+  },
+  '软件开发': {
+    icon: '💻', color: 'blue',
+    roadmap: [
+      {title:'初级开发工程师', desc:'掌握一门主流语言，能独立完成模块开发'},
+      {title:'中级开发工程师', desc:'负责核心功能开发，参与架构设计讨论'},
+      {title:'高级开发工程师', desc:'主导技术方案，指导初级成员，参与技术选型'},
+      {title:'技术专家 / 架构师', desc:'负责系统架构设计，解决技术难题，把控技术方向'}
+    ],
+    timeline: function(grade) {
+      var base = [];
+      if (grade === '大一' || grade === '大二') {
+        base.push({title:'语言基础', desc:'选定一门语言（Java/Python/Go/JS），系统学习语法与数据结构'});
+        base.push({title:'项目实战', desc:'完成2-3个个人项目，上传GitHub，写好README'});
+        base.push({title:'算法刷题', desc:'LeetCode刷100+题，重点掌握数组、链表、树、动态规划'});
+      } else if (grade === '大三') {
+        base.push({title:'框架深入', desc:'学习主流框架（Spring/React/Vue），理解原理'});
+        base.push({title:'暑期实习', desc:'2-5月投递实习，争取大厂研发岗位'});
+        base.push({title:'秋招冲刺', desc:'7-11月密集投递，准备技术面+HR面'});
+      } else {
+        base.push({title:'春招补录', desc:'3-5月关注补录，查漏补缺'});
+        base.push({title:'入职准备', desc:'复习核心技术栈，了解目标团队技术博客'});
+      }
+      return base;
+    },
+    skills: [
+      {title:'编程语言', desc:'精通至少一门：Java/Python/Go/JavaScript/TypeScript'},
+      {title:'数据结构与算法', desc:'掌握常用数据结构，能写出高效算法，LeetCode 200+题'},
+      {title:'框架与工具', desc:'Git版本控制、Linux基础、Docker容器化、CI/CD流程'},
+      {title:'系统设计', desc:'数据库设计、缓存策略、消息队列、微服务架构基础'}
+    ],
+    strategy: [
+      {title:'目标公司', desc:'大厂（BAT/TMD）+ 独角兽 + 优质创业公司，分层投递'},
+      {title:'简历重点', desc:'突出GitHub项目、技术博客、实习经历、开源贡献'},
+      {title:'面试准备', desc:'算法手撕代码、系统设计题、项目深挖、技术原理问答'},
+      {title:'加分项', desc:'GitHub Star项目、技术博客、ACM/蓝桥杯获奖、开源PR'}
+    ]
+  },
+  '数据分析': {
+    icon: '📊', color: 'green',
+    roadmap: [
+      {title:'数据分析师', desc:'负责日常数据报表、业务监控、专题分析'},
+      {title:'高级数据分析师', desc:'独立完成深度分析，驱动业务决策'},
+      {title:'数据科学家', desc:'建立预测模型，用机器学习解决业务问题'},
+      {title:'数据分析负责人', desc:'管理分析团队，制定数据策略'}
+    ],
+    timeline: function(grade) {
+      var base = [];
+      if (grade === '大一' || grade === '大二') {
+        base.push({title:'工具入门', desc:'学习Excel高级功能、SQL基础、Python/R语法'});
+        base.push({title:'统计基础', desc:'学习概率论、统计学、A/B测试原理'});
+        base.push({title:'实战练习', desc:'Kaggle竞赛入门，用公开数据集做分析报告'});
+      } else if (grade === '大三') {
+        base.push({title:'进阶技能', desc:'学习Tableau/PowerBI可视化、Python Pandas/NumPy'});
+        base.push({title:'实习积累', desc:'争取数据分析实习，积累业务sense'});
+        base.push({title:'秋招冲刺', desc:'9-11月投递，准备SQL笔试+分析案例面'});
+      } else {
+        base.push({title:'春招补录', desc:'3-5月继续投递，完善分析作品集'});
+        base.push({title:'入职准备', desc:'复习SQL窗口函数、业务分析框架'});
+      }
+      return base;
+    },
+    skills: [
+      {title:'SQL', desc:'熟练掌握窗口函数、子查询、多表关联，能写复杂查询'},
+      {title:'Python/R', desc:'Pandas/NumPy数据处理，Matplotlib/Seaborn可视化'},
+      {title:'统计学', desc:'假设检验、回归分析、A/B测试设计、贝叶斯推断'},
+      {title:'商业思维', desc:'理解业务指标体系（AARRR/RFE），能将数据转化为策略'}
+    ],
+    strategy: [
+      {title:'目标公司', desc:'互联网公司数据团队、金融科技、咨询公司数据岗'},
+      {title:'简历重点', desc:'突出分析项目经历、Kaggle成绩、SQL能力、业务洞察'},
+      {title:'面试准备', desc:'SQL手写题、分析案例题、统计学基础、业务理解力'},
+      {title:'加分项', desc:'Kaggle medal、数据分析个人博客、商业分析报告作品'}
+    ]
+  },
+  '市场营销': {
+    icon: '📢', color: 'rose',
+    roadmap: [
+      {title:'市场专员', desc:'协助执行营销活动，管理社交媒体账号'},
+      {title:'市场经理', desc:'独立策划营销 campaign，管理预算与渠道'},
+      {title:'品牌经理', desc:'负责品牌策略与定位，统筹品牌传播'},
+      {title:'市场总监', desc:'管理市场团队，制定整体营销战略'}
+    ],
+    timeline: function(grade) {
+      var base = [];
+      if (grade === '大一' || grade === '大二') {
+        base.push({title:'基础积累', desc:'运营个人社交媒体账号，学习营销理论（4P/STP）'});
+        base.push({title:'实践入门', desc:'加入学校社团宣传部，策划校园活动'});
+        base.push({title:'第一份实习', desc:'大二暑假争取市场/运营实习'});
+      } else if (grade === '大三') {
+        base.push({title:'深度实习', desc:'争取4A广告公司或互联网公司市场部实习'});
+        base.push({title:'作品积累', desc:'整理营销案例集，写营销分析文章'});
+        base.push({title:'秋招冲刺', desc:'9-11月投递管培生/市场岗'});
+      } else {
+        base.push({title:'春招补录', desc:'3-5月继续投递，关注快消/互联网管培生'});
+        base.push({title:'入职准备', desc:'研究目标公司品牌策略，准备case面试'});
+      }
+      return base;
+    },
+    skills: [
+      {title:'内容创作', desc:'文案写作、短视频脚本、社交媒体内容策划'},
+      {title:'数据分析', desc:'投放ROI分析、用户增长指标、社媒数据监控'},
+      {title:'品牌策略', desc:'品牌定位、竞品分析、整合营销传播（IMC）'},
+      {title:'项目管理', desc:'活动策划执行、预算管理、跨部门协调'}
+    ],
+    strategy: [
+      {title:'目标公司', desc:'快消（宝洁/联合利华）、互联网（字节/小红书）、4A广告公司'},
+      {title:'简历重点', desc:'突出实习经历、个人账号运营数据、活动策划案例'},
+      {title:'面试准备', desc:'营销案例分析、品牌策略题、创意能力展示'},
+      {title:'加分项', desc:'个人自媒体账号（粉丝1000+）、营销比赛获奖'}
+    ]
+  },
+  '金融': {
+    icon: '💰', color: 'amber',
+    roadmap: [
+      {title:'分析师', desc:'行业研究、财务建模、投资分析支持'},
+      {title:'高级分析师', desc:'独立撰写研究报告，覆盖特定行业/公司'},
+      {title:'副总裁', desc:'负责客户关系管理，主导项目执行'},
+      {title:'董事总经理', desc:'管理团队，负责业务拓展与战略决策'}
+    ],
+    timeline: function(grade) {
+      var base = [];
+      if (grade === '大一' || grade === '大二') {
+        base.push({title:'专业基础', desc:'学习财务会计、公司金融、投资学核心课程'});
+        base.push({title:'证书起步', desc:'开始备考CFA一级/证券从业资格'});
+        base.push({title:'实习积累', desc:'争取券商/银行/基金公司实习'});
+      } else if (grade === '大三') {
+        base.push({title:'核心实习', desc:'争取投行/行研/PE/VC暑期实习（竞争激烈）'});
+        base.push({title:'建模技能', desc:'熟练Excel财务建模、估值模型（DCF/可比公司）'});
+        base.push({title:'秋招冲刺', desc:'9-11月投递金融岗，准备技术面+行为面'});
+      } else {
+        base.push({title:'春招补录', desc:'3-5月关注银行/券商补录机会'});
+        base.push({title:'入职准备', desc:'复习金融知识，练习建模测试题'});
+      }
+      return base;
+    },
+    skills: [
+      {title:'财务分析', desc:'三大报表分析、财务建模、估值方法（DCF/Comparable）'},
+      {title:'金融知识', desc:'公司金融、投资学、固定收益、衍生品基础'},
+      {title:'工具技能', desc:'Excel高级建模、Bloomberg/Wind终端、Python数据处理'},
+      {title:'证书', desc:'CFA/CPA/FRM（至少通过一级），证券/基金从业资格'}
+    ],
+    strategy: [
+      {title:'目标公司', desc:'投行（中金/中信）、券商研究所、商业银行总行、基金公司'},
+      {title:'简历重点', desc:'突出金融实习、GPA排名、证书、建模能力'},
+      {title:'面试准备', desc:'行为面试（fit question）、技术面（估值/会计）、案例面试'},
+      {title:'加分项', desc:'CFA通过级别、金融建模比赛、高GPA（3.7+）、海外交换'}
+    ]
+  },
+  '设计': {
+    icon: '🎨', color: 'rose',
+    roadmap: [
+      {title:'初级设计师', desc:'完成设计需求，熟悉设计规范与协作流程'},
+      {title:'中级设计师', desc:'独立负责模块设计，参与设计系统建设'},
+      {title:'高级设计师', desc:'主导设计方向，指导初级设计师'},
+      {title:'设计专家 / Leader', desc:'管理设计团队，制定设计策略与标准'}
+    ],
+    timeline: function(grade) {
+      var base = [];
+      if (grade === '大一' || grade === '大二') {
+        base.push({title:'工具 mastery', desc:'精通Figma/Sketch/PS/AI，学习设计理论基础'});
+        base.push({title:'作品积累', desc:'每天练习UI设计，参加Dribbble/站酷挑战'});
+        base.push({title:'实习入门', desc:'争取设计实习，了解真实项目流程'});
+      } else if (grade === '大三') {
+        base.push({title:'深度实习', desc:'争取互联网公司/设计工作室实习'});
+        base.push({title:'作品集打磨', desc:'整理3-5个完整设计案例，展示设计思维'});
+        base.push({title:'秋招冲刺', desc:'9-11月投递设计岗，准备作品集评审'});
+      } else {
+        base.push({title:'春招补录', desc:'3-5月继续投递，更新作品集'});
+        base.push({title:'入职准备', desc:'研究目标公司设计风格，准备设计测试题'});
+      }
+      return base;
+    },
+    skills: [
+      {title:'设计工具', desc:'Figma（核心）、Photoshop、Illustrator、Principle/ProtoPie'},
+      {title:'设计理论', desc:'色彩理论、排版原则、视觉层次、交互设计原则'},
+      {title:'设计系统', desc:'组件库设计、设计规范制定、Material Design/iOS HIG'},
+      {title:'用户研究', desc:'用户访谈、可用性测试、用户旅程地图'}
+    ],
+    strategy: [
+      {title:'目标公司', desc:'互联网公司设计团队、设计工作室、外企设计中心'},
+      {title:'简历重点', desc:'作品集 > 简历，3-5个完整案例展示设计过程与结果'},
+      {title:'面试准备', desc:'作品集讲解、设计测试题、设计思维问答'},
+      {title:'加分项', desc:'Dribbble/站酷高赞作品、设计比赛获奖、个人设计IP'}
+    ]
+  },
+  '人力资源': {
+    icon: '👥', color: 'amber',
+    roadmap: [
+      {title:'HR专员', desc:'负责招聘/培训/薪酬某一模块执行工作'},
+      {title:'HR主管', desc:'独立负责模块运营，参与HR政策制定'},
+      {title:'HR经理', desc:'管理HR团队，统筹多个模块'},
+      {title:'HR总监 / HRBP', desc:'参与公司战略，制定人力资源战略'}
+    ],
+    timeline: function(grade) {
+      var base = [];
+      if (grade === '大一' || grade === '大二') {
+        base.push({title:'理论学习', desc:'学习人力资源管理、组织行为学、劳动法基础'});
+        base.push({title:'社团实践', desc:'在学生会/社团负责人事管理相关工作'});
+        base.push({title:'实习入门', desc:'争取企业HR实习，了解招聘/培训流程'});
+      } else if (grade === '大三') {
+        base.push({title:'深度实习', desc:'争取大厂HR实习或猎头公司实习'});
+        base.push({title:'证书考取', desc:'考取人力资源管理师证书'});
+        base.push({title:'秋招冲刺', desc:'9-11月投递HR管培生岗位'});
+      } else {
+        base.push({title:'春招补录', desc:'3-5月关注企业HR补录'});
+        base.push({title:'入职准备', desc:'了解目标公司文化，准备HR专业面试'});
+      }
+      return base;
+    },
+    skills: [
+      {title:'招聘技能', desc:'简历筛选、面试技巧、人才评估、雇主品牌建设'},
+      {title:'HR理论', desc:'六大模块（招聘/培训/绩效/薪酬/员工关系/规划）'},
+      {title:'沟通协调', desc:'员工沟通、冲突管理、跨部门协作'},
+      {title:'劳动法规', desc:'劳动合同法、社保政策、用工风险防范'}
+    ],
+    strategy: [
+      {title:'目标公司', desc:'大厂HR部门、猎头公司、咨询公司人力咨询岗'},
+      {title:'简历重点', desc:'突出HR实习经历、社团管理经验、沟通能力'},
+      {title:'面试准备', desc:'HR案例分析、行为面试、情景模拟题'},
+      {title:'加分项', desc:'人力资源管理师证书、心理咨询证书、学生干部经历'}
+    ]
+  },
+  '教育培训': {
+    icon: '📚', color: 'green',
+    roadmap: [
+      {title:'助教 / 实习教师', desc:'辅助教学，熟悉教学流程与学生管理'},
+      {title:'专任教师', desc:'独立承担课程教学，参与教研活动'},
+      {title:'骨干教师', desc:'负责学科建设，指导青年教师'},
+      {title:'教研组长 / 系主任', desc:'管理教学团队，制定教学计划'}
+    ],
+    timeline: function(grade) {
+      var base = [];
+      if (grade === '大一' || grade === '大二') {
+        base.push({title:'专业基础', desc:'学习教育学、心理学、学科教学法'});
+        base.push({title:'实践积累', desc:'参加支教/家教/培训机构兼职教学'});
+        base.push({title:'证书准备', desc:'大二开始准备教师资格证笔试'});
+      } else if (grade === '大三') {
+        base.push({title:'考证冲刺', desc:'通过教师资格证笔试+面试'});
+        base.push({title:'教学实习', desc:'争取学校实习机会，积累课堂教学经验'});
+        base.push({title:'秋招准备', desc:'关注教师招聘公告，准备试讲'});
+      } else {
+        base.push({title:'求职冲刺', desc:'关注各区县教师招聘，参加教招考试'});
+        base.push({title:'入职准备', desc:'打磨试讲课程，准备说课/结构化面试'});
+      }
+      return base;
+    },
+    skills: [
+      {title:'教学技能', desc:'课程设计、课堂管理、教学评价、多媒体教学'},
+      {title:'学科知识', desc:'扎实的学科专业知识，能深入浅出讲解'},
+      {title:'教育理论', desc:'教育学原理、发展心理学、教育心理学'},
+      {title:'证书资质', desc:'教师资格证（必备）、普通话证书（二甲以上）'}
+    ],
+    strategy: [
+      {title:'目标单位', desc:'公立学校（教招考试）、私立学校、培训机构、高校辅导员'},
+      {title:'简历重点', desc:'突出教学实习经历、教资证书、学科成绩'},
+      {title:'面试准备', desc:'试讲（15分钟微型课）、说课、结构化面试'},
+      {title:'加分项', desc:'教学比赛获奖、支教经历、班主任实习经验'}
+    ]
+  },
+  '公务员': {
+    icon: '🏛️', color: 'slate',
+    roadmap: [
+      {title:'科员', desc:'熟悉机关工作流程，负责具体业务办理'},
+      {title:'副科级', desc:'负责科室部分工作，参与政策执行'},
+      {title:'正科级', desc:'管理科室工作，统筹业务开展'},
+      {title:'处级及以上', desc:'参与决策，管理较大规模团队'}
+    ],
+    timeline: function(grade) {
+      var base = [];
+      if (grade === '大一' || grade === '大二') {
+        base.push({title:'了解政策', desc:'关注公务员考试动态，了解国考/省考/选调生区别'});
+        base.push({title:'知识积累', desc:'关注时事政治，阅读《半月谈》《人民日报》评论'});
+        base.push({title:'学业保持', desc:'保持高GPA，争取党员身份（选调生必备）'});
+      } else if (grade === '大三') {
+        base.push({title:'系统备考', desc:'开始系统学习行测（言语/数量/判断/资料/常识）'});
+        base.push({title:'申论练习', desc:'每周写1-2篇申论，积累素材与金句'});
+        base.push({title:'模考训练', desc:'每周做1套真题，限时模拟考试节奏'});
+      } else {
+        base.push({title:'国考冲刺', desc:'11-12月参加国家公务员考试'});
+        base.push({title:'省考准备', desc:'次年3-4月参加各省公务员考试'});
+        base.push({title:'面试准备', desc:'笔试通过后，准备结构化面试/无领导小组讨论'});
+      }
+      return base;
+    },
+    skills: [
+      {title:'行测能力', desc:'言语理解、数量关系、判断推理、资料分析、常识判断'},
+      {title:'申论写作', desc:'归纳概括、综合分析、贯彻执行、文章写作'},
+      {title:'政治素养', desc:'党的理论方针政策、时事政治、法律法规基础'},
+      {title:'综合素质', desc:'逻辑思维、文字表达、沟通协调、应急处理'}
+    ],
+    strategy: [
+      {title:'目标岗位', desc:'国考（中央机关）、省考（地方机关）、选调生（优秀毕业生）'},
+      {title:'备考重点', desc:'行测抓资料分析+判断推理（性价比最高），申论重积累+框架'},
+      {title:'面试准备', desc:'结构化面试（综合分析/计划组织/人际沟通/应急处理）'},
+      {title:'加分项', desc:'党员身份、学生干部、基层经历、高学历（选调生要求）'}
+    ]
+  },
+  '创业': {
+    icon: '🚀', color: 'purple',
+    roadmap: [
+      {title:'创业探索', desc:'发现市场机会，验证商业模式'},
+      {title:'启动阶段', desc:'组建团队，开发MVP产品，获取种子用户'},
+      {title:'成长阶段', desc:'获取融资，扩大团队，规模化增长'},
+      {title:'成熟阶段', desc:'建立管理体系，探索第二增长曲线'}
+    ],
+    timeline: function(grade) {
+      var base = [];
+      if (grade === '大一' || grade === '大二') {
+        base.push({title:'创业启蒙', desc:'参加创业社团/比赛（互联网+/挑战杯），阅读创业书籍'});
+        base.push({title:'技能储备', desc:'学习商业计划书撰写、市场调研、财务基础'});
+        base.push({title:'小步尝试', desc:'尝试小成本创业项目（校园电商/自媒体/服务）'});
+      } else if (grade === '大三') {
+        base.push({title:'项目验证', desc:'确定创业方向，做市场验证，获取早期用户反馈'});
+        base.push({title:'团队组建', desc:'寻找技术/运营/市场合伙人，组建核心团队'});
+        base.push({title:'比赛融资', desc:'参加创业大赛，争取种子轮天使投资'});
+      } else {
+        base.push({title:'正式启动', desc:'注册公司，完善产品，正式运营'});
+        base.push({title:'融资拓展', desc:'准备商业计划书，接触投资机构，争取融资'});
+      }
+      return base;
+    },
+    skills: [
+      {title:'商业思维', desc:'商业模式设计、市场分析、竞品研究、财务模型'},
+      {title:'产品能力', desc:'MVP开发、用户需求洞察、产品迭代'},
+      {title:'团队管理', desc:'合伙人选择、团队搭建、股权分配、文化建设'},
+      {title:'融资能力', desc:'商业计划书撰写、投资人沟通、估值谈判'}
+    ],
+    strategy: [
+      {title:'创业方向', desc:'从自身专业/兴趣出发，解决真实问题，避免伪需求'},
+      {title:'资源利用', desc:'利用学校创业孵化器、校友资源、政府创业补贴政策'},
+      {title:'风险控制', desc:'先验证再投入，控制初期成本，保持现金流健康'},
+      {title:'加分准备', desc:'参加互联网+大赛/挑战杯、积累行业人脉、找到靠谱合伙人'}
+    ]
+  }
+};
+
+// ============ State ============
+var currentPlan = null;
+
+// ============ Generate Plan ============
+function generatePlan() {
+  var name = (document.getElementById('inpName').value || '').trim();
+  var major = (document.getElementById('inpMajor').value || '').trim();
+  var grade = (document.getElementById('inpGrade').value || '').trim();
+  var career = (document.getElementById('inpCareer').value || '').trim();
+  var interests = (document.getElementById('inpInterests').value || '').trim();
+  var strengths = (document.getElementById('inpStrengths').value || '').trim();
+
+  if (!name) { showToast('请输入姓名'); document.getElementById('inpName').focus(); return; }
+  if (!major) { showToast('请输入专业'); document.getElementById('inpMajor').focus(); return; }
+  if (!grade) { showToast('请选择年级'); document.getElementById('inpGrade').focus(); return; }
+  if (!career) { showToast('请选择目标职业方向'); document.getElementById('inpCareer').focus(); return; }
+
+  var db = CAREER_DB[career];
+  if (!db) { showToast('未找到该方向的规划模板'); return; }
+
+  var timeline = db.timeline(grade);
+
+  currentPlan = {
+    inputs: { name: name, major: major, grade: grade, career: career, interests: interests, strengths: strengths },
+    plan: {
+      icon: db.icon,
+      color: db.color,
+      roadmap: db.roadmap,
+      timeline: timeline,
+      skills: db.skills,
+      strategy: db.strategy
+    },
+    createdAt: new Date().toISOString()
+  };
+
+  renderPlan(currentPlan);
+  document.getElementById('planResult').classList.add('show');
+  document.getElementById('planResult').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function renderPlan(p) {
+  document.getElementById('planTitle').textContent = p.inputs.name + '的职业规划方案';
+  document.getElementById('planSubtitle').textContent = p.inputs.major + ' · ' + p.inputs.grade + ' · 目标：' + p.inputs.career;
+  document.getElementById('planDate').textContent = '生成时间：' + new Date(p.createdAt).toLocaleString('zh-CN');
+
+  var d = p.plan;
+  var html = '';
+
+  // Roadmap
+  html += '<div class="plan-section">' +
+    '<div class="plan-section-header"><div class="psi ' + d.color + '">' + d.icon + '</div>🗺️ 职业路线图</div>';
+  d.roadmap.forEach(function(item, i) {
+    html += '<div class="plan-item"><div class="plan-item-dot"></div><div class="plan-item-body">' +
+      '<div class="plan-item-title">' + (i+1) + '. ' + item.title + '</div>' +
+      '<div class="plan-item-desc">' + item.desc + '</div></div></div>';
+  });
+  html += '</div>';
+
+  // Timeline
+  html += '<div class="plan-section">' +
+    '<div class="plan-section-header"><div class="psi ' + d.color + '">⏰</div>时间规划</div>';
+  d.timeline.forEach(function(item, i) {
+    html += '<div class="plan-item"><div class="plan-item-dot"></div><div class="plan-item-body">' +
+      '<div class="plan-item-title">' + item.title + '</div>' +
+      '<div class="plan-item-desc">' + item.desc + '</div></div></div>';
+  });
+  html += '</div>';
+
+  // Skills
+  html += '<div class="plan-section">' +
+    '<div class="plan-section-header"><div class="psi ' + d.color + '">📈</div>技能提升计划</div>';
+  d.skills.forEach(function(item, i) {
+    html += '<div class="plan-item"><div class="plan-item-dot"></div><div class="plan-item-body">' +
+      '<div class="plan-item-title">' + item.title + '</div>' +
+      '<div class="plan-item-desc">' + item.desc + '</div></div></div>';
+  });
+  html += '</div>';
+
+  // Strategy
+  html += '<div class="plan-section">' +
+    '<div class="plan-section-header"><div class="psi ' + d.color + '">💼</div>求职策略</div>';
+  d.strategy.forEach(function(item, i) {
+    html += '<div class="plan-item"><div class="plan-item-dot"></div><div class="plan-item-body">' +
+      '<div class="plan-item-title">' + item.title + '</div>' +
+      '<div class="plan-item-desc">' + item.desc + '</div></div></div>';
+  });
+  html += '</div>';
+
+  // Personalized tips
+  if (p.inputs.interests || p.inputs.strengths) {
+    html += '<div class="plan-section">' +
+      '<div class="plan-section-header"><div class="psi ' + d.color + '">✨</div>个性化建议</div>';
+    if (p.inputs.interests) {
+      html += '<div class="plan-item"><div class="plan-item-dot"></div><div class="plan-item-body">' +
+        '<div class="plan-item-title">结合你的兴趣特长</div>' +
+        '<div class="plan-item-desc">你的兴趣（' + esc(p.inputs.interests) + '）可以与' + p.inputs.career + '方向结合，' +
+        '比如在求职简历中突出相关经历，或在工作中发挥这些特长形成差异化优势。</div></div></div>';
+    }
+    if (p.inputs.strengths) {
+      html += '<div class="plan-item"><div class="plan-item-dot"></div><div class="plan-item-body">' +
+        '<div class="plan-item-title">发挥你的个人优势</div>' +
+        '<div class="plan-item-desc">基于你的自我评价（' + esc(p.inputs.strengths) + '），' +
+        '建议在' + p.inputs.career + '领域中选择能最大化发挥这些优势的岗位，扬长避短。</div></div></div>';
+    }
+    html += '</div>';
+  }
+
+  document.getElementById('planContent').innerHTML = html;
+}
+
+function regenerate() {
+  document.getElementById('planResult').classList.remove('show');
+  currentPlan = null;
+  document.querySelector('.form-card').scrollIntoView({ behavior: 'smooth' });
+}
+
+// ============ Save Plan ============
+function savePlan() {
+  if (!currentPlan) { showToast('请先生成规划方案'); return; }
+
+  var saved = getSavedPlans();
+  var planToSave = JSON.parse(JSON.stringify(currentPlan));
+  planToSave.id = Date.now();
+  saved.unshift(planToSave);
+  localStorage.setItem('saved_plans', JSON.stringify(saved));
+
+  showToast('✅ 方案已保存，可在「我的」页面查看');
+  renderSavedPlans();
+}
+
+function getSavedPlans() {
+  try {
+    return JSON.parse(localStorage.getItem('saved_plans') || '[]');
+  } catch(e) { return []; }
+}
+
+function renderSavedPlans() {
+  var saved = getSavedPlans();
+  var container = document.getElementById('savedList');
+
+  if (saved.length === 0) {
+    container.innerHTML = '<div class="saved-empty"><div class="se-icon">📋</div><p>暂无已保存的方案<br>填写信息生成你的第一个规划方案</p></div>';
+    return;
+  }
+
+  container.innerHTML = saved.map(function(p, i) {
+    return '<div class="saved-card">' +
+      '<div class="saved-card-header">' +
+        '<div class="saved-card-name">' + esc(p.inputs.name) + ' · ' + esc(p.inputs.career) + '</div>' +
+        '<div class="saved-card-date">' + new Date(p.createdAt).toLocaleDateString('zh-CN') + '</div>' +
+      '</div>' +
+      '<div class="saved-card-info">' + esc(p.inputs.major) + ' · ' + esc(p.inputs.grade) + '</div>' +
+      '<div class="saved-card-tags">' +
+        '<span class="saved-tag">路线图</span>' +
+        '<span class="saved-tag">时间规划</span>' +
+        '<span class="saved-tag">技能计划</span>' +
+        '<span class="saved-tag">求职策略</span>' +
+      '</div>' +
+      '<div class="saved-card-actions">' +
+        '<button class="saved-view-btn" onclick="viewSavedPlan(' + i + ')">查看详情</button>' +
+        '<button class="saved-del-btn" onclick="deletePlan(' + i + ')">删除</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function viewSavedPlan(index) {
+  var saved = getSavedPlans();
+  var p = saved[index];
+  if (!p) return;
+
+  var d = p.plan;
+  var html = '<button class="detail-close" onclick="closeDetail()">✕</button>' +
+    '<div class="detail-title">' + esc(p.inputs.name) + '的职业规划</div>' +
+    '<div class="detail-sub">' + esc(p.inputs.major) + ' · ' + esc(p.inputs.grade) + ' · ' + esc(p.inputs.career) + ' · ' + new Date(p.createdAt).toLocaleString('zh-CN') + '</div>';
+
+  function renderSection(icon, title, items) {
+    var h = '<div style="margin-bottom:14px;">' +
+      '<div style="font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:8px;">' + icon + ' ' + title + '</div>';
+    items.forEach(function(item, i) {
+      h += '<div style="display:flex;gap:8px;padding:6px 0;border-bottom:1px solid #f3f4f6;">' +
+        '<div style="width:6px;height:6px;border-radius:50%;background:var(--accent);margin-top:6px;flex-shrink:0;"></div>' +
+        '<div style="flex:1;"><div style="font-size:13px;font-weight:600;color:var(--text-primary);">' + (item.title || (i+1)) + '</div>' +
+        '<div style="font-size:12px;color:var(--text-secondary);line-height:1.5;margin-top:2px;">' + esc(item.desc || '') + '</div></div></div>';
+    });
+    h += '</div>';
+    return h;
+  }
+
+  html += renderSection('🗺️', '职业路线图', d.roadmap);
+  html += renderSection('⏰', '时间规划', d.timeline);
+  html += renderSection('📈', '技能提升', d.skills);
+  html += renderSection('💼', '求职策略', d.strategy);
+
+  document.getElementById('detailBox').innerHTML = html;
+  document.getElementById('detailOverlay').classList.add('show');
+}
+
+function closeDetail(e) {
+  if (e && e.target !== document.getElementById('detailOverlay')) return;
+  document.getElementById('detailOverlay').classList.remove('show');
+}
+
+function deletePlan(index) {
+  var saved = getSavedPlans();
+  saved.splice(index, 1);
+  localStorage.setItem('saved_plans', JSON.stringify(saved));
+  showToast('方案已删除');
+  renderSavedPlans();
+}
+
+// ============ Utils ============
+function showToast(msg) {
+  var el = document.getElementById('toastEl');
+  el.textContent = msg;
+  el.style.transform = 'translateX(-50%) translateY(0)';
+  clearTimeout(window._toastT);
+  window._toastT = setTimeout(function() {
+    el.style.transform = 'translateX(-50%) translateY(-120px)';
+  }, 2200);
+}
+
+function esc(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// ============ INIT ============
+renderSavedPlans();
+</script>
+</body>
+</html>

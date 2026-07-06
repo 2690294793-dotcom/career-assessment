@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>目标进度 · 自在生涯工作室</title>
+<style>
+  :root {
+    --primary: #7e22ce;
+    --primary-dark: #4c1d95;
+    --primary-light: #faf5ff;
+    --accent: #a855f7;
+    --success: #059669;
+    --bg: #faf5ff;
+    --card: #FFFFFF;
+    --text-primary: #1e1b4b;
+    --text-secondary: #6B7280;
+    --border: #E5E7EB;
+    --radius-sm: 12px;
+    --radius-md: 16px;
+    --radius-lg: 20px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    display: flex; justify-content: center; align-items: center;
+    min-height: 100vh; padding: 20px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .phone {
+    width: 390px; height: 844px;
+    background: var(--bg);
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 30px 80px rgba(76,29,149,0.25), 0 0 0 2px #3b0764;
+    display: flex; flex-direction: column;
+  }
+  .page-body {
+    flex: 1; overflow-y: auto; padding: 20px 16px 80px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .page-body::-webkit-scrollbar { width: 3px; }
+  .page-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  .page-title { font-size: 22px; font-weight: 800; color: var(--text-primary); }
+  .page-subtitle { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+
+  /* ===== Stats ===== */
+  .stats-row { display: flex; gap: 10px; }
+  .stat-card {
+    flex: 1; background: var(--card); border-radius: var(--radius-sm); padding: 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03); text-align: center;
+  }
+  .stat-val { font-size: 26px; font-weight: 800; color: var(--primary); }
+  .stat-label { font-size: 11px; color: var(--text-secondary); margin-top: 4px; }
+
+  /* ===== Goal Card ===== */
+  .goal-card {
+    background: var(--card); border-radius: var(--radius-md); padding: 16px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.04); transition: all 0.2s;
+  }
+  .goal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .goal-cat { font-size: 11px; padding: 3px 10px; border-radius: 10px; font-weight: 600; }
+  .cat-resume { background: #ede9fe; color: #7e22ce; }
+  .cat-interview { background: #fce7f3; color: #be185d; }
+  .cat-skill { background: #dbeafe; color: #1d4ed8; }
+  .cat-net { background: #dcfce7; color: #15803d; }
+  .cat-apply { background: #fef3c7; color: #b45309; }
+  .goal-progress { font-size: 12px; color: var(--text-secondary); font-weight: 700; }
+  .goal-title { font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+  .goal-desc { font-size: 12px; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.5; }
+  .goal-bar-wrap { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; margin-bottom: 8px; }
+  .goal-bar { height: 100%; border-radius: 4px; transition: width 0.5s; }
+
+  /* ===== Steps List ===== */
+  .steps-wrap {
+    margin-top: 4px; padding-top: 6px;
+    border-top: 1px solid var(--border);
+    overflow: hidden; transition: max-height 0.35s ease;
+  }
+  .steps-wrap.collapsed { max-height: 0 !important; padding-top: 0; border-top: none; }
+  .step-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 0; cursor: pointer;
+    transition: background 0.15s;
+    border-radius: 6px; padding-left: 4px;
+  }
+  .step-row:active { background: var(--primary-light); }
+  .step-check {
+    width: 20px; height: 20px; min-width: 20px;
+    border-radius: 50%; border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; transition: all 0.2s;
+    color: transparent;
+  }
+  .step-check.done {
+    background: var(--success); border-color: var(--success); color: #fff;
+  }
+  .step-text { font-size: 13px; color: var(--text-primary); flex: 1; }
+  .step-text.done { color: var(--text-light); text-decoration: line-through; }
+
+  .steps-toggle {
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 12px; color: var(--accent); font-weight: 600;
+    margin-bottom: 6px; cursor: pointer; padding: 2px 0;
+  }
+  .steps-count { font-size: 11px; color: var(--text-light); font-weight: 400; }
+
+  /* ===== Add Step ===== */
+  .add-step-row {
+    display: flex; gap: 6px; margin-top: 8px; padding-top: 6px;
+    border-top: 1px dashed var(--border);
+  }
+  .add-step-input {
+    flex: 1; height: 36px; background: #F5F5F7; border: 2px solid transparent;
+    border-radius: 8px; padding: 0 10px; font-size: 12px; color: var(--text-primary);
+    outline: none; font-family: inherit;
+  }
+  .add-step-input:focus { border-color: var(--primary); background: #fff; }
+  .add-step-btn {
+    width: 36px; height: 36px; border-radius: 18px; border: none;
+    background: var(--primary-light); color: var(--primary);
+    font-size: 18px; font-weight: 700; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .add-step-btn:active { opacity: 0.7; }
+  .del-step {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: #FEE2E2; color: #EF4444; border: none;
+    font-size: 10px; cursor: pointer; display: flex;
+    align-items: center; justify-content: center;
+    opacity: 0; transition: opacity 0.15s; flex-shrink: 0;
+  }
+  .step-row:hover .del-step { opacity: 1; }
+
+  /* ===== Goal Actions ===== */
+  .goal-actions { display: flex; gap: 8px; margin-top: 10px; }
+  .goal-act {
+    padding: 6px 14px; border-radius: 16px; font-size: 11px; font-weight: 600;
+    border: none; cursor: pointer; transition: all 0.2s;
+  }
+  .act-steps { background: var(--primary-light); color: var(--primary); }
+  .act-done { background: #D1FAE5; color: var(--success); }
+  .act-del { background: #FEE2E2; color: #EF4444; }
+  .goal-act:active { opacity: 0.7; }
+
+  .goal-done { opacity: 0.55; }
+  .goal-done .goal-title { text-decoration: line-through; }
+  .goal-done .goal-bar { background: #a7f3d0 !important; }
+  .done-badge { font-size: 10px; color: #fff; background: var(--success); padding: 2px 8px; border-radius: 8px; }
+
+  /* ===== Add Goal ===== */
+  .add-card {
+    background: var(--card); border-radius: var(--radius-md); padding: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+    border: 2px dashed var(--border);
+  }
+  .add-title { font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 14px; }
+  .add-input {
+    width: 100%; height: 44px; background: #F5F5F7; border: 2px solid transparent;
+    border-radius: 10px; padding: 0 14px; font-size: 14px; color: var(--text-primary);
+    outline: none; margin-bottom: 10px; transition: border 0.2s;
+    font-family: inherit;
+  }
+  .add-input:focus { border-color: var(--primary); background: #fff; }
+  .add-input[type="date"] { -webkit-appearance: none; appearance: none; cursor: pointer; }
+  .add-input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.6; cursor: pointer; }
+  .add-row { display: flex; gap: 10px; margin-bottom: 10px; }
+  .add-select {
+    flex: 1; height: 44px; background: #F5F5F7; border: 2px solid transparent;
+    border-radius: 10px; padding: 0 14px; font-size: 14px; color: var(--text-primary);
+    outline: none; cursor: pointer; font-family: inherit; -webkit-appearance: none;
+  }
+  .add-select:focus { border-color: var(--primary); background: #fff; }
+  .btn-add {
+    width: 100%; padding: 14px; border-radius: 25px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: #fff; font-size: 15px; font-weight: 700;
+    border: none; cursor: pointer;
+    box-shadow: 0 4px 14px rgba(126,34,206,0.3);
+  }
+  .btn-add:active { transform: scale(0.97); }
+  .add-toggle {
+    text-align: center; padding: 12px; color: var(--accent); font-size: 13px; font-weight: 600;
+    cursor: pointer; border-radius: var(--radius-sm); background: var(--card);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+  }
+
+  /* ===== Bottom Nav ===== */
+  .bottom-nav {
+    height: 64px; background: #fff; border-top: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-around;
+    flex-shrink: 0; z-index: 100; padding-bottom: 8px;
+  }
+  .nav-item {
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    text-decoration: none; cursor: pointer; padding: 6px 12px;
+    transition: all 0.2s; font-size: 10px; color: var(--text-light);
+  }
+  .nav-item svg { width: 22px; height: 22px; }
+  .nav-item.active { color: var(--primary); }
+
+  .toast {
+    position: fixed; top: 60px; left: 50%; transform: translateX(-50%);
+    background: rgba(30,27,75,0.9); color: #fff; padding: 10px 20px;
+    border-radius: 20px; font-size: 13px; z-index: 999;
+    opacity: 0; transition: opacity 0.3s;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; }
+
+  .step-desc { font-size: 12px; color: var(--text-secondary); margin-top: 2px; font-weight: 400; }
+
+  /* ===== Empty State ===== */
+  .empty-state {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 48px 24px 32px; text-align: center;
+  }
+  .empty-illustration {
+    width: 120px; height: 120px; margin-bottom: 20px;
+    background: linear-gradient(145deg, #ede9fe, #faf5ff);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 52px;
+    box-shadow: 0 8px 32px rgba(126,34,206,0.10);
+    animation: floatY 3s ease-in-out infinite;
+  }
+  @keyframes floatY {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+  .empty-title { font-size: 18px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px; }
+  .empty-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 24px; max-width: 260px; }
+  .empty-btn {
+    padding: 12px 32px; border-radius: 25px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: #fff; font-size: 15px; font-weight: 700;
+    border: none; cursor: pointer;
+    box-shadow: 0 4px 14px rgba(126,34,206,0.30);
+    transition: transform 0.2s;
+  }
+  .empty-btn:active { transform: scale(0.96); }
+</style>
+<script src="https://beacon.cdn.qq.com/sdk/4.5.9/beacon_web.min.js"></script>
+<script>
+(function(){
+  try{
+    var beacon=new BeaconAction({
+      appkey:'0WEB06U85YBSLJNL',
+      versionCode:'1.0.0',
+      channelID:'share',
+      delay:1000,
+      sessionDuration:30*60*1000,
+      isOversea:false,
+      needReportRqdEvent:false
+    });
+    beacon.onDirectUserAction('preview_page_view',{
+      'url':location.href,
+      'referrer':document.referrer,
+      'title':document.title,
+      'sandbox_id':'fa36b86aff3c44c5a750cdf276e0da0c'
+    });
+  }catch(e){}
+})();
+</script></head>
+<body>
+<div class="phone">
+  <div class="page-body" id="pageBody"></div>
+
+  <div class="bottom-nav">
+    <a class="nav-item" href="index.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>首页</span>
+    </a>
+    <a class="nav-item" href="assessment.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      <span>测评</span>
+    </a>
+    <a class="nav-item" href="consult-flow.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <span>咨询</span>
+    </a>
+    <a class="nav-item active" href="goals.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      <span>目标</span>
+    </a>
+    <a class="nav-item" href="resume.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span>我的</span>
+    </a>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+var STORAGE_KEY = 'career_goals_v2';
+var EXPANDED = {};
+
+/* 计算目标进度 = 已完成步骤数 / 总步骤数 */
+function calcProgress(g) {
+  if (!g.steps || g.steps.length === 0) return 0;
+  var done = g.steps.filter(function(s){ return s.done; }).length;
+  return Math.round(done / g.steps.length * 100);
+}
+
+function loadGoals() {
+  try {
+    var d = localStorage.getItem(STORAGE_KEY);
+    if (d) {
+      var parsed = JSON.parse(d);
+      parsed.forEach(function(g) { if (!g.steps) g.steps = []; });
+      return parsed;
+    }
+  } catch(e) {}
+  return [];
+}
+
+function saveGoals() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(goals));
+}
+
+var goals = loadGoals();
+var showAdd = false;
+
+/* 每次渲染前刷新所有目标的progress（防止旧数据没有实时进度） */
+function refreshAllProgress() {
+  goals.forEach(function(g) {
+    g.progress = calcProgress(g);
+    if (g.progress >= 100 && !g.done) { g.done = true; }
+  });
+}
+
+function render() {
+  refreshAllProgress();
+  var activeGoals = goals.filter(function(g) { return !g.done; });
+  var doneGoals = goals.filter(function(g) { return g.done; });
+  var totalProgress = goals.length
+    ? Math.round(goals.reduce(function(s,g){return s + (g.progress || 0);},0) / goals.length)
+    : 0;
+
+  var html = '';
+
+  /* 空状态 */
+  if (goals.length === 0 && !showAdd) {
+    html += '<div class="empty-state">'+
+      '<div class="empty-illustration">🎯</div>'+
+      '<div class="empty-title">还没有目标</div>'+
+      '<div class="empty-desc">创建你的第一个职业目标吧！<br>拆解成子步骤，一步步达成 ✨</div>'+
+      '<button class="empty-btn" onclick="toggleAdd()">+ 创建第一个目标</button>'+
+    '</div>';
+    document.getElementById('pageBody').innerHTML = html;
+    return;
+  }
+
+  html += '<div><div class="page-title">目标进度</div><div class="page-subtitle">每完成一个子步骤，进度自动更新</div></div>';
+
+  html += '<div class="stats-row">'+
+    '<div class="stat-card"><div class="stat-val">'+goals.length+'</div><div class="stat-label">总目标</div></div>'+
+    '<div class="stat-card"><div class="stat-val">'+doneGoals.length+'</div><div class="stat-label">已完成</div></div>'+
+    '<div class="stat-card"><div class="stat-val">'+totalProgress+'%</div><div class="stat-label">总进度</div></div>'+
+  '</div>';
+
+  if (activeGoals.length > 0) {
+    html += '<div style="font-size:14px;font-weight:700;color:var(--text-primary);padding-top:6px;">进行中 ('+activeGoals.length+')</div>';
+    activeGoals.forEach(function(g) { html += renderGoalCard(g); });
+  }
+
+  if (doneGoals.length > 0) {
+    html += '<div style="font-size:14px;font-weight:700;color:var(--text-primary);padding-top:6px;">已完成 ('+doneGoals.length+')</div>';
+    doneGoals.forEach(function(g) { html += renderGoalCard(g); });
+  }
+
+  html += '<div class="add-toggle" onclick="toggleAdd()">'+(showAdd ? '收起 ▲' : '+ 新建目标')+'</div>';
+
+  if (showAdd) {
+    html += '<div class="add-card">'+
+      '<div class="add-title">✏️ 新建目标</div>'+
+      '<input class="add-input" id="newTitle" placeholder="目标名称（必填）" maxlength="30">'+
+      '<input class="add-input" id="newDesc" placeholder="描述（可选）">'+
+      '<div class="add-row">'+
+        '<select class="add-select" id="newCat"><option value="简历优化">简历优化</option><option value="面试准备">面试准备</option><option value="技能提升">技能提升</option><option value="人脉拓展">人脉拓展</option><option value="求职投递">求职投递</option></select>'+
+        '<input class="add-input" id="newDeadline" type="date" placeholder="截止日期" style="flex:1;margin-bottom:0;">'+
+      '</div>'+
+      '<div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;">子步骤（每行一个，可选）</div>'+
+      '<textarea class="add-input" id="newSteps" placeholder="步骤1&#10;步骤2&#10;步骤3" style="height:80px;resize:vertical;padding-top:10px;font-size:13px;line-height:1.8;margin-bottom:14px;"></textarea>'+
+      '<button class="btn-add" onclick="addGoal()">创建目标</button>'+
+    '</div>';
+  }
+
+  document.getElementById('pageBody').innerHTML = html;
+}
+
+function renderGoalCard(g) {
+  var catClassMap = { '简历优化':'cat-resume','面试准备':'cat-interview','技能提升':'cat-skill','人脉拓展':'cat-net','求职投递':'cat-apply' };
+  var cc = catClassMap[g.cat] || 'cat-resume';
+  var pct = g.progress || calcProgress(g);
+  var steps = g.steps || [];
+  var doneCount = steps.filter(function(s){ return s.done; }).length;
+  var isExpanded = EXPANDED[g.id] || false;
+  var maxStepsH = Math.max(60, steps.length * 32 + 20);
+
+  var stepsHtml = '';
+  if (steps.length > 0) {
+    stepsHtml += '<div class="steps-toggle" onclick="event.stopPropagation();toggleSteps('+g.id+')">'+
+      '<span>'+(isExpanded ? '▾' : '▸')+' 子步骤清单</span>'+
+      '<span class="steps-count">'+doneCount+'/'+steps.length+'</span>'+
+    '</div>'+
+    '<div class="steps-wrap'+(isExpanded ? '' : ' collapsed')+'" style="max-height:'+maxStepsH+'px;" id="steps-'+g.id+'">';
+
+    steps.forEach(function(s, i) {
+      stepsHtml += '<div class="step-row" onclick="event.stopPropagation();toggleStep('+g.id+','+i+')">'+
+        '<div class="step-check'+(s.done ? ' done' : '')+'">'+(s.done ? '✓' : '')+'</div>'+
+        '<span class="step-text'+(s.done ? ' done' : '')+'">'+escapeHtml(s.text)+'</span>'+
+        '<button class="del-step" onclick="event.stopPropagation();deleteStep('+g.id+','+i+')">×</button>'+
+      '</div>';
+    });
+
+    if (!g.done) {
+      stepsHtml += '<div class="add-step-row">'+
+        '<input class="add-step-input" id="addStepInput-'+g.id+'" placeholder="新增子步骤…" maxlength="50" onkeydown="if(event.key===\'Enter\')addStep('+g.id+')">'+
+        '<button class="add-step-btn" onclick="event.stopPropagation();addStep('+g.id+')">+</button>'+
+      '</div>';
+    }
+
+    stepsHtml += '</div>';
+  }
+
+  return '<div class="goal-card'+(g.done?' goal-done':'')+'">'+
+    '<div class="goal-header">'+
+      '<span class="goal-cat '+cc+'">'+g.cat+'</span>'+
+      '<span class="goal-progress">'+(g.done?'<span class="done-badge">✓ 已完成</span>':pct+'%')+'</span>'+
+    '</div>'+
+    '<div class="goal-title">'+g.title+'</div>'+
+    '<div class="goal-desc">'+g.desc+'</div>'+
+    '<div class="goal-bar-wrap"><div class="goal-bar" style="width:'+pct+'%;background:'+g.color+'"></div></div>'+
+    '<div class="goal-meta"><span>⏰ '+g.deadline+'</span><span style="color:'+(g.done?'var(--success)':'var(--text-light)')+';">'+doneCount+'/'+steps.length+' 步</span></div>'+
+    stepsHtml +
+    (g.done ? '<div class="goal-actions"><button class="goal-act act-del" onclick="event.stopPropagation();deleteGoal('+g.id+')">🗑 删除</button></div>' :
+     '<div class="goal-actions">'+
+       '<button class="goal-act act-steps" onclick="event.stopPropagation();toggleSteps('+g.id+')">'+(isExpanded?'▲ 收起子步骤':'☰ 展开子步骤')+'</button>'+
+       '<button class="goal-act act-done" onclick="event.stopPropagation();markDone('+g.id+')">✓ 全部完成</button>'+
+       '<button class="goal-act act-del" onclick="event.stopPropagation();deleteGoal('+g.id+')">🗑</button>'+
+     '</div>')+
+  '</div>';
+}
+
+function escapeHtml(s) {
+  var d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+/* ---------- Actions ---------- */
+
+function toggleSteps(id) {
+  EXPANDED[id] = !EXPANDED[id];
+  refreshRender();
+}
+
+function toggleStep(gid, si) {
+  var g = goals.find(function(x){ return x.id === gid; });
+  if (!g || !g.steps) return;
+  g.steps[si].done = !g.steps[si].done;
+  g.progress = calcProgress(g);
+  if (g.progress >= 100 && !g.done) { g.done = true; showToast('🎉 目标达成！'); }
+  saveGoals();
+  refreshRender();
+}
+
+function addStep(gid) {
+  var inp = document.getElementById('addStepInput-'+gid);
+  var text = inp ? inp.value.trim() : '';
+  if (!text) { showToast('请输入子步骤内容'); return; }
+  var g = goals.find(function(x){ return x.id === gid; });
+  if (!g) return;
+  if (!g.steps) g.steps = [];
+  g.steps.push({text: text, done: false});
+  g.progress = calcProgress(g);
+  saveGoals();
+  EXPANDED[gid] = true;
+  refreshRender();
+}
+
+function deleteStep(gid, si) {
+  var g = goals.find(function(x){ return x.id === gid; });
+  if (!g || !g.steps) return;
+  g.steps.splice(si, 1);
+  g.progress = calcProgress(g);
+  saveGoals();
+  refreshRender();
+}
+
+function markDone(id) {
+  var g = goals.find(function(x){ return x.id === id; });
+  if (!g) return;
+  if (g.steps) g.steps.forEach(function(s){ s.done = true; });
+  g.progress = 100;
+  g.done = true;
+  saveGoals();
+  refreshRender();
+  showToast('🎉 目标已完成！');
+}
+
+function deleteGoal(id) {
+  goals = goals.filter(function(x){ return x.id !== id; });
+  delete EXPANDED[id];
+  saveGoals();
+  refreshRender();
+  showToast('目标已删除');
+}
+
+function toggleAdd() { showAdd = !showAdd; render(); if (showAdd) { setTimeout(function(){ var d = new Date(); var s = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); var el = document.getElementById('newDeadline'); if (el) el.value = s; }, 50); } }
+
+function addGoal() {
+  var title = document.getElementById('newTitle').value.trim();
+  if (!title) { showToast('请输入目标名称'); return; }
+  var desc = document.getElementById('newDesc').value.trim();
+  var cat = document.getElementById('newCat').value;
+  var deadline = document.getElementById('newDeadline').value.trim() || '未设截止';
+  var stepsRaw = document.getElementById('newSteps').value.trim();
+  var steps = [];
+  if (stepsRaw) {
+    steps = stepsRaw.split('\n').filter(function(l){ return l.trim(); }).map(function(l){
+      return {text: l.trim(), done: false};
+    });
+  }
+
+  var catColorMap = {
+    '简历优化':'linear-gradient(90deg,#7e22ce,#a855f7)',
+    '面试准备':'linear-gradient(90deg,#be185d,#f472b6)',
+    '技能提升':'linear-gradient(90deg,#1d4ed8,#60a5fa)',
+    '人脉拓展':'linear-gradient(90deg,#15803d,#4ade80)',
+    '求职投递':'linear-gradient(90deg,#b45309,#fbbf24)'
+  };
+
+  var g = {
+    id: Date.now(),
+    title: title,
+    desc: desc || '努力推进中…',
+    cat: cat,
+    color: catColorMap[cat] || 'linear-gradient(90deg,#7e22ce,#a855f7)',
+    deadline: deadline,
+    done: false,
+    steps: steps,
+    progress: 0
+  };
+
+  goals.push(g);
+  saveGoals();
+  showAdd = false;
+  showToast(steps.length ? '目标已创建（'+steps.length+'个子步骤）✅' : '目标已创建 ✅');
+  render();
+}
+
+function refreshRender() {
+  // 轻量刷新：不重置 showAdd 状态
+  render();
+}
+
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2000);
+}
+
+render();
+</script>
+</body>
+</html>

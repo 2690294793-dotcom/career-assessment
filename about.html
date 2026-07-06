@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>关于我们 · 自在生涯工作室</title>
+<style>
+:root {
+  --bg: #FAF8F5;
+  --card: #FFFFFF;
+  --text-primary: #2D2D2D;
+  --text-secondary: #8E8E93;
+  --text-light: #B0B0B8;
+  --border: #F0EDEA;
+  --accent: #C88EA7;
+  --accent-soft: #F5EDF1;
+  --accent-gradient: linear-gradient(135deg, #D4A08A, #C88EA7, #B8869F);
+  --radius-sm: 14px;
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background: #EDE8E3;
+  display: flex; justify-content: center; align-items: center;
+  min-height: 100vh; padding: 16px;
+}
+.phone-frame {
+  width: 390px; height: 844px;
+  background: var(--bg);
+  border-radius: 42px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 0 0 8px #F5F0ED, 0 0 0 10px rgba(0,0,0,0.08), 0 20px 60px rgba(0,0,0,0.12);
+  display: flex; flex-direction: column;
+}
+
+/* Header */
+.header {
+  padding: 20px 20px 16px;
+  display: flex; align-items: center; gap: 12px;
+  flex-shrink: 0; background: var(--bg);
+}
+.back-btn {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--card); border: 1px solid var(--border);
+  cursor: pointer; font-size: 16px; color: var(--text-primary);
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s; flex-shrink: 0;
+}
+.back-btn:active { transform: scale(0.95); background: var(--accent-soft); }
+.header-title { font-size: 20px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.3px; }
+
+/* Scroll */
+.scroll-area {
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  padding: 0 16px 40px 16px;
+  -webkit-overflow-scrolling: touch;
+}
+.scroll-area::-webkit-scrollbar { width: 0; }
+
+/* Hero */
+.about-hero {
+  text-align: center; padding: 32px 20px 24px;
+}
+.about-logo {
+  width: 72px; height: 72px; border-radius: 20px;
+  background: linear-gradient(135deg, #6366f1, #4338ca);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 16px;
+  box-shadow: 0 6px 20px rgba(99,102,241,0.25);
+}
+.about-logo svg { width: 40px; height: 40px; }
+.about-title { font-size: 22px; font-weight: 800; color: var(--text-primary); margin-bottom: 6px; }
+.about-sub { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+
+/* Cards */
+.about-card {
+  background: var(--card); border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-card); margin-bottom: 12px; padding: 18px;
+}
+.about-card h3 {
+  font-size: 15px; font-weight: 700; color: var(--text-primary);
+  margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
+}
+.about-card p, .about-card li {
+  font-size: 13px; color: var(--text-secondary); line-height: 1.7;
+}
+.about-card ul { list-style: none; padding-left: 0; }
+.about-card li { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 6px; }
+.about-card li::before {
+  content: '•'; color: var(--accent); font-size: 16px; line-height: 1.5; flex-shrink: 0;
+}
+
+.feature-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+}
+.feature-item {
+  background: var(--bg); border-radius: 12px; padding: 14px; text-align: center;
+}
+.feature-item .fi-icon { font-size: 24px; margin-bottom: 6px; display: block; }
+.feature-item .fi-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+.feature-item .fi-desc { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+
+.version-row {
+  text-align: center; padding: 20px 0 8px; font-size: 12px; color: var(--text-light);
+}
+</style>
+</head>
+<body>
+
+<div class="phone-frame">
+  <div class="header">
+    <button class="back-btn" onclick="window.location.href='resume.html'">‹</button>
+    <span class="header-title">关于我们</span>
+  </div>
+
+  <div class="scroll-area">
+    <div class="about-hero">
+      <div class="about-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="12,2 22,8.5 22,15.5 12,22 2,15.5 2,8.5"/>
+          <circle cx="12" cy="12" r="3" fill="#fff" stroke="none"/>
+        </svg>
+      </div>
+      <div class="about-title">职趣星图</div>
+      <div class="about-sub">自在生涯工作室 · 大学生职业兴趣测评与咨询平台</div>
+    </div>
+
+    <div class="about-card">
+      <h3>🎯 平台简介</h3>
+      <p>职趣星图是面向大学生的职业规划辅助工具，由自在生涯工作室打造。我们致力于帮助大学生科学认知自我、探索职业方向、制定成长规划，让每位同学都能找到适合自己的职业道路。</p>
+    </div>
+
+    <div class="about-card">
+      <h3>🛠️ 核心功能</h3>
+      <div class="feature-grid">
+        <div class="feature-item">
+          <span class="fi-icon">🧭</span>
+          <div class="fi-name">职业测评</div>
+          <div class="fi-desc">霍兰德/MBTI/大五/DISC</div>
+        </div>
+        <div class="feature-item">
+          <span class="fi-icon">💬</span>
+          <div class="fi-name">预约咨询</div>
+          <div class="fi-desc">一对一导师咨询</div>
+        </div>
+        <div class="feature-item">
+          <span class="fi-icon">🗺️</span>
+          <div class="fi-name">规划方案</div>
+          <div class="fi-desc">AI智能职业规划</div>
+        </div>
+        <div class="feature-item">
+          <span class="fi-icon">🎯</span>
+          <div class="fi-name">目标进度</div>
+          <div class="fi-desc">可视化成长追踪</div>
+        </div>
+        <div class="feature-item">
+          <span class="fi-icon">📚</span>
+          <div class="fi-name">资讯中心</div>
+          <div class="fi-desc">职场干货与指导</div>
+        </div>
+        <div class="feature-item">
+          <span class="fi-icon">📄</span>
+          <div class="fi-name">我的简历</div>
+          <div class="fi-desc">个人资料管理</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="about-card">
+      <h3>✨ 我们的特色</h3>
+      <ul>
+        <li><span>专业量表：采用国际权威职业测评工具，结果科学可靠</span></li>
+        <li><span>个性解读：结合大学生群体特点，提供通俗易懂的测评报告</span></li>
+        <li><span>真人咨询：资深职业规划师一对一辅导，针对性解决职业困惑</span></li>
+        <li><span>全程陪伴：从测评到规划再到执行，陪伴你完成职业探索之旅</span></li>
+        <li><span>数据隐私：所有个人信息本地存储，保障你的隐私安全</span></li>
+      </ul>
+    </div>
+
+    <div class="about-card">
+      <h3>👩‍🏫 导师团队</h3>
+      <p>我们拥有一支经验丰富的职业规划师团队，包括企业管理教授、GCDF职业规划师、CVCC职业规划师、创新创业导师等，覆盖职业定位、简历优化、面试辅导、行业分析、创业指导等多个领域。</p>
+    </div>
+
+    <div class="version-row">版本：v1.0.0 · 自在生涯工作室</div>
+  </div>
+</div>
+
+</body>
+</html>

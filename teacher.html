@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>自在生涯工作室</title>
+<style>
+:root {
+  --primary: #6366f1; --primary-dark: #4338ca; --primary-light: #EEF0FF;
+  --accent: #818cf8; --bg: #F0F4FF; --card: #FFFFFF;
+  --text-primary: #1a1a2e; --text-secondary: #7C8594; --text-light: #B0B8C8;
+  --border: #E8ECF2; --radius-sm: 14px; --radius-md: 20px; --radius-lg: 24px;
+  --green: #10B981; --orange: #F59E0B; --red: #EF4444; --blue: #3B82F6; --purple: #A78BFA;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background: var(--bg); color: var(--text-primary); min-height: 100vh; -webkit-font-smoothing: antialiased;
+}
+
+/* Top bar */
+.top-bar {
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+  color: #fff; padding: 0 32px; height: 60px; display: flex; align-items: center;
+  justify-content: space-between; box-shadow: 0 2px 12px rgba(99,102,241,0.2);
+  position: sticky; top: 0; z-index: 100;
+}
+.top-bar .brand { display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 700; }
+.top-bar .nav-links { display: inline-flex; align-items: center; gap: 0; background: rgba(255,255,255,0.15); border-radius: 22px; padding: 3px; }
+.top-bar .nav-links a {
+  color: rgba(255,255,255,0.7); text-decoration: none;
+  padding: 7px 18px; border-radius: 19px; font-size: 13px; font-weight: 600;
+  transition: all 0.3s cubic-bezier(.4,0,.2,1);
+  white-space: nowrap; display: flex; align-items: center; gap: 5px;
+}
+.top-bar .nav-links a:hover { color: rgba(255,255,255,0.95); }
+.top-bar .nav-links a.active {
+  background: #fff; color: var(--primary-dark);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
+.top-bar .nav-links a svg { width: 15px; height: 15px; }
+
+/* Container */
+.container { max-width: 1200px; margin: 0 auto; padding: 28px 24px; }
+
+/* Login */
+.login-wrap {
+  display: flex; justify-content: center; align-items: center; min-height: calc(100vh - 60px);
+}
+.login-card {
+  background: var(--card); border-radius: var(--radius-lg); padding: 40px 36px;
+  max-width: 380px; width: 100%; text-align: center; box-shadow: 0 8px 32px rgba(99,102,241,0.1);
+}
+.login-card .lock { font-size: 44px; margin-bottom: 16px; }
+.login-card h2 { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+.login-card p { color: var(--text-secondary); font-size: 14px; margin-bottom: 24px; }
+.login-card input {
+  width: 100%; padding: 14px 18px; border: 2px solid var(--border);
+  border-radius: var(--radius-sm); font-size: 15px; text-align: center;
+  outline: none; transition: border-color 0.2s; margin-bottom: 16px;
+}
+.login-card input:focus { border-color: var(--primary); }
+.login-card button {
+  width: 100%; padding: 14px; border: none; border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; transition: transform 0.15s;
+}
+.login-card button:active { transform: scale(0.97); }
+.login-card .hint { color: var(--text-light); font-size: 12px; margin-top: 18px; }
+
+/* ===== TABS ===== */
+.tab-bar {
+  display: flex; gap: 2px; background: var(--card); border-radius: var(--radius-md);
+  padding: 6px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.tab-btn {
+  flex: 1; padding: 12px 20px; border: none; background: transparent;
+  border-radius: 14px; font-size: 15px; font-weight: 600; cursor: pointer;
+  color: var(--text-secondary); transition: all 0.2s; text-align: center;
+}
+.tab-btn.active { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; }
+.tab-btn:hover:not(.active) { background: var(--primary-light); color: var(--primary); }
+.tab-btn .tab-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-left: 6px; }
+.tab-btn .tab-dot.red { background: var(--red); animation: pulse-dot 1.5s infinite; }
+@keyframes pulse-dot { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+/* Tab panels */
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* Stats */
+.stats-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px; margin-bottom: 24px;
+}
+.stat-card {
+  background: var(--card); border-radius: var(--radius-md); padding: 20px 18px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.04); text-align: center;
+}
+.stat-val { font-size: 28px; font-weight: 900; color: var(--primary); }
+.stat-label { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+.stat-card.warn .stat-val { color: var(--orange); }
+.stat-card.good .stat-val { color: var(--green); }
+.stat-card.danger .stat-val { color: var(--red); }
+
+/* Table (测评管理) */
+.table-wrap {
+  background: var(--card); border-radius: var(--radius-md);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.04); overflow: hidden;
+}
+.toolbar {
+  display: flex; align-items: center; gap: 12px; padding: 14px 18px;
+  border-bottom: 1px solid var(--border); flex-wrap: wrap;
+}
+.toolbar input, .toolbar select {
+  padding: 8px 12px; border: 2px solid var(--border); border-radius: 10px;
+  font-size: 13px; outline: none; transition: border-color 0.2s;
+  background: var(--card); color: var(--text-primary);
+}
+.toolbar input { flex: 1; min-width: 160px; }
+.toolbar input:focus, .toolbar select:focus { border-color: var(--primary); }
+.toolbar .btn {
+  padding: 8px 14px; border: none; border-radius: 10px; font-size: 13px; font-weight: 600;
+  cursor: pointer; background: var(--primary-light); color: var(--primary); transition: all 0.2s;
+}
+.toolbar .btn:hover { background: var(--primary); color: #fff; }
+.toolbar .btn-danger { background: #FEE2E2; color: var(--red); }
+.toolbar .btn-danger:hover { background: var(--red); color: #fff; }
+
+table { width: 100%; border-collapse: collapse; }
+th {
+  background: #F8F9FC; padding: 11px 12px; text-align: left; font-size: 11px;
+  font-weight: 700; color: var(--text-secondary); text-transform: uppercase;
+  letter-spacing: 0.5px; border-bottom: 2px solid var(--border); white-space: nowrap;
+}
+td { padding: 11px 12px; border-bottom: 1px solid var(--border); font-size: 13px; }
+tr:hover td { background: rgba(99,102,241,0.02); }
+tr:last-child td { border-bottom: none; }
+
+.badge {
+  display: inline-block; padding: 3px 9px; border-radius: 10px; font-size: 11px; font-weight: 700;
+}
+.badge-bigfive { background: #FEF3C7; color: #92400e; }
+.badge-holland { background: #DBEAFE; color: #1e40af; }
+.badge-disc { background: #FCE7F3; color: #9d174d; }
+.badge-mbti { background: #E0E7FF; color: #3730a3; }
+.result-code { font-weight: 800; font-size: 14px; letter-spacing: 1px; color: var(--primary); }
+
+.empty {
+  text-align: center; padding: 60px 20px; color: var(--text-light);
+}
+.empty .icon { font-size: 44px; margin-bottom: 12px; }
+
+/* ===== APPOINTMENT CARDS ===== */
+.apt-filter-bar {
+  display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap;
+}
+.apt-filter-chip {
+  padding: 8px 18px; border: 2px solid var(--border); border-radius: 20px;
+  font-size: 13px; font-weight: 600; cursor: pointer; background: var(--card);
+  color: var(--text-secondary); transition: all 0.2s;
+}
+.apt-filter-chip:hover { border-color: var(--primary); color: var(--primary); }
+.apt-filter-chip.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+.apt-filter-chip .count {
+  display: inline-block; min-width: 20px; background: rgba(255,255,255,0.25);
+  border-radius: 10px; padding: 1px 7px; font-size: 11px; margin-left: 4px;
+}
+
+.apt-card {
+  background: var(--card); border-radius: var(--radius-md); padding: 20px 22px;
+  margin-bottom: 14px; box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  border-left: 4px solid var(--border); transition: all 0.2s;
+}
+.apt-card.pending { border-left-color: var(--orange); }
+.apt-card.accepted { border-left-color: var(--green); }
+.apt-card.rejected { border-left-color: var(--red); }
+.apt-card.completed { border-left-color: var(--blue); }
+.apt-card.new-apt { animation: slideIn 0.4s ease-out; }
+@keyframes slideIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+
+.apt-card-header {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  margin-bottom: 12px; flex-wrap: wrap; gap: 8px;
+}
+.apt-card-header .apt-no { font-size: 11px; color: var(--text-light); }
+.apt-card-header .apt-status {
+  font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 10px;
+}
+.apt-card-header .apt-status.pending { background: #FEF3C7; color: #92400e; }
+.apt-card-header .apt-status.accepted { background: #D1FAE5; color: #065f46; }
+.apt-card-header .apt-status.rejected { background: #FEE2E2; color: #991b1b; }
+.apt-card-header .apt-status.completed { background: #DBEAFE; color: #1e40af; }
+
+.apt-card-body { display: flex; flex-direction: column; gap: 6px; }
+.apt-row { display: flex; align-items: center; gap: 8px; font-size: 14px; flex-wrap: wrap; }
+.apt-row .label { color: var(--text-secondary); font-size: 12px; min-width: 48px; }
+.apt-row .label::after { content: '：'; }
+.apt-row .value { font-weight: 600; color: var(--text-primary); }
+.apt-row .value.mentor { color: var(--primary); }
+
+.apt-card-actions {
+  display: flex; gap: 10px; margin-top: 14px; padding-top: 14px;
+  border-top: 1px solid var(--border); flex-wrap: wrap;
+}
+.apt-card-actions button {
+  padding: 8px 20px; border: none; border-radius: 10px; font-size: 13px;
+  font-weight: 700; cursor: pointer; transition: all 0.2s;
+}
+.apt-btn-accept { background: var(--green); color: #fff; }
+.apt-btn-accept:hover { background: #059669; }
+.apt-btn-reject { background: var(--red); color: #fff; }
+.apt-btn-reject:hover { background: #DC2626; }
+.apt-btn-notes { background: var(--primary-light); color: var(--primary); }
+.apt-btn-notes:hover { background: var(--primary); color: #fff; }
+.apt-btn-delete { background: #F3F4F6; color: var(--text-secondary); }
+.apt-btn-delete:hover { background: var(--text-secondary); color: #fff; }
+
+/* Notes panel */
+.apt-notes-panel {
+  display: none; margin-top: 12px; padding: 14px; background: #F8F9FC;
+  border-radius: 12px;
+}
+.apt-notes-panel textarea {
+  width: 100%; padding: 10px; border: 2px solid var(--border); border-radius: 10px;
+  font-size: 13px; outline: none; font-family: inherit; resize: vertical;
+  min-height: 80px;
+}
+.apt-notes-panel textarea:focus { border-color: var(--primary); }
+.apt-notes-panel .notes-actions { display: flex; gap: 8px; margin-top: 14px; justify-content: flex-end; }
+
+/* Multi-field notes form */
+.notes-form { display: flex; flex-direction: column; gap: 10px; }
+.notes-field-group { display: flex; flex-direction: column; gap: 6px; }
+.notes-field-label {
+  font-size: 12px; font-weight: 700; color: var(--text-secondary);
+  display: flex; align-items: center; gap: 4px;
+}
+.notes-field-textarea {
+  width: 100%; padding: 10px; border: 2px solid var(--border); border-radius: 10px;
+  font-size: 13px; outline: none; font-family: inherit; resize: vertical;
+  min-height: 60px; background: #fff; line-height: 1.5;
+}
+.notes-field-textarea:focus { border-color: var(--primary); background: #fff; }
+.notes-field-display {
+  padding: 10px 12px; background: #fff; border-radius: 10px; border: 1px solid var(--border);
+  font-size: 13px; color: var(--text-primary); line-height: 1.5; min-height: 40px;
+}
+
+.timestamp { font-size: 11px; color: var(--text-light); }
+
+/* Workflow step indicator */
+.apt-workflow-tip {
+  display: flex; align-items: center; gap: 6px;
+  margin-bottom: 12px; padding: 10px 14px;
+  background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+  border-radius: 12px; font-size: 12px; flex-wrap: wrap;
+}
+.workflow-step {
+  padding: 4px 10px; border-radius: 8px; font-weight: 600;
+  background: #d1fae5; color: #065f46;
+}
+.workflow-step.active {
+  background: var(--green); color: #fff;
+  animation: pulse-step 1.5s infinite;
+}
+.workflow-step:not(.active) { opacity: 0.6; }
+.workflow-arrow { color: var(--text-light); font-size: 14px; }
+@keyframes pulse-step {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.85; transform: scale(1.03); }
+}
+
+/* Completed consultation notes display */
+.apt-notes-display {
+  margin: 12px 0; padding: 14px 16px;
+  background: #f8f9fc; border-radius: 12px;
+  border-left: 3px solid var(--blue);
+}
+.notes-display-title {
+  font-size: 13px; font-weight: 700; color: var(--primary);
+  margin-bottom: 8px;
+}
+.notes-display-content {
+  font-size: 13px; color: var(--text-primary); line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+/* Toast */
+.toast {
+  position: fixed; top: 76px; left: 50%;
+  transform: translateX(-50%) translateY(-100px);
+  background: var(--text-primary); color: #fff; padding: 12px 24px;
+  border-radius: 12px; font-size: 14px; font-weight: 500;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15); z-index: 9999;
+  transition: transform 0.35s cubic-bezier(.175,.885,.32,1.275);
+  pointer-events: none;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+.toast.success { background: var(--green); }
+.toast.error { background: var(--red); }
+
+/* Modal */
+.modal-bg {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+  z-index: 200; align-items: center; justify-content: center; padding: 24px;
+}
+.modal-bg.show { display: flex; }
+.modal {
+  background: var(--card); border-radius: var(--radius-lg); max-width: 560px;
+  width: 100%; max-height: 85vh; overflow-y: auto; box-shadow: 0 16px 48px rgba(0,0,0,0.15);
+}
+.modal-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 24px; border-bottom: 1px solid var(--border);
+}
+.modal-head h3 { font-size: 18px; font-weight: 700; }
+.modal-close {
+  background: none; border: none; font-size: 22px; cursor: pointer;
+  color: var(--text-light); padding: 4px 8px; border-radius: 8px;
+}
+.modal-close:hover { background: var(--bg); }
+.modal-body { padding: 24px; }
+.detail-row {
+  display: flex; padding: 10px 0; border-bottom: 1px solid var(--border);
+}
+.detail-label { width: 90px; font-size: 14px; color: var(--text-secondary); font-weight: 600; flex-shrink: 0; }
+.detail-val { font-size: 14px; color: var(--text-primary); flex: 1; }
+.score-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.score-bar-label { font-size: 13px; color: var(--text-secondary); width: 70px; flex-shrink: 0; }
+.score-bar-track { flex: 1; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+.score-bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--primary), var(--accent)); }
+.score-bar-val { font-size: 13px; font-weight: 700; color: var(--primary); width: 40px; text-align: right; }
+
+/* Loading */
+.loading { display: flex; justify-content: center; padding: 40px; }
+.spinner {
+  width: 36px; height: 36px; border: 3px solid var(--border);
+  border-top-color: var(--primary); border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 768px) {
+  .container { padding: 14px; }
+  .top-bar { padding: 0 16px; }
+  .top-bar .nav-links a { padding: 5px 10px; font-size: 12px; }
+  .tab-bar { flex-direction: row; }
+  .tab-btn { padding: 10px 12px; font-size: 13px; }
+  .toolbar { flex-direction: column; align-items: stretch; }
+  .toolbar input, .toolbar select { width: 100%; }
+  th, td { padding: 9px 6px; font-size: 11px; }
+  .hide-mobile { display: none; }
+  .apt-card { padding: 14px 16px; }
+  .apt-card-actions button { padding: 7px 14px; font-size: 12px; }
+}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div class="brand">
+    <span>🌟</span>
+    <span>自在生涯工作室</span>
+  </div>
+  <div class="nav-links">
+    <a href="index.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+      学生端
+    </a>
+    <a href="teacher.html" class="active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg>
+      教师端
+    </a>
+  </div>
+</div>
+
+<!-- Login -->
+<div class="login-wrap" id="loginPage">
+  <div class="login-card">
+    <div class="lock">🔐</div>
+    <h2>教师登录</h2>
+    <p>请输入密码查看学生数据</p>
+    <input type="password" id="pwdInput" placeholder="请输入密码"
+      onkeydown="if(event.key==='Enter') doLogin()">
+    <button onclick="doLogin()">登 录</button>
+    <div class="hint">默认密码：123</div>
+  </div>
+</div>
+
+<!-- Dashboard -->
+<div class="container" id="dashboard" style="display:none;">
+
+  <!-- Tab Bar -->
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('assessments')">
+      📊 测评管理
+    </button>
+    <button class="tab-btn" id="tabAppointments" onclick="switchTab('appointments')">
+      📅 预约管理<span class="tab-dot red" id="aptDot" style="display:none;"></span>
+    </button>
+    <button class="tab-btn" id="tabRecords" onclick="switchTab('records')">
+      📝 咨询记录
+    </button>
+  </div>
+
+  <!-- ========== Tab 1: 测评管理 ========== -->
+  <div class="tab-panel active" id="panelAssessments">
+    <div class="stats-grid" id="statsGrid"></div>
+    <div class="table-wrap">
+      <div class="toolbar">
+        <input type="text" id="searchInput" placeholder="搜索姓名、学号、班级..." oninput="filterTable()">
+        <select id="classFilter" onchange="filterTable()">
+          <option value="">全部班级</option>
+        </select>
+        <select id="testFilter" onchange="filterTable()">
+          <option value="">全部测评</option>
+          <option value="bigfive">大五人格</option>
+          <option value="holland">霍兰德</option>
+          <option value="disc">DISC</option>
+          <option value="mbti">MBTI</option>
+        </select>
+        <button class="btn" onclick="exportCSV()">📄 导出CSV</button>
+        <button class="btn" onclick="loadAssessments()">🔄 刷新</button>
+      </div>
+      <div id="tableContent">
+        <div class="loading"><div class="spinner"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== Tab 2: 预约管理 ========== -->
+  <div class="tab-panel" id="panelAppointments">
+    <div class="stats-grid" id="aptStatsGrid"></div>
+    <div class="apt-filter-bar">
+      <div class="apt-filter-chip active" onclick="filterAppointments('all')">
+        全部<span class="count" id="aptCountAll">0</span>
+      </div>
+      <div class="apt-filter-chip" onclick="filterAppointments('pending')" id="chipPending">
+        待处理<span class="count" id="aptCountPending">0</span>
+      </div>
+      <div class="apt-filter-chip" onclick="filterAppointments('accepted')" id="chipAccepted">
+        已同意<span class="count" id="aptCountAccepted">0</span>
+      </div>
+      <div class="apt-filter-chip" onclick="filterAppointments('rejected')" id="chipRejected">
+        已拒绝<span class="count" id="aptCountRejected">0</span>
+      </div>
+      <div style="flex:1;"></div>
+      <button class="btn" onclick="loadAppointments()">🔄 刷新</button>
+    </div>
+    <div id="aptList">
+      <div class="loading"><div class="spinner"></div></div>
+    </div>
+  </div>
+
+  <!-- ========== Tab 3: 咨询记录 ========== -->
+  <div class="tab-panel" id="panelRecords">
+    <div class="stats-grid" id="recordStatsGrid"></div>
+    <div id="recordList">
+      <div class="loading"><div class="spinner"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Detail Modal -->
+<div class="modal-bg" id="detailModal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>📋 测评详情</h3>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Notification sound (hidden audio element) -->
+<audio id="notifSound" preload="auto" style="display:none;">
+  <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACAf39/f4B/f3+Af39/gH9/f4B/f3+Af39/gH9/f4B/f3+Af39/gH9/f4B/f3+Af39/gH9/f4B/f3+Af39/gH9/f4B/f3+Af39/gH9/f4AA=" type="audio/wav">
+</audio>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script>
+// ============================================
+// 自在生涯工作室 - 教师端
+// ============================================
+
+var TEACHER_PASSWORD = "123";
+var currentTab = "assessments";
+
+// ===== Test Info =====
+var TEST_INFO = {
+  bigfive: { name: "大五人格", dims: ["O","C","E","A","N"], dimNames: {O:"开放性",C:"尽责性",E:"外向性",A:"宜人性",N:"神经质"} },
+  holland: { name: "霍兰德", dims: ["R","I","A","S","E","C"], dimNames: {R:"现实型",I:"研究型",A:"艺术型",S:"社会型",E:"企业型",C:"常规型"} },
+  disc: { name: "DISC", dims: ["D","I","S","C"], dimNames: {D:"支配型",I:"影响型",S:"稳健型",C:"谨慎型"} },
+  mbti: { name: "MBTI", dims: ["EI","SN","TF","JP"], dimNames: {EI:"外倾/内倾",SN:"感觉/直觉",TF:"思维/情感",JP:"判断/感知"} }
+};
+
+var TYPE_NAMES = {
+  career:'职业规划', resume:'简历优化', interview:'面试辅导', industry:'行业分析'
+};
+
+var allData = [];
+var allAppointments = [];
+var aptFilter = "all";
+var realtimeUnsub = null;
+
+// ============================================
+// LOGIN
+// ============================================
+function doLogin() {
+  var pwd = document.getElementById("pwdInput").value;
+  if (pwd === TEACHER_PASSWORD) {
+    sessionStorage.setItem("teacher_login", "1");
+    showDashboard();
+  } else {
+    showToast("密码错误", "error");
+  }
+}
+
+function showDashboard() {
+  document.getElementById("loginPage").style.display = "none";
+  document.getElementById("dashboard").style.display = "block";
+  loadAssessments();
+  loadAppointments();
+  startRealtimeSubscription();
+  playNotifOnNext = false; // 首次加载不播放声音
+}
+
+// ============================================
+// TAB SWITCHING
+// ============================================
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll(".tab-btn").forEach(function(b) { b.classList.remove("active"); });
+  document.querySelectorAll(".tab-panel").forEach(function(p) { p.classList.remove("active"); });
+  document.getElementById("panel" + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add("active");
+  document.getElementById("tab" + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add("active");
+
+  if (tab === "appointments") {
+    document.getElementById("aptDot").style.display = "none";
+    loadAppointments();
+  } else if (tab === "records") {
+    loadRecords();
+  }
+}
+
+// ============================================
+// TAB 1: 测评管理
+// ============================================
+async function loadAssessments() {
+  var tc = document.getElementById("tableContent");
+  tc.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+  try {
+    allData = await getAllSubmissions();
+    renderStats();
+    renderClassFilter();
+    renderTable(allData);
+  } catch(err) {
+    tc.innerHTML = '<div class="empty"><div class="icon">⚠️</div><div>数据加载失败，请检查 Supabase 配置</div></div>';
+  }
+}
+
+function renderStats() {
+  var total = allData.length;
+  var classes = {};
+  var testCounts = {};
+  var todayCount = 0;
+  var today = new Date().toDateString();
+
+  allData.forEach(function(d) {
+    classes[d.class_name] = true;
+    testCounts[d.test_type] = (testCounts[d.test_type] || 0) + 1;
+    if (d.created_at && new Date(d.created_at).toDateString() === today) todayCount++;
+  });
+
+  var topTest = "-", topCount = 0;
+  for (var t in testCounts) {
+    if (testCounts[t] > topCount) { topCount = testCounts[t]; topTest = TEST_INFO[t] ? TEST_INFO[t].name : t; }
+  }
+
+  document.getElementById("statsGrid").innerHTML =
+    '<div class="stat-card"><div class="stat-val">'+total+'</div><div class="stat-label">总测评次数</div></div>'+
+    '<div class="stat-card"><div class="stat-val">'+Object.keys(classes).length+'</div><div class="stat-label">覆盖班级</div></div>'+
+    '<div class="stat-card"><div class="stat-val">'+todayCount+'</div><div class="stat-label">今日新增</div></div>'+
+    '<div class="stat-card"><div class="stat-val" style="font-size:20px;">'+topTest+'</div><div class="stat-label">最多测评('+topCount+')</div></div>';
+}
+
+function renderClassFilter() {
+  var classes = {};
+  allData.forEach(function(d) { classes[d.class_name] = true; });
+  var sel = document.getElementById("classFilter");
+  var cur = sel.value;
+  sel.innerHTML = '<option value="">全部班级</option>' +
+    Object.keys(classes).sort().map(function(c) { return '<option value="'+esc(c)+'">'+esc(c)+'</option>'; }).join("");
+  sel.value = cur;
+}
+
+function renderTable(data) {
+  var tc = document.getElementById("tableContent");
+  if (data.length === 0) {
+    tc.innerHTML = '<div class="empty"><div class="icon">📭</div><div>暂无测评数据</div><div style="font-size:13px;margin-top:8px;">学生提交测评后将在此显示</div></div>';
+    return;
+  }
+
+  var html = '<table><thead><tr>'+
+    '<th>姓名</th><th>学校</th><th>学号</th><th>班级</th><th>测评类型</th>'+
+    '<th>结果</th><th class="hide-mobile">概述</th><th class="hide-mobile">提交时间</th><th>操作</th>'+
+    '</tr></thead><tbody>';
+
+  data.forEach(function(item, idx) {
+    var testName = TEST_INFO[item.test_type] ? TEST_INFO[item.test_type].name : (item.test_name || item.test_type);
+    var time = item.created_at ? new Date(item.created_at).toLocaleString("zh-CN", {month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit"}) : "-";
+
+    html += '<tr>'+
+      '<td style="font-weight:600;">'+esc(item.name)+'</td>'+
+      '<td>'+esc(item.school||'-')+'</td>'+
+      '<td>'+esc(item.student_id)+'</td>'+
+      '<td>'+esc(item.class_name)+'</td>'+
+      '<td><span class="badge badge-'+(item.test_type||'')+'">'+esc(testName)+'</span></td>'+
+      '<td><span class="result-code">'+esc(item.result_code||'-')+'</span></td>'+
+      '<td class="hide-mobile" style="color:var(--text-secondary);font-size:12px;">'+esc(item.result_summary||'-')+'</td>'+
+      '<td class="hide-mobile" style="color:var(--text-light);font-size:12px;">'+time+'</td>'+
+      '<td><button class="btn" style="padding:5px 10px;font-size:11px;" onclick="showDetail('+idx+')">查看</button></td>'+
+    '</tr>';
+  });
+
+  html += '</tbody></table>';
+  tc.innerHTML = html;
+}
+
+function filterTable() {
+  var kw = (document.getElementById("searchInput").value || "").toLowerCase();
+  var cf = document.getElementById("classFilter").value;
+  var tf = document.getElementById("testFilter").value;
+
+  var filtered = allData.filter(function(item) {
+    var mk = !kw || (item.name||"").toLowerCase().indexOf(kw)>=0 ||
+      (item.school||"").toLowerCase().indexOf(kw)>=0 ||
+      (item.student_id||"").toLowerCase().indexOf(kw)>=0 ||
+      (item.class_name||"").toLowerCase().indexOf(kw)>=0;
+    var mc = !cf || item.class_name === cf;
+    var mt = !tf || item.test_type === tf;
+    return mk && mc && mt;
+  });
+  renderTable(filtered);
+}
+
+// ============================================
+// TAB 2: 预约管理
+// ============================================
+var playNotifOnNext = false;
+
+async function loadAppointments() {
+  var al = document.getElementById("aptList");
+  al.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+  try {
+    allAppointments = await getAppointments();
+    renderAptStats();
+    renderAppointments(allAppointments);
+  } catch(err) {
+    console.error("加载预约失败:", err);
+    al.innerHTML = '<div class="empty"><div class="icon">⚠️</div><div>加载失败，请检查网络或 Supabase 配置</div></div>';
+  }
+}
+
+function renderAptStats() {
+  var total = allAppointments.length;
+  var counts = { pending: 0, accepted: 0, rejected: 0, completed: 0 };
+  allAppointments.forEach(function(a) { if (counts[a.status] !== undefined) counts[a.status]++; });
+
+  document.getElementById("aptStatsGrid").innerHTML =
+    '<div class="stat-card warn"><div class="stat-val">'+counts.pending+'</div><div class="stat-label">待处理</div></div>'+
+    '<div class="stat-card good"><div class="stat-val">'+counts.accepted+'</div><div class="stat-label">已同意</div></div>'+
+    '<div class="stat-card danger"><div class="stat-val">'+counts.rejected+'</div><div class="stat-label">已拒绝</div></div>'+
+    '<div class="stat-card"><div class="stat-val">'+counts.completed+'</div><div class="stat-label">已完成</div></div>';
+
+  document.getElementById("aptCountAll").textContent = total;
+  document.getElementById("aptCountPending").textContent = counts.pending;
+  document.getElementById("aptCountAccepted").textContent = counts.accepted;
+  document.getElementById("aptCountRejected").textContent = counts.rejected;
+}
+
+function filterAppointments(status) {
+  aptFilter = status;
+  document.querySelectorAll(".apt-filter-chip").forEach(function(c) { c.classList.remove("active"); });
+  if (status === "all") {
+    document.querySelector(".apt-filter-chip").classList.add("active");
+  } else {
+    document.getElementById("chip" + status.charAt(0).toUpperCase() + status.slice(1)).classList.add("active");
+  }
+  renderAppointments(allAppointments);
+}
+
+function renderAppointments(appointments) {
+  var al = document.getElementById("aptList");
+  var filtered = appointments;
+  if (aptFilter !== "all") {
+    filtered = appointments.filter(function(a) { return a.status === aptFilter; });
+  }
+  filtered.sort(function(a, b) {
+    return new Date(b.created_at) - new Date(a.created_at);
+  });
+
+  if (filtered.length === 0) {
+    al.innerHTML = '<div class="empty"><div class="icon">📭</div><div>暂无预约数据</div><div style="font-size:13px;margin-top:8px;">学生提交预约后将在此显示</div></div>';
+    return;
+  }
+
+  var statusNames = { pending:'待处理', accepted:'已同意', rejected:'已拒绝', completed:'已完成', cancelled:'已取消' };
+
+  var html = "";
+  filtered.forEach(function(apt) {
+    var time = apt.created_at ? new Date(apt.created_at).toLocaleString("zh-CN") : "-";
+    var aptDate = [apt.appointment_date, apt.appointment_time].filter(Boolean).join(" ");
+    var isNew = (apt._isNew === true);
+
+    html += '<div class="apt-card '+esc(apt.status)+(isNew?' new-apt':'')+'" id="aptCard'+esc(String(apt.id))+'">'+
+      '<div class="apt-card-header">'+
+        '<span class="apt-no">预约编号：'+esc(apt.appointment_no||apt.id)+'</span>'+
+        '<span class="apt-status '+esc(apt.status)+'">'+(statusNames[apt.status]||apt.status)+'</span>'+
+      '</div>'+
+      '<div class="apt-card-body">'+
+        '<div class="apt-row"><span class="label">学生</span><span class="value">'+esc(apt.student_name)+'</span></div>'+
+        '<div class="apt-row"><span class="label">电话</span><span class="value">'+esc(apt.student_phone||'-')+'</span>'+
+          '<span style="margin-left:12px;" class="label">学校</span><span class="value">'+esc(apt.student_school||'-')+'</span></div>'+
+        '<div class="apt-row"><span class="label">导师</span><span class="value mentor">'+esc(apt.mentor_name)+'</span></div>'+
+        '<div class="apt-row"><span class="label">类型</span><span class="value">'+esc(TYPE_NAMES[apt.consult_type]||apt.consult_type_name||'-')+'</span>'+
+          '<span style="margin-left:12px;" class="label">时间</span><span class="value">'+esc(aptDate||'-')+'</span></div>'+
+        '<div class="apt-row"><span class="label">问题</span><span class="value" style="color:var(--text-secondary);">'+esc((apt.problem_desc||"").substring(0,80))+((apt.problem_desc||"").length>80?'…':'')+'</span></div>'+
+        '<div class="apt-row" style="margin-top:4px; color:var(--text-light); font-size:11px;">提交时间：'+time+'</div>'+
+      '</div>';
+
+    // Actions
+    if (apt.status === "pending") {
+      html += '<div class="apt-card-actions">'+
+        '<button class="apt-btn-accept" onclick="handleAppointment('+apt.id+',\'accepted\')">✅ 同意预约</button>'+
+        '<button class="apt-btn-reject" onclick="handleAppointment('+apt.id+',\'rejected\')">❌ 拒绝</button>'+
+        '<button class="apt-btn-delete" onclick="handleDeleteApt('+apt.id+')">🗑 删除</button>'+
+      '</div>';
+    } else if (apt.status === "accepted") {
+      var noteObj = parseNotes(apt.consultation_notes);
+      html += '<div class="apt-workflow-tip">'+
+        '<span class="workflow-step">✅ 已同意</span>'+
+        '<span class="workflow-arrow">→</span>'+
+        '<span class="workflow-step active">📝 填写咨询记录</span>'+
+        '<span class="workflow-arrow">→</span>'+
+        '<span class="workflow-step">💾 标记完成</span>'+
+      '</div>'+
+      '<div class="apt-card-actions">'+
+        '<button class="apt-btn-notes" onclick="toggleNotes('+apt.id+')">📝 填写咨询记录并完成</button>'+
+        '<button class="apt-btn-delete" style="margin-left:auto;" onclick="handleDeleteApt('+apt.id+')">🗑 删除</button>'+
+      '</div>'+
+      '<div class="apt-notes-panel" id="notesPanel'+apt.id+'">'+
+        '<div style="font-size:13px;font-weight:700;color:var(--primary);margin-bottom:10px;">📋 咨询记录 — 请按模块填写</div>'+
+        buildNotesFieldsHTML(apt.id, noteObj, true) +
+        '<div class="notes-actions">'+
+          '<button class="apt-btn-delete" onclick="toggleNotes('+apt.id+')">取消</button>'+
+          '<button class="apt-btn-accept" onclick="saveNotes('+apt.id+')">💾 保存并标记完成</button>'+
+        '</div>'+
+      '</div>';
+    } else if (apt.status === "completed") {
+      var noteObjDone = parseNotes(apt.consultation_notes);
+      html += buildNotesFieldsHTML(apt.id, noteObjDone, false) +
+      '<div class="apt-card-actions">'+
+        '<button class="apt-btn-notes" onclick="toggleNotes('+apt.id+')">📝 编辑记录</button>'+
+        '<button class="apt-btn-delete" style="margin-left:auto;" onclick="handleDeleteApt('+apt.id+')">🗑 删除</button>'+
+      '</div>'+
+      '<div class="apt-notes-panel" id="notesPanel'+apt.id+'">'+
+        '<div style="font-size:13px;font-weight:700;color:var(--primary);margin-bottom:10px;">📋 编辑咨询记录</div>'+
+        buildNotesFieldsHTML(apt.id, noteObjDone, true) +
+        '<div class="notes-actions">'+
+          '<button class="apt-btn-delete" onclick="toggleNotes('+apt.id+')">取消</button>'+
+          '<button class="apt-btn-accept" onclick="saveNotes('+apt.id+')">💾 更新记录</button>'+
+        '</div>'+
+      '</div>';
+    } else {
+      html += '<div class="apt-card-actions">'+
+        '<button class="apt-btn-delete" onclick="handleDeleteApt('+apt.id+')">🗑 删除</button>'+
+      '</div>';
+    }
+
+    html += '</div>';
+  });
+
+  al.innerHTML = html;
+}
+
+async function handleAppointment(id, status) {
+  var statusName = { accepted:'已同意', rejected:'已拒绝' };
+  var msg = status === 'accepted' ? '确定同意这个预约吗？\n\n同意后可以在「已同意」中填写咨询记录并完成咨询。' : '确定拒绝这个预约？';
+  if (!confirm(msg)) return;
+
+  try {
+    await updateAppointmentStatus(id, status, statusName[status]);
+    showToast(status === 'accepted' ? '已同意预约 ✅ 请在「已同意」中填写咨询记录' : '已拒绝预约 ❌', 'success');
+
+    // 同意后自动切换到「已同意」筛选，让老师立刻看到下一步操作
+    if (status === 'accepted') {
+      aptFilter = 'accepted';
+      document.querySelectorAll(".apt-filter-chip").forEach(function(c) { c.classList.remove("active"); });
+      document.getElementById("chipAccepted").classList.add("active");
+    }
+    loadAppointments();
+  } catch(err) {
+    console.error("更新失败:", err);
+    showToast("操作失败，请重试", "error");
+  }
+}
+
+// ============================================
+// 咨询记录多字段模块处理
+// ============================================
+function parseNotes(raw) {
+  if (!raw) return { goals: '', analysis: '', solution: '', action: '', notes: '' };
+  try {
+    var obj = JSON.parse(raw);
+    if (typeof obj === 'object' && obj !== null && (obj.goals || obj.analysis || obj.solution || obj.action || obj.notes)) {
+      return obj;
+    }
+  } catch(e) {}
+  // 旧格式兼容：纯文本转 notes 字段
+  return { goals: '', analysis: '', solution: '', action: '', notes: raw };
+}
+
+function buildNotesFieldsHTML(id, noteObj, isEdit) {
+  var obj = noteObj || { goals: '', analysis: '', solution: '', action: '', notes: '' };
+  var ro = isEdit ? '' : 'readonly';
+  var tag = isEdit ? 'textarea' : 'div';
+  var cls = isEdit ? 'notes-field-textarea' : 'notes-field-display';
+  var endTag = isEdit ? '</textarea>' : '</div>';
+  var h = '';
+  h += '<div class="notes-form">';
+  h += '<div class="notes-field-group"><div class="notes-field-label">🎯 咨询目标/诉求</div>';
+  if (isEdit) {
+    h += '<textarea id="notesGoals' + id + '" class="notes-field-textarea" placeholder="学生本次咨询的核心诉求是什么？">' + esc(obj.goals) + '</textarea>';
+  } else {
+    h += '<div class="notes-field-display">' + (obj.goals ? esc(obj.goals).replace(/\n/g, '<br>') : '<span style="color:var(--text-light);font-style:italic;">未填写</span>') + '</div>';
+  }
+  h += '</div>';
+  h += '<div class="notes-field-group"><div class="notes-field-label">🔍 问题分析</div>';
+  if (isEdit) {
+    h += '<textarea id="notesAnalysis' + id + '" class="notes-field-textarea" placeholder="分析学生面临的主要问题与原因">' + esc(obj.analysis) + '</textarea>';
+  } else {
+    h += '<div class="notes-field-display">' + (obj.analysis ? esc(obj.analysis).replace(/\n/g, '<br>') : '<span style="color:var(--text-light);font-style:italic;">未填写</span>') + '</div>';
+  }
+  h += '</div>';
+  h += '<div class="notes-field-group"><div class="notes-field-label">💡 解决方案/建议</div>';
+  if (isEdit) {
+    h += '<textarea id="notesSolution' + id + '" class="notes-field-textarea" placeholder="给出针对性的职业规划建议与方案">' + esc(obj.solution) + '</textarea>';
+  } else {
+    h += '<div class="notes-field-display">' + (obj.solution ? esc(obj.solution).replace(/\n/g, '<br>') : '<span style="color:var(--text-light);font-style:italic;">未填写</span>') + '</div>';
+  }
+  h += '</div>';
+  h += '<div class="notes-field-group"><div class="notes-field-label">📋 行动计划/下一步</div>';
+  if (isEdit) {
+    h += '<textarea id="notesAction' + id + '" class="notes-field-textarea" placeholder="明确的后续行动步骤与时间节点">' + esc(obj.action) + '</textarea>';
+  } else {
+    h += '<div class="notes-field-display">' + (obj.action ? esc(obj.action).replace(/\n/g, '<br>') : '<span style="color:var(--text-light);font-style:italic;">未填写</span>') + '</div>';
+  }
+  h += '</div>';
+  h += '<div class="notes-field-group"><div class="notes-field-label">📝 补充备注</div>';
+  if (isEdit) {
+    h += '<textarea id="notesExtra' + id + '" class="notes-field-textarea" placeholder="其他需要记录的信息" style="min-height:60px;">' + esc(obj.notes) + '</textarea>';
+  } else {
+    h += '<div class="notes-field-display" style="min-height:40px;">' + (obj.notes ? esc(obj.notes).replace(/\n/g, '<br>') : '<span style="color:var(--text-light);font-style:italic;">未填写</span>') + '</div>';
+  }
+  h += '</div>';
+  h += '</div>';
+  return h;
+}
+
+function toggleNotes(id) {
+  var panel = document.getElementById("notesPanel" + id);
+  if (panel) {
+    panel.style.display = panel.style.display === "block" ? "none" : "block";
+  }
+}
+
+async function saveNotes(id) {
+  var goals = document.getElementById("notesGoals" + id).value.trim();
+  var analysis = document.getElementById("notesAnalysis" + id).value.trim();
+  var solution = document.getElementById("notesSolution" + id).value.trim();
+  var action = document.getElementById("notesAction" + id).value.trim();
+  var notes = document.getElementById("notesExtra" + id).value.trim();
+  var payload = JSON.stringify({ goals: goals, analysis: analysis, solution: solution, action: action, notes: notes });
+  try {
+    await saveConsultationNotes(id, payload);
+    showToast("咨询记录已保存 ✅", "success");
+    loadAppointments();
+  } catch(err) {
+    console.error("保存失败:", err);
+    showToast("保存失败，请重试", "error");
+  }
+}
+
+async function handleDeleteApt(id) {
+  if (!confirm("确定删除这条预约记录？")) return;
+  try {
+    await deleteAppointment(id);
+    showToast("已删除", "success");
+    loadAppointments();
+  } catch(err) {
+    showToast("删除失败", "error");
+  }
+}
+
+// ============================================
+// TAB 3: 咨询记录
+// ============================================
+async function loadRecords() {
+  var rl = document.getElementById("recordList");
+  rl.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+  try {
+    var all = await getAppointments();
+    var completed = all.filter(function(a) { return a.status === "completed"; });
+
+    document.getElementById("recordStatsGrid").innerHTML =
+      '<div class="stat-card"><div class="stat-val">'+completed.length+'</div><div class="stat-label">已完成咨询</div></div>'+
+      '<div class="stat-card good"><div class="stat-val">'+all.filter(function(a){return a.status==="accepted";}).length+'</div><div class="stat-label">进行中</div></div>'+
+      '<div class="stat-card" style="grid-column:span 2;"><div class="stat-val" style="font-size:18px;">咨询记录将自动同步到云端</div><div class="stat-label">数据安全保障</div></div>';
+
+    if (completed.length === 0) {
+      rl.innerHTML = '<div class="empty"><div class="icon">📝</div><div>暂无咨询记录</div><div style="font-size:13px;margin-top:8px;">在"预约管理"中同意并完成咨询后，记录将显示在这里</div></div>';
+      return;
+    }
+
+    var html = "";
+    completed.sort(function(a, b) { return new Date(b.updated_at||b.created_at) - new Date(a.updated_at||a.created_at); });
+    completed.forEach(function(apt) {
+      var time = apt.updated_at ? new Date(apt.updated_at).toLocaleString("zh-CN") : "-";
+      html += '<div class="apt-card completed">'+
+        '<div class="apt-card-header">'+
+          '<span class="apt-no">'+esc(apt.appointment_no||apt.id)+'</span>'+
+          '<span class="apt-status completed">已完成</span>'+
+        '</div>'+
+        '<div class="apt-card-body">'+
+          '<div class="apt-row"><span class="label">学生</span><span class="value">'+esc(apt.student_name)+'</span></div>'+
+          '<div class="apt-row"><span class="label">导师</span><span class="value mentor">'+esc(apt.mentor_name)+'</span></div>'+
+          '<div class="apt-row"><span class="label">类型</span><span class="value">'+esc(TYPE_NAMES[apt.consult_type]||apt.consult_type_name||'-')+'</span></div>'+
+          (apt.consultation_notes ? buildNotesFieldsHTML(apt.id, parseNotes(apt.consultation_notes), false) : '<div style="margin-top:10px;padding:12px;background:#F8F9FC;border-radius:10px;font-size:13px;color:var(--text-secondary);">📝 未填写咨询记录</div>')+
+          '<div class="apt-row" style="margin-top:8px; color:var(--text-light); font-size:11px;">完成时间：'+time+'</div>'+
+        '</div>'+
+        '<div class="apt-card-actions">'+
+          '<button class="apt-btn-delete" onclick="handleDeleteApt('+apt.id+')">🗑 删除</button>'+
+        '</div>'+
+      '</div>';
+    });
+    rl.innerHTML = html;
+  } catch(err) {
+    rl.innerHTML = '<div class="empty"><div class="icon">⚠️</div><div>加载失败</div></div>';
+  }
+}
+
+// ============================================
+// REALTIME SUBSCRIPTION
+// ============================================
+function startRealtimeSubscription() {
+  if (!isDbReady()) {
+    console.log("[教师端] Supabase 未配置，使用本地模式（需手动刷新）");
+    return;
+  }
+
+  realtimeUnsub = subscribeAppointments({
+    onInsert: function(newApt) {
+      console.log("[教师端] 收到新预约！", newApt.student_name);
+      newApt._isNew = true;
+
+      // 在列表顶部插入
+      allAppointments.unshift(newApt);
+
+      if (currentTab === "appointments") {
+        renderAptStats();
+        renderAppointments(allAppointments);
+      } else {
+        // 在非预约tab时，显示红点提醒
+        document.getElementById("aptDot").style.display = "inline-block";
+      }
+
+      // 播放提示音
+      playNotification();
+      showToast("🔔 新预约：" + newApt.student_name + " - " + (TYPE_NAMES[newApt.consult_type]||newApt.consult_type_name||"") + "", "success");
+    },
+    onUpdate: function(updatedApt, oldApt) {
+      console.log("[教师端] 预约更新:", updatedApt.id, updatedApt.status);
+      var idx = allAppointments.findIndex(function(a) { return a.id === updatedApt.id; });
+      if (idx >= 0) {
+        allAppointments[idx] = updatedApt;
+      }
+      if (currentTab === "appointments") {
+        renderAptStats();
+        renderAppointments(allAppointments);
+      }
+    },
+    onDelete: function(oldApt) {
+      allAppointments = allAppointments.filter(function(a) { return a.id !== oldApt.id; });
+      if (currentTab === "appointments") {
+        renderAptStats();
+        renderAppointments(allAppointments);
+      }
+    }
+  });
+}
+
+function playNotification() {
+  try {
+    var audio = document.getElementById("notifSound");
+    if (audio) { audio.currentTime = 0; audio.play().catch(function(e) {}); }
+  } catch(e) {}
+}
+
+// Cleanup
+window.addEventListener("beforeunload", function() {
+  if (realtimeUnsub) realtimeUnsub();
+});
+
+// ============================================
+// MODAL (测评详情)
+// ============================================
+function showDetail(idx) {
+  var kw = (document.getElementById("searchInput").value || "").toLowerCase();
+  var cf = document.getElementById("classFilter").value;
+  var tf = document.getElementById("testFilter").value;
+  var filtered = allData.filter(function(item) {
+    var mk = !kw || (item.name||"").toLowerCase().indexOf(kw)>=0 ||
+      (item.school||"").toLowerCase().indexOf(kw)>=0 ||
+      (item.student_id||"").toLowerCase().indexOf(kw)>=0 ||
+      (item.class_name||"").toLowerCase().indexOf(kw)>=0;
+    var mc = !cf || item.class_name === cf;
+    var mt = !tf || item.test_type === tf;
+    return mk && mc && mt;
+  });
+
+  var item = filtered[idx];
+  if (!item) return;
+
+  var testName = TEST_INFO[item.test_type] ? TEST_INFO[item.test_type].name : (item.test_name || item.test_type);
+  var time = item.created_at ? new Date(item.created_at).toLocaleString("zh-CN") : "-";
+  var info = TEST_INFO[item.test_type] || { dims: [], dimNames: {} };
+
+  var scoresHtml = "";
+  if (item.scores && typeof item.scores === "object") {
+    var sorted = info.dims.map(function(d) { return {dim:d, score:item.scores[d]||0}; })
+      .sort(function(a,b) { return b.score - a.score; });
+    scoresHtml = sorted.map(function(e) {
+      return '<div class="score-bar-row">'+
+        '<span class="score-bar-label">'+(info.dimNames[e.dim]||e.dim)+'</span>'+
+        '<div class="score-bar-track"><div class="score-bar-fill" style="width:'+e.score+'%"></div></div>'+
+        '<span class="score-bar-val">'+e.score+'%</span>'+
+      '</div>';
+    }).join("");
+  }
+
+  document.getElementById("modalBody").innerHTML =
+    '<div class="detail-row"><div class="detail-label">姓名</div><div class="detail-val" style="font-weight:600;">'+esc(item.name)+'</div></div>'+
+    '<div class="detail-row"><div class="detail-label">学校</div><div class="detail-val">'+esc(item.school||'-')+'</div></div>'+
+    '<div class="detail-row"><div class="detail-label">学号</div><div class="detail-val">'+esc(item.student_id)+'</div></div>'+
+    '<div class="detail-row"><div class="detail-label">班级</div><div class="detail-val">'+esc(item.class_name)+'</div></div>'+
+    '<div class="detail-row"><div class="detail-label">测评类型</div><div class="detail-val"><span class="badge badge-'+(item.test_type||'')+'">'+esc(testName)+'</span></div></div>'+
+    '<div class="detail-row"><div class="detail-label">结果代码</div><div class="detail-val" style="font-size:20px;font-weight:800;color:var(--primary);letter-spacing:2px;">'+esc(item.result_code||'-')+'</div></div>'+
+    '<div class="detail-row"><div class="detail-label">概述</div><div class="detail-val">'+esc(item.result_summary||'-')+'</div></div>'+
+    '<div class="detail-row"><div class="detail-label">提交时间</div><div class="detail-val" style="color:var(--text-secondary);">'+time+'</div></div>'+
+    (scoresHtml ? '<div style="margin-top:20px;"><div style="font-size:14px;font-weight:700;margin-bottom:12px;">📊 各维度得分</div>'+scoresHtml+'</div>' : '')+
+    '<div style="margin-top:24px;padding-top:16px;border-top:1px solid var(--border);">'+
+      '<button class="btn" style="background:var(--red);color:#fff;padding:9px 16px;" onclick="confirmDelete('+item.id+')">🗑 删除记录</button>'+
+    '</div>';
+
+  document.getElementById("detailModal").classList.add("show");
+}
+
+function closeModal() {
+  document.getElementById("detailModal").classList.remove("show");
+}
+
+async function confirmDelete(id) {
+  if (!confirm("确定删除这条记录？此操作不可撤销。")) return;
+  try {
+    await deleteSubmission(id);
+    showToast("删除成功", "success");
+    closeModal();
+    loadAssessments();
+  } catch(err) {
+    showToast("删除失败", "error");
+  }
+}
+
+// ============================================
+// EXPORT CSV
+// ============================================
+function exportCSV() {
+  if (allData.length === 0) { showToast("暂无数据可导出", "error"); return; }
+
+  var headers = ["姓名","学校","学号","班级","测评类型","结果代码","概述","提交时间"];
+  var rows = allData.map(function(item) {
+    var testName = TEST_INFO[item.test_type] ? TEST_INFO[item.test_type].name : (item.test_name || item.test_type);
+    return [
+      item.name || "", item.school || "", item.student_id || "",
+      item.class_name || "", testName, item.result_code || "",
+      item.result_summary || "",
+      item.created_at ? new Date(item.created_at).toLocaleString("zh-CN") : ""
+    ];
+  });
+
+  var csv = "\uFEFF" + headers.join(",") + "\n";
+  rows.forEach(function(row) {
+    csv += row.map(function(cell) {
+      var s = String(cell);
+      if (s.indexOf(",") >= 0) return '"' + s.replace(/"/g,'""') + '"';
+      return s;
+    }).join(",") + "\n";
+  });
+
+  var blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  var link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "职趣星图_测评数据_" + new Date().toISOString().slice(0,10) + ".csv";
+  link.click();
+  URL.revokeObjectURL(link.href);
+  showToast("导出成功", "success");
+}
+
+// ============================================
+// UTILS
+// ============================================
+function esc(str) {
+  if (!str) return "";
+  var d = document.createElement("div");
+  d.textContent = String(str);
+  return d.innerHTML;
+}
+
+function showToast(msg, type) {
+  var t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = "toast show" + (type ? " " + type : "");
+  setTimeout(function() { t.className = "toast"; }, 2500);
+}
+
+// ============================================
+// INIT
+// ============================================
+initSupabase();
+if (sessionStorage.getItem("teacher_login") === "1") {
+  showDashboard();
+}
+</script>
+</body>
+</html>

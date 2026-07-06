@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>登录 · 自在生涯工作室</title>
+<style>
+:root {
+  --primary: #6366f1;
+  --text-primary: #1a1a2e;
+  --text-secondary: #7C8594;
+  --text-light: #B0B8C8;
+  --bg: #F7F8FA;
+  --card: #FFFFFF;
+  --border: #E8ECF2;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background: #fff; display: flex; justify-content: center; align-items: center;
+  min-height: 100vh; padding: 16px;
+}
+.phone-frame {
+  width: 390px; height: 844px; background: #fff;
+  border-radius: 42px; overflow: hidden; position: relative;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.06);
+  display: flex; flex-direction: column;
+}
+
+/* Header */
+.login-header-bar {
+  height: 52px; display: flex; align-items: center; justify-content: center;
+  position: relative; flex-shrink: 0; padding: 0 16px;
+}
+.back-btn {
+  position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+  width: 32px; height: 32px; border-radius: 50%; border: none; background: none;
+  cursor: pointer; font-size: 20px; color: var(--text-primary); display: flex;
+  align-items: center; justify-content: center; -webkit-tap-highlight-color: transparent;
+}
+.back-btn:active { background: rgba(0,0,0,0.04); }
+.header-title { font-size: 17px; font-weight: 600; color: var(--text-primary); }
+
+/* Content */
+.login-content {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  padding: 80px 32px 40px;
+}
+
+/* Logo */
+.login-logo-wrap {
+  width: 88px; height: 88px; border-radius: 50%;
+  background: linear-gradient(135deg, #6366f1, #4338ca);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 24px; box-shadow: 0 8px 24px rgba(99,102,241,0.25);
+}
+.login-logo-wrap svg { width: 48px; height: 48px; }
+
+.login-app-name { font-size: 20px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; }
+.login-app-sub { font-size: 13px; color: var(--text-secondary); margin-bottom: 60px; }
+
+/* Buttons */
+.login-btn-primary {
+  width: 100%; height: 50px; border-radius: 10px; border: none;
+  background: #1a1a2e; color: #fff; font-size: 16px; font-weight: 500;
+  cursor: pointer; font-family: inherit; letter-spacing: 0.5px;
+  transition: opacity 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px;
+  -webkit-tap-highlight-color: transparent;
+}
+.login-btn-primary:active { opacity: 0.85; }
+
+.login-btn-cancel {
+  width: 100%; height: 48px; border-radius: 10px; border: none; background: none;
+  color: var(--text-secondary); font-size: 15px; font-weight: 400; cursor: pointer;
+  font-family: inherit; margin-top: 8px; -webkit-tap-highlight-color: transparent;
+}
+.login-btn-cancel:active { color: var(--text-primary); }
+
+/* Divider */
+.login-divider {
+  width: 100%; display: flex; align-items: center; gap: 12px; margin: 24px 0; color: var(--text-light); font-size: 12px;
+}
+.login-divider::before, .login-divider::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+
+/* Form (simple) */
+.simple-form {
+  width: 100%; display: none; flex-direction: column; gap: 14px; margin-top: 10px;
+}
+.simple-form.show { display: flex; }
+.simple-input {
+  width: 100%; height: 48px; padding: 0 16px; border: 1px solid var(--border); border-radius: 10px;
+  font-size: 15px; color: var(--text-primary); outline: none; font-family: inherit;
+  transition: border-color 0.2s;
+}
+.simple-input:focus { border-color: var(--primary); }
+.simple-input::placeholder { color: var(--text-light); }
+
+/* Agreement */
+.agreement-row {
+  display: flex; align-items: center; gap: 8px; margin-top: auto; padding-top: 20px;
+}
+.agreement-row input[type="checkbox"] {
+  width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer;
+}
+.agreement-row label { font-size: 12px; color: var(--text-secondary); cursor: pointer; }
+.agreement-row a { color: var(--primary); text-decoration: none; font-weight: 500; }
+</style>
+</head>
+<body>
+
+<div class="phone-frame">
+  <!-- Header -->
+  <div class="login-header-bar">
+    <button class="back-btn" onclick="goBack()">‹</button>
+    <div class="header-title">登录</div>
+  </div>
+
+  <!-- Content -->
+  <div class="login-content">
+    <div class="login-logo-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="12,2 22,8.5 22,15.5 12,22 2,15.5 2,8.5"/>
+        <circle cx="12" cy="12" r="3" fill="#fff" stroke="none"/>
+      </svg>
+    </div>
+    <div class="login-app-name">职趣星图</div>
+    <div class="login-app-sub">自在生涯工作室</div>
+
+    <!-- 快捷登录 -->
+    <button class="login-btn-primary" id="quickLoginBtn" onclick="doQuickLogin()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      快捷登录
+    </button>
+    <button class="login-btn-cancel" onclick="goBack()">取消</button>
+
+    <div class="login-divider">或</div>
+
+    <!-- 简易信息填写（首次登录时显示） -->
+    <div class="simple-form" id="simpleForm">
+      <input type="text" class="simple-input" id="sName" placeholder="请输入姓名" maxlength="20">
+      <input type="text" class="simple-input" id="sSid" placeholder="请输入学号" maxlength="20">
+      <input type="text" class="simple-input" id="sClass" placeholder="请输入班级，如：2023级计算机1班" maxlength="30">
+      <div class="simple-input" style="padding:14px 18px; background:#f8f9fa; border:1px solid #eee; border-radius:12px; font-size:15px; color:var(--text-primary); font-weight:600; text-align:left;">广州职业技术大学</div>
+      <button class="login-btn-primary" onclick="doSimpleLogin()">确认登录</button>
+    </div>
+
+    <!-- Agreement -->
+    <div class="agreement-row">
+      <input type="checkbox" id="agreeCheck" checked>
+      <label for="agreeCheck">同意<a href="javascript:void(0)" onclick="alert('用户协议：本小程序仅用于职业规划辅助，用户信息保存在本地，不会上传至服务器。')">《用户协议》</a>和<a href="javascript:void(0)" onclick="alert('隐私政策：我们非常重视您的隐私，所有数据仅保存在您的设备本地。')">《隐私政策》</a></label>
+    </div>
+  </div>
+</div>
+
+<script>
+function goBack() {
+  var redirect = sessionStorage.getItem('login_redirect') || 'index.html';
+  sessionStorage.removeItem('login_redirect');
+  window.location.href = redirect;
+}
+
+function doQuickLogin() {
+  if (!document.getElementById('agreeCheck').checked) {
+    alert('请先同意用户协议和隐私政策'); return;
+  }
+  // 检查是否已有登录信息
+  var saved = localStorage.getItem('app_user_info');
+  if (saved) {
+    var info = JSON.parse(saved);
+    if (info && info.name) {
+      goBack(); return;
+    }
+  }
+  // 首次登录：显示简易表单
+  document.getElementById('quickLoginBtn').style.display = 'none';
+  document.getElementById('simpleForm').classList.add('show');
+}
+
+function doSimpleLogin() {
+  if (!document.getElementById('agreeCheck').checked) {
+    alert('请先同意用户协议和隐私政策'); return;
+  }
+  var name = document.getElementById('sName').value.trim();
+  var sid = document.getElementById('sSid').value.trim();
+  var className = document.getElementById('sClass').value.trim();
+  var school = '广州职业技术大学';
+  if (!name) { alert('请输入姓名'); return; }
+  if (!sid) { alert('请输入学号'); return; }
+  if (!className) { alert('请输入班级'); return; }
+  var userInfo = { name: name, sid: sid, className: className, school: school, loginTime: new Date().toISOString() };
+  localStorage.setItem('app_user_info', JSON.stringify(userInfo));
+  // 同步班级到完善资料页
+  try {
+    var resumeData = JSON.parse(localStorage.getItem('resumeData') || '{}');
+    if (!resumeData.basic) resumeData.basic = {};
+    resumeData.basic.name = name;
+    resumeData.basic.sid = sid;
+    resumeData.basic.className = className;
+    resumeData.basic.school = school;
+    localStorage.setItem('resumeData', JSON.stringify(resumeData));
+  } catch(e) {}
+  goBack();
+}
+</script>
+
+</body>
+</html>

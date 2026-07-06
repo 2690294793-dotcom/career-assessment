@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>我的 · 自在生涯工作室</title>
+<style>
+:root {
+  --bg: #FAF8F5;
+  --card: #FFFFFF;
+  --text-primary: #2D2D2D;
+  --text-secondary: #8E8E93;
+  --text-light: #B0B0B8;
+  --border: #F0EDEA;
+  --accent: #C88EA7;
+  --accent-soft: #F5EDF1;
+  --accent-gradient: linear-gradient(135deg, #D4A08A, #C88EA7, #B8869F);
+  --primary: #6366f1;
+  --success: #7CB89A;
+  --danger: #D4786B;
+  --radius-sm: 14px;
+  --radius-md: 20px;
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02);
+  --shadow-elevated: 0 4px 16px rgba(0,0,0,0.06);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background: #EDE8E3;
+  display: flex; justify-content: center; align-items: center;
+  min-height: 100vh; padding: 16px;
+}
+.phone-frame {
+  width: 390px; height: 844px;
+  background: var(--bg);
+  border-radius: 42px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 0 0 8px #F5F0ED, 0 0 0 10px rgba(0,0,0,0.08), 0 20px 60px rgba(0,0,0,0.12);
+  display: flex; flex-direction: column;
+}
+
+/* Scroll */
+.scroll-area {
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+.scroll-area::-webkit-scrollbar { width: 0; }
+
+/* ====== USER CARD ====== */
+.user-card {
+  background: var(--card); border-radius: 0 0 var(--radius-md) var(--radius-md);
+  padding: 28px 20px 20px; margin-bottom: 12px;
+  box-shadow: var(--shadow-card);
+}
+.user-card-top {
+  display: flex; align-items: center; gap: 16px; margin-bottom: 14px;
+}
+.user-avatar-lg {
+  width: 64px; height: 64px; border-radius: 50%;
+  background: var(--accent-gradient);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px; color: #fff; font-weight: 700; flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(200,142,167,0.25);
+}
+.user-name-area { flex: 1; min-width: 0; }
+.user-name-lg {
+  font-size: 20px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px;
+}
+.user-profile-link {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 13px; color: var(--text-secondary); text-decoration: none;
+  cursor: pointer; transition: color 0.2s;
+}
+.user-profile-link:active { color: var(--accent); }
+.user-profile-link svg { width: 14px; height: 14px; }
+
+/* ====== MENU GROUP ====== */
+.menu-group {
+  background: var(--card); border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-card); margin: 0 16px 12px; overflow: hidden;
+}
+.menu-item {
+  display: flex; align-items: center; gap: 14px;
+  padding: 16px 18px; text-decoration: none; cursor: pointer;
+  -webkit-tap-highlight-color: transparent; transition: background 0.15s;
+  border-bottom: 1px solid var(--border);
+}
+.menu-item:last-child { border-bottom: none; }
+.menu-item:active { background: var(--accent-soft); }
+.menu-icon {
+  width: 36px; height: 36px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;
+}
+.menu-icon.pink { background: #FDF2F8; }
+.menu-icon.pink svg { stroke: #C88EA7; }
+.menu-icon.blue { background: #EFF6FF; }
+.menu-icon.blue svg { stroke: #60A5FA; }
+.menu-icon.green { background: #ECFDF5; }
+.menu-icon.green svg { stroke: #34D399; }
+.menu-icon.purple { background: #F5F3FF; }
+.menu-icon.purple svg { stroke: #A78BFA; }
+.menu-icon.orange { background: #FFF7ED; }
+.menu-icon.orange svg { stroke: #FB923C; }
+.menu-icon.gray { background: #F3F4F6; }
+.menu-icon.gray svg { stroke: #9CA3AF; }
+.menu-icon.red { background: #FEF2F2; }
+.menu-icon.red svg { stroke: #F87171; }
+
+.menu-info { flex: 1; min-width: 0; }
+.menu-name { font-size: 15px; font-weight: 500; color: var(--text-primary); }
+.menu-badge {
+  background: #FEE2E2; color: #EF4444; font-size: 11px; font-weight: 600;
+  padding: 2px 8px; border-radius: 10px; margin-left: 6px; display: none;
+}
+.menu-badge.show { display: inline-block; }
+.menu-arrow {
+  font-size: 13px; color: var(--text-light); flex-shrink: 0;
+}
+
+/* ====== BOTTOM NAV ====== */
+.bottom-nav {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 58px; background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-around;
+  z-index: 100; flex-shrink: 0; padding: 0 4px;
+}
+.nav-item {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  text-decoration: none; cursor: pointer; flex: 1; padding: 6px 0;
+  -webkit-tap-highlight-color: transparent;
+  color: #B0B0B8;
+}
+.nav-item svg { width: 22px; height: 22px; }
+.nav-item span { font-size: 10px; font-weight: 500; }
+.nav-item.active { color: var(--accent); }
+.nav-item:active { opacity: 0.7; }
+
+/* ====== TOAST ====== */
+.toast {
+  position: fixed; top: 30px; left: 50%;
+  transform: translateX(-50%) translateY(-120px);
+  background: var(--text-primary); color: #fff;
+  padding: 12px 24px; border-radius: 14px;
+  font-size: 14px; font-weight: 500; z-index: 9999;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  pointer-events: none; white-space: nowrap;
+}
+.toast.visible { transform: translateX(-50%) translateY(0); }
+.toast.hidden { transform: translateX(-50%) translateY(-120px); }
+
+/* ====== SUB PAGES (embedded in scroll area) ====== */
+.sub-page {
+  display: none; padding: 0 16px 80px 16px;
+}
+.sub-page.show { display: block; }
+.sub-page-header {
+  display: flex; align-items: center; gap: 12px; padding: 20px 0 12px;
+}
+.sub-page-header .back-btn {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--card); border: 1px solid var(--border);
+  cursor: pointer; font-size: 16px; color: var(--text-primary);
+  display: flex; align-items: center; justify-content: center;
+}
+.sub-page-header .sub-title { font-size: 18px; font-weight: 700; color: var(--text-primary); }
+
+/* Appointment & Plan list styles (reused from old resume.html) */
+.apt-list { max-height: 480px; overflow-y: auto; }
+.apt-item {
+  background: var(--card); border-radius: var(--radius-sm); padding: 14px 16px; margin-bottom: 10px;
+  cursor: pointer; transition: background 0.15s; display: flex; align-items: flex-start; gap: 12px;
+  box-shadow: var(--shadow-card);
+}
+.apt-item:active { background: var(--accent-soft); }
+.apt-status-dot { width: 10px; height: 10px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+.apt-status-dot.pending { background: #F59E0B; }
+.apt-status-dot.accepted { background: var(--success); }
+.apt-status-dot.rejected { background: var(--danger); }
+.apt-status-dot.completed { background: #A78BFA; }
+.apt-item-body { flex: 1; min-width: 0; }
+.apt-item-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+.apt-item-no { font-size: 11px; color: var(--text-light); font-family: monospace; }
+.apt-item-status {
+  font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px;
+}
+.apt-item-status.pending { background: #FEF3C7; color: #92400e; }
+.apt-item-status.accepted { background: #EDF7F1; color: #065f46; }
+.apt-item-status.rejected { background: #FDF0ED; color: #991b1b; }
+.apt-item-status.completed { background: #EDE9FE; color: #5b21b6; }
+.apt-item-meta { font-size: 13px; color: var(--text-secondary); margin-bottom: 3px; }
+.apt-item-meta strong { color: var(--text-primary); }
+.apt-item-problem {
+  font-size: 12px; color: var(--text-light); line-height: 1.5;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-top: 2px;
+}
+.apt-detail {
+  display: none; padding: 10px 0 4px; margin-top: 8px; border-top: 1px dashed var(--border);
+}
+.apt-detail.show { display: block; }
+.apt-detail-row { display: flex; padding: 4px 0; }
+.apt-detail-label { width: 70px; font-size: 12px; color: var(--text-light); flex-shrink: 0; }
+.apt-detail-val { font-size: 13px; color: var(--text-primary); flex: 1; word-break: break-all; }
+.apt-empty {
+  text-align: center; padding: 40px 20px; color: var(--text-light);
+}
+.apt-empty .apt-empty-icon { font-size: 40px; margin-bottom: 10px; }
+.apt-empty p { font-size: 13px; margin-top: 4px; }
+.apt-empty .apt-empty-link {
+  display: inline-block; margin-top: 12px; padding: 8px 20px;
+  border-radius: 20px; background: var(--accent-gradient);
+  color: #fff; font-size: 13px; font-weight: 500; text-decoration: none;
+}
+.apt-loading {
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px; gap: 8px; color: var(--text-light); font-size: 13px;
+}
+.apt-loading .mini-spinner {
+  width: 16px; height: 16px; border: 2px solid var(--border);
+  border-top-color: var(--accent); border-radius: 50%;
+  animation: miniSpin 0.6s linear infinite;
+}
+@keyframes miniSpin { to { transform: rotate(360deg); } }
+
+/* Assessment list */
+.assess-list-item {
+  background: var(--card); border-radius: var(--radius-sm); padding: 14px 16px; margin-bottom: 10px;
+  cursor: pointer; box-shadow: var(--shadow-card); transition: background 0.15s;
+}
+.assess-list-item:active { background: var(--accent-soft); }
+.assess-title { font-size: 15px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+.assess-meta { font-size: 12px; color: var(--text-secondary); }
+.assess-tag {
+  display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 6px; margin-top: 6px; margin-right: 4px;
+}
+.assess-tag.holland { background: #EEF2FF; color: #6366f1; }
+.assess-tag.mbti { background: #FDF2F8; color: #C88EA7; }
+.assess-tag.bigfive { background: #ECFDF5; color: #34D399; }
+.assess-tag.disc { background: #FFF7ED; color: #FB923C; }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+</head>
+<body>
+
+<div class="toast hidden" id="toast"></div>
+
+<div class="phone-frame">
+
+  <div class="scroll-area" id="mainScroll">
+
+    <!-- ====== MAIN PAGE: 我的 ====== -->
+    <div id="pageMy">
+      <!-- User Card -->
+      <div class="user-card" id="userCard" style="display:none;">
+        <div class="user-card-top">
+          <div class="user-avatar-lg" id="userAvatar">👤</div>
+          <div class="user-name-area">
+            <div class="user-name-lg" id="userDisplayName">学生</div>
+            <a class="user-profile-link" onclick="window.location.href='profile.html'">
+              完善个人资料
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Not logged in prompt -->
+      <div id="loginPrompt" style="display:none; padding:60px 20px; text-align:center;">
+        <div style="font-size:48px; margin-bottom:12px;">👤</div>
+        <div style="font-size:16px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">请先登录</div>
+        <div style="font-size:13px; color:var(--text-secondary); margin-bottom:20px;">登录后即可查看个人中心</div>
+        <a href="login.html" style="display:inline-block; padding:12px 36px; border-radius:24px; background:var(--accent-gradient); color:#fff; font-size:15px; font-weight:600; text-decoration:none;">去登录</a>
+      </div>
+
+      <!-- Menu Group 1 -->
+      <div class="menu-group" id="menuGroup1" style="display:none;">
+        <a class="menu-item" onclick="showSubPage('appointments')">
+          <div class="menu-icon pink">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </div>
+          <div class="menu-info">
+            <span class="menu-name">我的预约</span>
+            <span class="menu-badge" id="aptBadge">0</span>
+          </div>
+          <span class="menu-arrow">›</span>
+        </a>
+        <a class="menu-item" onclick="showSubPage('assessments')">
+          <div class="menu-icon blue">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+          </div>
+          <div class="menu-info">
+            <span class="menu-name">我的测评</span>
+            <span class="menu-badge" id="assessBadge">0</span>
+          </div>
+          <span class="menu-arrow">›</span>
+        </a>
+        <a class="menu-item" onclick="showSubPage('plans')">
+          <div class="menu-icon green">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 21 18 21 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+          </div>
+          <div class="menu-info">
+            <span class="menu-name">我的规划方案</span>
+            <span class="menu-badge" id="planBadge">0</span>
+          </div>
+          <span class="menu-arrow">›</span>
+        </a>
+      </div>
+
+      <!-- Menu Group 2 -->
+      <div class="menu-group" id="menuGroup2" style="display:none;">
+        <a class="menu-item" onclick="window.location.href='about.html'">
+          <div class="menu-icon gray">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          </div>
+          <div class="menu-info"><span class="menu-name">关于我们</span></div>
+          <span class="menu-arrow">›</span>
+        </a>
+        <a class="menu-item" onclick="doLogout()">
+          <div class="menu-icon red">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          </div>
+          <div class="menu-info"><span class="menu-name">退出登录</span></div>
+          <span class="menu-arrow">›</span>
+        </a>
+      </div>
+    </div><!-- end pageMy -->
+
+    <!-- ====== SUB PAGE: 我的预约 ====== -->
+    <div class="sub-page" id="pageAppointments">
+      <div class="sub-page-header">
+        <button class="back-btn" onclick="showMainPage()">‹</button>
+        <span class="sub-title">我的预约</span>
+      </div>
+      <div class="apt-list" id="aptList"><div class="apt-loading"><span class="mini-spinner"></span>加载中...</div></div>
+    </div>
+
+    <!-- ====== SUB PAGE: 我的测评 ====== -->
+    <div class="sub-page" id="pageAssessments">
+      <div class="sub-page-header">
+        <button class="back-btn" onclick="showMainPage()">‹</button>
+        <span class="sub-title">我的测评</span>
+      </div>
+      <div id="assessList"></div>
+    </div>
+
+    <!-- ====== SUB PAGE: 我的规划方案 ====== -->
+    <div class="sub-page" id="pagePlans">
+      <div class="sub-page-header">
+        <button class="back-btn" onclick="showMainPage()">‹</button>
+        <span class="sub-title">我的规划方案</span>
+      </div>
+      <div id="plansList"></div>
+    </div>
+
+  </div><!-- end scroll-area -->
+
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav">
+    <a class="nav-item" href="index.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>首页</span>
+    </a>
+    <a class="nav-item" href="assessment.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      <span>测评</span>
+    </a>
+    <a class="nav-item" href="consult-flow.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      <span>咨询</span>
+    </a>
+    <a class="nav-item" href="goals.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+      <span>目标</span>
+    </a>
+    <a class="nav-item active" href="resume.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span>我的</span>
+    </a>
+  </nav>
+
+</div>
+
+<script>
+// ============ STATE ============
+var userInfo = null;
+
+function init() {
+  var saved = localStorage.getItem('app_user_info');
+  if (saved) { try { userInfo = JSON.parse(saved); } catch(e) { userInfo = null; } }
+  applyLoginState();
+  if (userInfo) {
+    initSupabase();
+    loadAppointmentHistory();
+    loadMyAssessments();
+    loadMyPlans();
+  }
+}
+
+function applyLoginState() {
+  var userCard = document.getElementById('userCard');
+  var loginPrompt = document.getElementById('loginPrompt');
+  var menu1 = document.getElementById('menuGroup1');
+  var menu2 = document.getElementById('menuGroup2');
+
+  if (userInfo && userInfo.name) {
+    userCard.style.display = 'block';
+    loginPrompt.style.display = 'none';
+    menu1.style.display = 'block';
+    menu2.style.display = 'block';
+    document.getElementById('userDisplayName').textContent = userInfo.name;
+    document.getElementById('userAvatar').textContent = userInfo.name.charAt(0);
+  } else {
+    userCard.style.display = 'none';
+    loginPrompt.style.display = 'block';
+    menu1.style.display = 'none';
+    menu2.style.display = 'none';
+  }
+}
+
+function doLogout() {
+  try { localStorage.removeItem('app_user_info'); } catch(e) {}
+  userInfo = null;
+  applyLoginState();
+  showToast('已退出登录');
+  setTimeout(function() { location.reload(); }, 800);
+}
+
+// ============ PAGE NAVIGATION ============
+function showSubPage(page) {
+  document.getElementById('pageMy').style.display = 'none';
+  document.getElementById('pageAppointments').classList.remove('show');
+  document.getElementById('pageAssessments').classList.remove('show');
+  document.getElementById('pagePlans').classList.remove('show');
+  if (page === 'appointments') document.getElementById('pageAppointments').classList.add('show');
+  if (page === 'assessments') document.getElementById('pageAssessments').classList.add('show');
+  if (page === 'plans') document.getElementById('pagePlans').classList.add('show');
+  document.getElementById('mainScroll').scrollTop = 0;
+}
+function showMainPage() {
+  document.getElementById('pageMy').style.display = 'block';
+  document.getElementById('pageAppointments').classList.remove('show');
+  document.getElementById('pageAssessments').classList.remove('show');
+  document.getElementById('pagePlans').classList.remove('show');
+  document.getElementById('mainScroll').scrollTop = 0;
+}
+
+// ============ TOAST ============
+var toastTimer = null;
+function showToast(message) {
+  var toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.classList.remove('hidden'); toast.classList.add('visible');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(function() { toast.classList.remove('visible'); toast.classList.add('hidden'); }, 2000);
+}
+
+// ============ 我的测评 ============
+function loadMyAssessments() {
+  var container = document.getElementById('assessList');
+  var tests = [];
+  try {
+    var h = JSON.parse(localStorage.getItem('holland_result') || 'null');
+    if (h) tests.push({ type:'holland', title:'霍兰德职业兴趣测评', date:h.completedAt||h.date, code:h.code||'' });
+  } catch(e) {}
+  try {
+    var m = JSON.parse(localStorage.getItem('mbti_result') || 'null');
+    if (m) tests.push({ type:'mbti', title:'MBTI职业性格测评', date:m.completedAt||m.date, code:m.type||'' });
+  } catch(e) {}
+  try {
+    var b = JSON.parse(localStorage.getItem('bigfive_result') || 'null');
+    if (b) tests.push({ type:'bigfive', title:'大五人格测评', date:b.completedAt||b.date, code:'' });
+  } catch(e) {}
+  try {
+    var d = JSON.parse(localStorage.getItem('disc_result') || 'null');
+    if (d) tests.push({ type:'disc', title:'DISC行为风格测评', date:d.completedAt||d.date, code:d.type||'' });
+  } catch(e) {}
+
+  document.getElementById('assessBadge').textContent = tests.length;
+  if (tests.length > 0) document.getElementById('assessBadge').classList.add('show');
+  else document.getElementById('assessBadge').classList.remove('show');
+
+  if (tests.length === 0) {
+    container.innerHTML = '<div class="apt-empty"><div class="apt-empty-icon">📝</div><p style="font-weight:500;color:var(--text-secondary);">暂无测评记录</p><p style="font-size:12px;">完成测评后，结果将同步到这里</p><a class="apt-empty-link" href="assessment.html">去测评 →</a></div>';
+    return;
+  }
+
+  var html = '';
+  var typeMap = { holland:'holland', mbti:'mbti', bigfive:'bigfive', disc:'disc' };
+  var tagMap = { holland:'holland', mbti:'mbti', bigfive:'bigfive', disc:'disc' };
+  var labelMap = { holland:'霍兰德', mbti:'MBTI', bigfive:'大五人格', disc:'DISC' };
+  tests.sort(function(a,b) { return new Date(b.date||0) - new Date(a.date||0); });
+  tests.forEach(function(t) {
+    var dateStr = t.date ? new Date(t.date).toLocaleDateString('zh-CN') : '';
+    var tagClass = tagMap[t.type] || '';
+    var tagName = labelMap[t.type] || t.type;
+    html += '<div class="assess-list-item" onclick="window.location.href=\'assessment.html\'">';
+    html += '<div class="assess-title">' + esc(t.title) + '</div>';
+    html += '<div class="assess-meta">' + (dateStr ? '完成于 ' + dateStr : '') + '</div>';
+    html += '<span class="assess-tag ' + tagClass + '">' + tagName + (t.code ? ' · ' + esc(t.code) : '') + '</span>';
+    html += '</div>';
+  });
+  container.innerHTML = html;
+}
+
+// ============ 我的规划方案 ============
+function loadMyPlans() {
+  var container = document.getElementById('plansList');
+  var saved = [];
+  try { saved = JSON.parse(localStorage.getItem('saved_plans') || '[]'); } catch(e) {}
+
+  document.getElementById('planBadge').textContent = saved.length;
+  if (saved.length > 0) document.getElementById('planBadge').classList.add('show');
+  else document.getElementById('planBadge').classList.remove('show');
+
+  if (saved.length === 0) {
+    container.innerHTML = '<div class="apt-empty"><div class="apt-empty-icon">🗺️</div><p style="font-weight:500;color:var(--text-secondary);">暂无规划方案</p><p style="font-size:12px;">去生成你的第一个职业规划方案</p><a class="apt-empty-link" href="resume-templates.html">去生成方案 →</a></div>';
+    return;
+  }
+  var html = '';
+  saved.forEach(function(p, idx) {
+    var d = p.plan || {};
+    var inputs = p.inputs || {};
+    var dateStr = p.createdAt ? new Date(p.createdAt).toLocaleDateString('zh-CN') : '';
+    html += '<div class="assess-list-item" onclick="viewMyPlan(' + idx + ')">';
+    html += '<div class="assess-title">' + esc(inputs.name || '未命名') + ' 的职业规划</div>';
+    html += '<div class="assess-meta">' + esc(inputs.major || '') + ' · ' + esc(inputs.grade || '') + ' · ' + dateStr + '</div>';
+    html += '<span class="assess-tag purple">规划方案</span>';
+    html += '</div>';
+  });
+  container.innerHTML = html;
+}
+
+function viewMyPlan(index) {
+  var saved = [];
+  try { saved = JSON.parse(localStorage.getItem('saved_plans') || '[]'); } catch(e) {}
+  var p = saved[index]; if (!p) return;
+  var d = p.plan || {};
+  var inputs = p.inputs || {};
+  var dateStr = p.createdAt ? new Date(p.createdAt).toLocaleString('zh-CN') : '';
+
+  var overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2000;display:flex;align-items:center;justify-content:center;animation:fadeIn 0.25s ease;';
+  var box = document.createElement('div');
+  box.style.cssText = 'width:340px;max-height:78vh;overflow-y:auto;background:#fff;border-radius:22px;padding:24px 20px 18px;box-shadow:0 20px 60px rgba(0,0,0,0.2);position:relative;';
+
+  var h = '<button onclick="this.parentElement.parentElement.remove()" style="position:absolute;top:12px;right:14px;width:28px;height:28px;border-radius:50%;background:#f1f5f9;border:none;cursor:pointer;font-size:16px;color:#8E8E93;display:flex;align-items:center;justify-content:center;">✕</button>';
+  h += '<div style="font-size:18px;font-weight:700;color:var(--text-primary);margin-bottom:4px;">' + esc(inputs.name || '') + '的职业规划</div>';
+  h += '<div style="font-size:12px;color:var(--text-secondary);margin-bottom:16px;">' + esc(inputs.major || '') + ' · ' + esc(inputs.grade || '') + ' · ' + esc(dateStr) + '</div>';
+  function rs(icon, title, items) {
+    var s = '<div style="margin-bottom:14px;"><div style="font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:8px;">' + icon + ' ' + title + '</div>';
+    if (items && items.length) {
+      items.forEach(function(item, i) {
+        var t = item.title || (i+1);
+        var desc = item.desc || '';
+        s += '<div style="display:flex;gap:8px;padding:6px 0;border-bottom:1px solid #f3f4f6;">' +
+          '<div style="width:6px;height:6px;border-radius:50%;background:var(--accent);margin-top:6px;flex-shrink:0;"></div>' +
+          '<div style="flex:1;"><div style="font-size:13px;font-weight:600;color:var(--text-primary);">' + esc(t) + '</div>' +
+          '<div style="font-size:12px;color:var(--text-secondary);line-height:1.5;margin-top:2px;">' + esc(desc).replace(/\n/g, '<br>') + '</div></div></div>';
+      });
+    }
+    s += '</div>'; return s;
+  }
+  h += rs('🗺️', '职业路线图', d.roadmap);
+  h += rs('⏰', '时间规划', d.timeline);
+  h += rs('📈', '技能提升', d.skills);
+  h += rs('💼', '求职策略', d.strategy);
+  h += '<div style="display:flex;gap:8px;margin-top:10px;">';
+  h += '<button onclick="this.parentElement.parentElement.parentElement.remove()" style="flex:1;padding:11px;border:1.5px solid var(--border);border-radius:14px;background:#fff;color:var(--text-secondary);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">关闭</button>';
+  h += '<button onclick="deleteMyPlan(' + index + ')" style="padding:11px 18px;border:1.5px solid #fecaca;border-radius:14px;background:#fff;color:#ef4444;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">删除</button>';
+  h += '</div>';
+  box.innerHTML = h;
+  overlay.appendChild(box);
+  overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+  document.body.appendChild(overlay);
+}
+function deleteMyPlan(index) {
+  var saved = [];
+  try { saved = JSON.parse(localStorage.getItem('saved_plans') || '[]'); } catch(e) {}
+  saved.splice(index, 1);
+  localStorage.setItem('saved_plans', JSON.stringify(saved));
+  var overlays = document.querySelectorAll('[style*="z-index:2000"]');
+  overlays.forEach(function(o) { o.remove(); });
+  showToast('方案已删除');
+  loadMyPlans();
+}
+
+// ============ 预约历史 ============
+var aptAutoRefreshTimer = null;
+function getMyAppointmentIds() {
+  try { return JSON.parse(localStorage.getItem('my_appointments') || '[]'); } catch(e) { return []; }
+}
+async function loadAppointmentHistory() {
+  var list = document.getElementById('aptList');
+  var ids = getMyAppointmentIds();
+  if (ids.length === 0) { renderEmptyApt(); return; }
+  list.innerHTML = '<div class="apt-loading"><span class="mini-spinner"></span>加载中...</div>';
+  try {
+    var appointments = await getMyAppointments(ids);
+    renderAppointmentList(appointments);
+  } catch(e) {
+    try {
+      var local = JSON.parse(localStorage.getItem('zt_appointments') || '[]');
+      var filtered = local.filter(function(a) { return ids.indexOf(a.appointment_no) >= 0; })
+        .sort(function(a, b) { return new Date(b.created_at) - new Date(a.created_at); });
+      renderAppointmentList(filtered);
+    } catch(e2) { list.innerHTML = '<div class="apt-empty"><div class="apt-empty-icon">⚠️</div><p>加载失败，请刷新重试</p></div>'; }
+  }
+}
+function renderEmptyApt() {
+  document.getElementById('aptList').innerHTML =
+    '<div class="apt-empty"><div class="apt-empty-icon">📋</div><p style="font-weight:500;color:var(--text-secondary);">暂无预约记录</p><p style="font-size:12px;">去预约咨询，开启你的职业规划之旅</p><a class="apt-empty-link" href="consult-flow.html">去预约咨询 →</a></div>';
+}
+function renderAppointmentList(appointments) {
+  var list = document.getElementById('aptList');
+  if (!appointments || appointments.length === 0) { renderEmptyApt(); return; }
+  var statusLabels = { pending:'待处理', accepted:'已同意', rejected:'已拒绝', completed:'已完成' };
+  var typeNames = { career:'职业规划', resume:'简历优化', interview:'面试辅导', industry:'行业分析' };
+
+  document.getElementById('aptBadge').textContent = appointments.length;
+  document.getElementById('aptBadge').classList.add('show');
+
+  var html = '';
+  appointments.forEach(function(apt, idx) {
+    var status = apt.status || 'pending';
+    var typeName = typeNames[apt.consult_type] || apt.consult_type_name || apt.consult_type || '';
+    var dateStr = apt.appointment_date || '';
+    var timeStr = apt.appointment_time || '';
+    var problem = apt.problem_desc || '';
+    var problemPreview = problem.length > 50 ? problem.substring(0, 50) + '...' : problem;
+    var no = apt.appointment_no || apt.id || '';
+
+    html += '<div class="apt-item" id="apt-item-' + idx + '">';
+    html += '<div class="apt-status-dot ' + status + '"></div>';
+    html += '<div class="apt-item-body" onclick="toggleAptDetail(' + idx + ')">';
+    html += '<div class="apt-item-top">';
+    html += '<span class="apt-item-no">' + esc(no) + '</span>';
+    html += '<span class="apt-item-status ' + status + '">' + (statusLabels[status] || status) + '</span>';
+    html += '</div>';
+    html += '<div class="apt-item-meta">';
+    html += '<strong>' + esc(apt.mentor_name || '未指定') + '</strong> · ' + esc(typeName);
+    if (dateStr) html += ' · ' + esc(dateStr) + (timeStr ? ' ' + esc(timeStr) : '');
+    html += '</div>';
+    if (problemPreview) html += '<div class="apt-item-problem">' + esc(problemPreview) + '</div>';
+    html += '<div class="apt-detail" id="apt-detail-' + idx + '">';
+    html += '<div class="apt-detail-row"><span class="apt-detail-label">预约编号</span><span class="apt-detail-val" style="font-family:monospace;">' + esc(no) + '</span></div>';
+    html += '<div class="apt-detail-row"><span class="apt-detail-label">状态</span><span class="apt-detail-val"><span class="apt-item-status ' + status + '">' + (statusLabels[status] || status) + '</span></span></div>';
+    html += '<div class="apt-detail-row"><span class="apt-detail-label">导师</span><span class="apt-detail-val">' + esc(apt.mentor_name || '未指定') + '</span></div>';
+    html += '<div class="apt-detail-row"><span class="apt-detail-label">咨询方向</span><span class="apt-detail-val">' + esc(typeName) + '</span></div>';
+    if (dateStr) html += '<div class="apt-detail-row"><span class="apt-detail-label">预约时间</span><span class="apt-detail-val">' + esc(dateStr) + (timeStr ? ' ' + esc(timeStr) : '') + '</span></div>';
+    html += '<div class="apt-detail-row"><span class="apt-detail-label">姓名</span><span class="apt-detail-val">' + esc(apt.student_name || '-') + '</span></div>';
+    if (apt.student_phone) html += '<div class="apt-detail-row"><span class="apt-detail-label">手机</span><span class="apt-detail-val">' + esc(apt.student_phone) + '</span></div>';
+    if (apt.student_school) html += '<div class="apt-detail-row"><span class="apt-detail-label">学校</span><span class="apt-detail-val">' + esc(apt.student_school) + '</span></div>';
+    html += '<div class="apt-detail-row"><span class="apt-detail-label">问题描述</span><span class="apt-detail-val">' + esc(problem || '-') + '</span></div>';
+    if (apt.teacher_response) html += '<div class="apt-detail-row"><span class="apt-detail-label">教师回复</span><span class="apt-detail-val" style="color:var(--accent);">' + esc(apt.teacher_response) + '</span></div>';
+    if (apt.consultation_notes) html += '<div style="margin-top:8px;padding:10px 12px;background:#FAF8F5;border-radius:10px;font-size:12px;color:var(--text-secondary);line-height:1.6;"><strong>📝 咨询记录</strong><br>' + formatNotes(apt.consultation_notes) + '</div>';
+    if (apt.updated_at) html += '<div class="apt-detail-row"><span class="apt-detail-label">最近更新</span><span class="apt-detail-val" style="color:var(--text-light);font-size:12px;">' + new Date(apt.updated_at).toLocaleString('zh-CN') + '</span></div>';
+    html += '</div>';
+    html += '<div style="font-size:11px;color:var(--text-light);margin-top:4px;" id="apt-expand-hint-' + idx + '">点击查看详情 ▼</div>';
+    html += '</div>';
+    html += '</div>';
+  });
+  list.innerHTML = html;
+  startAptAutoRefresh();
+}
+function toggleAptDetail(idx) {
+  var detail = document.getElementById('apt-detail-' + idx);
+  var hint = document.getElementById('apt-expand-hint-' + idx);
+  if (detail.classList.contains('show')) {
+    detail.classList.remove('show');
+    if (hint) hint.textContent = '点击查看详情 ▼';
+  } else {
+    detail.classList.add('show');
+    if (hint) hint.textContent = '点击收起详情 ▲';
+  }
+}
+function startAptAutoRefresh() {
+  stopAptAutoRefresh();
+  aptAutoRefreshTimer = setInterval(function() {
+    var ids = getMyAppointmentIds();
+    if (ids.length === 0) { stopAptAutoRefresh(); return; }
+    getMyAppointments(ids).then(function(data) { if (data && data.length > 0) renderAppointmentList(data); }).catch(function() {});
+  }, 15000);
+}
+function stopAptAutoRefresh() { if (aptAutoRefreshTimer) { clearInterval(aptAutoRefreshTimer); aptAutoRefreshTimer = null; } }
+function formatNotes(raw) {
+  if (!raw) return '';
+  try { var obj = JSON.parse(raw); if (obj && (obj.goals || obj.analysis || obj.solution || obj.action || obj.notes)) { return esc((obj.goals||'') + '\n' + (obj.analysis||'') + '\n' + (obj.solution||'') + '\n' + (obj.action||'') + '\n' + (obj.notes||'')).replace(/\n/g, '<br>'); } }
+  catch(e) {}
+  return esc(raw).replace(/\n/g, '<br>');
+}
+
+function esc(str) { if (!str) return ''; return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
+init();
+</script>
+
+</body>
+</html>

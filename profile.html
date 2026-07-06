@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>完善个人资料 · 自在生涯工作室</title>
+<style>
+:root {
+  --bg: #FAF8F5;
+  --card: #FFFFFF;
+  --text-primary: #2D2D2D;
+  --text-secondary: #8E8E93;
+  --text-light: #B0B0B8;
+  --border: #F0EDEA;
+  --accent: #C88EA7;
+  --accent-soft: #F5EDF1;
+  --accent-gradient: linear-gradient(135deg, #D4A08A, #C88EA7, #B8869F);
+  --success: #7CB89A;
+  --danger: #D4786B;
+  --danger-bg: #FDF0ED;
+  --radius-sm: 14px;
+  --radius-md: 20px;
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02);
+  --shadow-elevated: 0 4px 16px rgba(0,0,0,0.06);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background: #EDE8E3;
+  display: flex; justify-content: center; align-items: center;
+  min-height: 100vh; padding: 16px;
+}
+.phone-frame {
+  width: 390px; height: 844px;
+  background: var(--bg);
+  border-radius: 42px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 0 0 8px #F5F0ED, 0 0 0 10px rgba(0,0,0,0.08), 0 20px 60px rgba(0,0,0,0.12);
+  display: flex; flex-direction: column;
+}
+
+/* Header */
+.header {
+  padding: 20px 20px 16px;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0; background: var(--bg);
+}
+.header-left { display: flex; align-items: center; gap: 12px; }
+.back-btn {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--card); border: 1px solid var(--border);
+  cursor: pointer; font-size: 16px; color: var(--text-primary);
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s; flex-shrink: 0;
+}
+.back-btn:active { transform: scale(0.95); background: var(--accent-soft); }
+.header-title { font-size: 20px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.3px; }
+
+/* Scroll */
+.scroll-area {
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  padding: 0 16px 80px 16px;
+  -webkit-overflow-scrolling: touch;
+}
+.scroll-area::-webkit-scrollbar { width: 0; }
+
+/* Card */
+.card {
+  background: var(--card); border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-card); margin-bottom: 12px; overflow: hidden;
+  transition: box-shadow 0.3s;
+}
+.card-header {
+  padding: 14px 18px; display: flex; align-items: center; justify-content: space-between;
+  cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent;
+}
+.card-header h3 {
+  font-size: 15px; font-weight: 600; color: var(--text-primary);
+  display: flex; align-items: center; gap: 8px;
+}
+.card-header h3 .card-icon { font-size: 18px; }
+.chevron {
+  font-size: 12px; color: var(--text-light);
+  transition: transform 0.3s ease; flex-shrink: 0;
+}
+.card.expanded .chevron { transform: rotate(180deg); }
+.card-body { max-height: 0; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.4,0,0.2,1); }
+.card.expanded .card-body { max-height: 2400px; }
+.card-body-inner { padding: 0 18px 18px 18px; }
+
+/* Inputs */
+.input-group { margin-bottom: 10px; }
+.input-group label {
+  display: block; font-size: 12px; font-weight: 500;
+  color: var(--text-secondary); margin-bottom: 5px;
+}
+.input-group label .required { color: #E74C3C; margin-left: 2px; }
+.input-group input, .input-group select, .input-group textarea {
+  width: 100%; height: 44px; padding: 0 12px;
+  border: 1px solid var(--border); border-radius: 12px;
+  background: #FAF8F5; font-size: 14px; font-family: inherit;
+  color: var(--text-primary); outline: none;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+}
+.input-group textarea { height: 72px; padding: 10px 12px; resize: vertical; min-height: 44px; }
+.input-group input:focus, .input-group select:focus, .input-group textarea:focus {
+  border-color: var(--accent); background: #fff;
+  box-shadow: 0 0 0 3px rgba(200,142,167,0.1);
+}
+.inline-row { display: flex; gap: 8px; }
+.inline-row .input-group { flex: 1; }
+
+.sub-section {
+  background: #FAF8F5; border-radius: 12px;
+  padding: 12px; margin-bottom: 8px; position: relative;
+}
+.sub-section .remove-btn {
+  position: absolute; top: 8px; right: 8px;
+  width: 22px; height: 22px; border-radius: 50%;
+  border: none; background: var(--danger-bg); color: var(--danger);
+  font-size: 12px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.add-btn {
+  display: flex; align-items: center; justify-content: center; gap: 4px;
+  width: 100%; height: 40px;
+  border: 1.5px dashed var(--border); border-radius: 12px;
+  background: transparent; color: var(--accent);
+  font-size: 13px; font-weight: 500; cursor: pointer;
+  font-family: inherit; margin-top: 2px;
+}
+.add-btn:active { background: rgba(200,142,167,0.04); }
+
+.save-btn {
+  width: 100%; height: 48px; margin-top: 8px;
+  background: var(--accent-gradient);
+  color: #fff; border: none; border-radius: 14px;
+  font-size: 15px; font-weight: 600; cursor: pointer;
+  font-family: inherit; letter-spacing: 0.5px;
+  box-shadow: 0 4px 14px rgba(200,142,167,0.25);
+  transition: transform 0.15s, box-shadow 0.2s;
+}
+.save-btn:active { transform: scale(0.98); }
+
+/* Toast */
+.toast {
+  position: fixed; top: 30px; left: 50%;
+  transform: translateX(-50%) translateY(-120px);
+  background: var(--text-primary); color: #fff;
+  padding: 12px 24px; border-radius: 14px;
+  font-size: 14px; font-weight: 500; z-index: 9999;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  pointer-events: none; white-space: nowrap;
+}
+.toast.visible { transform: translateX(-50%) translateY(0); }
+.toast.hidden { transform: translateX(-50%) translateY(-120px); }
+</style>
+</head>
+<body>
+
+<div class="toast hidden" id="toast"></div>
+
+<div class="phone-frame">
+  <div class="header">
+    <div class="header-left">
+      <button class="back-btn" onclick="goBack()">‹</button>
+      <span class="header-title">完善个人资料</span>
+    </div>
+  </div>
+
+  <div class="scroll-area" id="scrollArea">
+    <!-- 基本信息 -->
+    <div class="card expanded" id="card-basic">
+      <div class="card-header" onclick="toggleCard('card-basic')">
+        <h3><span class="card-icon">👤</span>基本信息</h3>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="card-body">
+        <div class="card-body-inner">
+          <div class="input-group">
+            <label>姓名<span class="required">*</span></label>
+            <input type="text" id="name" placeholder="请输入姓名">
+          </div>
+          <div class="input-group">
+            <label>学号<span class="required">*</span></label>
+            <input type="text" id="sid" placeholder="请输入学号">
+          </div>
+          <div class="input-group">
+            <label>学校</label>
+            <div class="readonly-field" style="padding:14px 18px; background:#f8f9fa; border:1px solid #eee; border-radius:12px; font-size:15px; color:var(--text-primary); font-weight:600; text-align:left;">广州职业技术大学</div>
+          </div>
+          <div class="input-group">
+            <label>班级</label>
+            <input type="text" id="className" placeholder="如：2023级计算机1班">
+          </div>
+          <div class="input-group">
+            <label>手机号码</label>
+            <input type="tel" id="phone" placeholder="请输入手机号码">
+          </div>
+          <div class="input-group">
+            <label>邮箱</label>
+            <input type="email" id="email" placeholder="请输入邮箱">
+          </div>
+          <div class="inline-row">
+            <div class="input-group"><label>目标职位</label><input type="text" id="targetPosition" placeholder="如 前端工程师"></div>
+            <div class="input-group"><label>目标行业</label><input type="text" id="targetIndustry" placeholder="如 互联网"></div>
+          </div>
+          <div class="input-group">
+            <label>个人优势/自我评价</label>
+            <textarea id="selfSummary" placeholder="简要描述你的核心优势、性格特点等"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 教育经历 -->
+    <div class="card" id="card-education">
+      <div class="card-header" onclick="toggleCard('card-education')">
+        <h3><span class="card-icon">🎓</span>教育经历</h3>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="card-body">
+        <div class="card-body-inner" id="educationList"></div>
+        <div style="padding:0 18px 18px 18px;">
+          <button class="add-btn" onclick="addEducation()">+ 添加教育经历</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 工作/实习 -->
+    <div class="card" id="card-experience">
+      <div class="card-header" onclick="toggleCard('card-experience')">
+        <h3><span class="card-icon">💼</span>工作/实习经历</h3>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="card-body">
+        <div class="card-body-inner" id="experienceList"></div>
+        <div style="padding:0 18px 18px 18px;">
+          <button class="add-btn" onclick="addExperience()">+ 添加工作/实习经历</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 项目经历 -->
+    <div class="card" id="card-project">
+      <div class="card-header" onclick="toggleCard('card-project')">
+        <h3><span class="card-icon">📁</span>项目经历</h3>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="card-body">
+        <div class="card-body-inner" id="projectList"></div>
+        <div style="padding:0 18px 18px 18px;">
+          <button class="add-btn" onclick="addProject()">+ 添加项目经历</button>
+        </div>
+      </div>
+    </div>
+
+    <button class="save-btn" onclick="saveAll()">💾 保存资料</button>
+  </div>
+</div>
+
+<script>
+// ============ DATA ============
+var resumeData = {
+  basic: { name:'', sid:'', school:'广州职业技术大学', className:'', phone:'', email:'', targetPosition:'', targetIndustry:'', selfSummary:'' },
+  education: [],
+  experience: [],
+  projects: []
+};
+
+function loadData() {
+  var saved = localStorage.getItem('resumeData');
+  if (saved) {
+    try {
+      var parsed = JSON.parse(saved);
+      if (parsed.basic) { for (var k in parsed.basic) { if (parsed.basic.hasOwnProperty(k) && k !== 'school') resumeData.basic[k] = parsed.basic[k]; } resumeData.basic.school = '广州职业技术大学'; }
+      if (parsed.education) resumeData.education = parsed.education;
+      if (parsed.experience) resumeData.experience = parsed.experience;
+      if (parsed.projects) resumeData.projects = parsed.projects;
+    } catch(e) {}
+  }
+  // 同步登录信息
+  var user = localStorage.getItem('app_user_info');
+  if (user) {
+    try {
+      var u = JSON.parse(user);
+      if (!resumeData.basic.name && u.name) resumeData.basic.name = u.name;
+      if (!resumeData.basic.sid && u.sid) resumeData.basic.sid = u.sid;
+      if (!resumeData.basic.className && u.className) resumeData.basic.className = u.className;
+      resumeData.basic.school = '广州职业技术大学';
+    } catch(e) {}
+  }
+}
+
+function saveData() {
+  localStorage.setItem('resumeData', JSON.stringify(resumeData));
+}
+
+function goBack() {
+  window.location.href = 'resume.html';
+}
+
+// ============ TOAST ============
+var toastTimer = null;
+function showToast(message) {
+  var toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.classList.remove('hidden'); toast.classList.add('visible');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(function() { toast.classList.remove('visible'); toast.classList.add('hidden'); }, 2000);
+}
+
+// ============ RENDER ============
+function renderAll() {
+  renderBasic(); renderEducation(); renderExperience(); renderProjects();
+}
+function renderBasic() {
+  document.getElementById('name').value = resumeData.basic.name || '';
+  document.getElementById('sid').value = resumeData.basic.sid || '';
+  document.getElementById('className').value = resumeData.basic.className || '';
+  document.getElementById('phone').value = resumeData.basic.phone || '';
+  document.getElementById('email').value = resumeData.basic.email || '';
+  document.getElementById('targetPosition').value = resumeData.basic.targetPosition || '';
+  document.getElementById('targetIndustry').value = resumeData.basic.targetIndustry || '';
+  document.getElementById('selfSummary').value = resumeData.basic.selfSummary || '';
+}
+function renderEducation() {
+  var container = document.getElementById('educationList');
+  if (resumeData.education.length === 0) { resumeData.education.push({ school:'', major:'', degree:'本科', startYear:'', endYear:'' }); }
+  var html = '';
+  for (var i = 0; i < resumeData.education.length; i++) {
+    var edu = resumeData.education[i];
+    html += '<div class="sub-section">';
+    if (resumeData.education.length > 1) html += '<button class="remove-btn" onclick="removeEducation(' + i + ')">✕</button>';
+    html += '<div class="input-group"><label>学校名称</label><input type="text" placeholder="请输入学校名称" value="' + esc(edu.school||'') + '" onchange="updateEducation('+i+',\'school\',this.value)"></div>';
+    html += '<div class="input-group"><label>专业</label><input type="text" placeholder="请输入专业" value="' + esc(edu.major||'') + '" onchange="updateEducation('+i+',\'major\',this.value)"></div>';
+    html += '<div class="inline-row">';
+    html += '<div class="input-group"><label>学历</label><select onchange="updateEducation('+i+',\'degree\',this.value)">';
+    ['大专','本科','硕士','博士'].forEach(function(d) { html += '<option value="'+d+'"' + (edu.degree===d?' selected':'') + '>'+d+'</option>'; });
+    html += '</select></div>';
+    html += '<div class="input-group"><label>开始年份</label><input type="text" placeholder="如 2020" value="' + esc(edu.startYear||'') + '" onchange="updateEducation('+i+',\'startYear\',this.value)"></div>';
+    html += '<div class="input-group"><label>结束年份</label><input type="text" placeholder="如 2024" value="' + esc(edu.endYear||'') + '" onchange="updateEducation('+i+',\'endYear\',this.value)"></div></div>';
+    html += '</div>';
+  }
+  container.innerHTML = html;
+}
+function renderExperience() {
+  var container = document.getElementById('experienceList');
+  if (resumeData.experience.length === 0) { resumeData.experience.push({ company:'', position:'', startDate:'', endDate:'', description:'' }); }
+  var html = '';
+  for (var i = 0; i < resumeData.experience.length; i++) {
+    var exp = resumeData.experience[i];
+    html += '<div class="sub-section">';
+    if (resumeData.experience.length > 1) html += '<button class="remove-btn" onclick="removeExperience(' + i + ')">✕</button>';
+    html += '<div class="input-group"><label>公司名称</label><input type="text" placeholder="请输入公司名称" value="' + esc(exp.company||'') + '" onchange="updateExperience('+i+',\'company\',this.value)"></div>';
+    html += '<div class="input-group"><label>职位</label><input type="text" placeholder="请输入职位" value="' + esc(exp.position||'') + '" onchange="updateExperience('+i+',\'position\',this.value)"></div>';
+    html += '<div class="inline-row">';
+    html += '<div class="input-group"><label>开始时间</label><input type="text" placeholder="如 2022.06" value="' + esc(exp.startDate||'') + '" onchange="updateExperience('+i+',\'startDate\',this.value)"></div>';
+    html += '<div class="input-group"><label>结束时间</label><input type="text" placeholder="如 2024.06" value="' + esc(exp.endDate||'') + '" onchange="updateExperience('+i+',\'endDate\',this.value)"></div></div>';
+    html += '<div class="input-group"><label>工作描述</label><textarea placeholder="请描述工作内容和成果" onchange="updateExperience('+i+',\'description\',this.value)">' + esc(exp.description||'') + '</textarea></div>';
+    html += '</div>';
+  }
+  container.innerHTML = html;
+}
+function renderProjects() {
+  var container = document.getElementById('projectList');
+  if (resumeData.projects.length === 0) { resumeData.projects.push({ name:'', role:'', url:'', description:'' }); }
+  var html = '';
+  for (var i = 0; i < resumeData.projects.length; i++) {
+    var p = resumeData.projects[i];
+    html += '<div class="sub-section">';
+    if (resumeData.projects.length > 1) html += '<button class="remove-btn" onclick="removeProject(' + i + ')">✕</button>';
+    html += '<div class="input-group"><label>项目名称</label><input type="text" placeholder="请输入项目名称" value="' + esc(p.name||'') + '" onchange="updateProject('+i+',\'name\',this.value)"></div>';
+    html += '<div class="inline-row">';
+    html += '<div class="input-group"><label>担任角色</label><input type="text" placeholder="如 负责人/开发" value="' + esc(p.role||'') + '" onchange="updateProject('+i+',\'role\',this.value)"></div>';
+    html += '<div class="input-group"><label>项目链接</label><input type="text" placeholder="选填" value="' + esc(p.url||'') + '" onchange="updateProject('+i+',\'url\',this.value)"></div></div>';
+    html += '<div class="input-group"><label>项目描述</label><textarea placeholder="请描述项目内容和你的贡献" onchange="updateProject('+i+',\'description\',this.value)">' + esc(p.description||'') + '</textarea></div>';
+    html += '</div>';
+  }
+  container.innerHTML = html;
+}
+
+function toggleCard(cardId) {
+  var card = document.getElementById(cardId);
+  card.classList.toggle('expanded');
+}
+
+// ============ CRUD ============
+function addEducation() { resumeData.education.push({ school:'', major:'', degree:'本科', startYear:'', endYear:'' }); renderEducation(); saveData(); }
+function removeEducation(i) { if (resumeData.education.length <= 1) return; resumeData.education.splice(i,1); renderEducation(); saveData(); }
+function updateEducation(i, f, v) { resumeData.education[i][f] = v; saveData(); }
+function addExperience() { resumeData.experience.push({ company:'', position:'', startDate:'', endDate:'', description:'' }); renderExperience(); saveData(); }
+function removeExperience(i) { if (resumeData.experience.length <= 1) return; resumeData.experience.splice(i,1); renderExperience(); saveData(); }
+function updateExperience(i, f, v) { resumeData.experience[i][f] = v; saveData(); }
+function addProject() { resumeData.projects.push({ name:'', role:'', url:'', description:'' }); renderProjects(); saveData(); }
+function removeProject(i) { if (resumeData.projects.length <= 1) return; resumeData.projects.splice(i,1); renderProjects(); saveData(); }
+function updateProject(i, f, v) { resumeData.projects[i][f] = v; saveData(); }
+
+function saveAll() {
+  resumeData.basic.name = document.getElementById('name').value.trim();
+  resumeData.basic.sid = document.getElementById('sid').value.trim();
+  resumeData.basic.className = document.getElementById('className').value.trim();
+  resumeData.basic.phone = document.getElementById('phone').value.trim();
+  resumeData.basic.email = document.getElementById('email').value.trim();
+  resumeData.basic.targetPosition = document.getElementById('targetPosition').value.trim();
+  resumeData.basic.targetIndustry = document.getElementById('targetIndustry').value.trim();
+  resumeData.basic.selfSummary = document.getElementById('selfSummary').value.trim();
+  if (!resumeData.basic.name) { showToast('请填写姓名'); return; }
+  if (!resumeData.basic.sid) { showToast('请填写学号'); return; }
+  saveData();
+  // 同步登录信息
+  var user = localStorage.getItem('app_user_info');
+  if (user) {
+    try {
+      var u = JSON.parse(user);
+      u.name = resumeData.basic.name; u.sid = resumeData.basic.sid; u.school = resumeData.basic.school; u.className = resumeData.basic.className;
+      localStorage.setItem('app_user_info', JSON.stringify(u));
+    } catch(e) {}
+  }
+  showToast('资料保存成功');
+  setTimeout(goBack, 600);
+}
+
+function esc(str) { if (!str) return ''; return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
+loadData(); renderAll();
+</script>
+
+</body>
+</html>

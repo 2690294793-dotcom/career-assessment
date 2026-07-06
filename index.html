@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>自在生涯工作室</title>
+<style>
+/* ====== Design System ====== */
+:root {
+  --bg: #F0F4FF;
+  --card: #FFFFFF;
+  --text-primary: #1a1a2e;
+  --text-secondary: #7C8594;
+  --text-light: #B0B8C8;
+  --border: #E8ECF2;
+  --primary: #6366f1;
+  --primary-dark: #4338ca;
+  --purple-light: #EEF0FF;
+  --green-hex: #34D399;
+  --blue-hex: #60A5FA;
+  --purple-hex: #A78BFA;
+  --orange-hex: #FB923C;
+  --red-hex: #F87171;
+  --rose-hex: #FB7185;
+  --teal-hex: #2DD4BF;
+  --radius-sm: 14px;
+  --radius-md: 20px;
+  --radius-lg: 24px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 50%, #f5f7ff 100%);
+  display: flex; justify-content: center; align-items: center;
+  min-height: 100vh; padding: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ====== Phone Frame ====== */
+.phone-frame {
+  width: 390px; height: 844px;
+  background: linear-gradient(180deg, #EBF0FF 0%, #F0F3FF 30%, #F8F9FF 70%, #FFFFFF 100%);
+  border-radius: 42px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(99,102,241,0.12), 0 0 0 1px rgba(99,102,241,0.08);
+  display: flex; flex-direction: column;
+}
+
+/* Subtle background dots */
+.phone-frame::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: radial-gradient(circle at 1px 1px, rgba(99,102,241,0.06) 1px, transparent 0);
+  background-size: 24px 24px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ====== Career Background Elements ====== */
+.career-bg-layer {
+  position: absolute; inset: 0;
+  pointer-events: none; z-index: 0;
+  overflow: hidden;
+}
+.career-icon {
+  position: absolute; font-size: 20px;
+  opacity: 0.2; filter: grayscale(0.2);
+  animation: careerFloat 8s ease-in-out infinite;
+}
+.career-icon-1 { top: 70px; left: 20px; font-size: 22px; animation-delay: 0s; }
+.career-icon-2 { top: 120px; right: 18px; font-size: 18px; animation-delay: 1.2s; }
+.career-icon-3 { top: 200px; left: 12px; font-size: 16px; animation-delay: 2.5s; }
+.career-icon-4 { top: 250px; right: 25px; font-size: 20px; animation-delay: 0.8s; }
+.career-icon-5 { top: 380px; left: 15px; font-size: 18px; animation-delay: 3s; }
+.career-icon-6 { top: 420px; right: 20px; font-size: 16px; animation-delay: 1.8s; }
+.career-icon-7 { top: 500px; left: 22px; font-size: 20px; animation-delay: 2.2s; }
+.career-icon-8 { top: 550px; right: 15px; font-size: 18px; animation-delay: 0.5s; }
+.career-icon-9 { top: 620px; left: 18px; font-size: 16px; animation-delay: 3.5s; }
+.career-icon-10 { top: 680px; right: 22px; font-size: 22px; animation-delay: 1.5s; }
+
+@keyframes careerFloat {
+  0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.18; }
+  50% { transform: translateY(-10px) rotate(5deg); opacity: 0.3; }
+}
+
+.growth-bars {
+  position: absolute; bottom: 70px; left: 30px;
+  display: flex; align-items: flex-end; gap: 4px;
+  opacity: 0.2; z-index: 0;
+}
+.growth-bar {
+  width: 10px; border-radius: 3px 3px 0 0;
+  background: linear-gradient(to top, #6366f1, #a5b4fc);
+  animation: barRise 4s ease-in-out infinite;
+}
+.growth-bar:nth-child(1) { height: 16px; animation-delay: 0s; }
+.growth-bar:nth-child(2) { height: 26px; animation-delay: 0.3s; }
+.growth-bar:nth-child(3) { height: 38px; animation-delay: 0.6s; }
+.growth-bar:nth-child(4) { height: 52px; animation-delay: 0.9s; }
+.growth-bar:nth-child(5) { height: 68px; animation-delay: 1.2s; }
+@keyframes barRise {
+  0%, 100% { transform: scaleY(0.7); opacity: 0.5; }
+  50% { transform: scaleY(1); opacity: 1; }
+}
+
+.career-path-svg {
+  position: absolute; bottom: 0; left: 0; right: 0; height: 200px;
+  opacity: 0.15; z-index: 0; pointer-events: none;
+}
+
+/* ====== Nav Header ====== */
+.nav-header {
+  height: 52px; padding: 0 18px;
+  display: flex; align-items: center; justify-content: space-between;
+  background: transparent; flex-shrink: 0;
+  position: relative; z-index: 10;
+}
+.mode-toggle {
+  display: inline-flex; align-items: center;
+  background: rgba(99,102,241,0.1);
+  border-radius: 22px; padding: 3px; position: relative;
+}
+.mode-toggle-item {
+  display: flex; align-items: center; gap: 5px;
+  padding: 6px 16px; border-radius: 19px;
+  font-size: 13px; font-weight: 600;
+  color: var(--text-secondary);
+  text-decoration: none; cursor: pointer;
+  transition: all 0.3s cubic-bezier(.4,0,.2,1);
+  position: relative; z-index: 1;
+  -webkit-tap-highlight-color: transparent;
+  white-space: nowrap;
+}
+.mode-toggle-item.active {
+  background: linear-gradient(135deg, #6366f1, #4338ca);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(99,102,241,0.3);
+}
+.mode-toggle-item:not(.active):active { background: rgba(99,102,241,0.08); }
+.mode-toggle-item svg { width: 15px; height: 15px; }
+
+.nav-right { display: flex; align-items: center; gap: 12px; }
+.nav-icon-btn {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: transparent; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px; color: var(--text-primary);
+  transition: all 0.2s;
+}
+.nav-icon-btn:hover { background: rgba(99,102,241,0.08); }
+.avatar-sm {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 13px; font-weight: 600;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 8px rgba(102,126,234,0.25);
+}
+
+/* ====== Scroll Area ====== */
+.scroll-area {
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+  text-align: center; z-index: 1;
+}
+.scroll-area::-webkit-scrollbar { width: 0; }
+
+/* ====== Hero Section ====== */
+.hero-section {
+  text-align: center; padding: 10px 24px 0; position: relative;
+}
+.hero-title {
+  font-size: 34px; font-weight: 900;
+  background: linear-gradient(135deg, #4338ca, #6366f1, #818cf8, #a5b4fc);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  letter-spacing: -1px; line-height: 1.25;
+  position: relative; display: inline-block;
+}
+.hero-title::after {
+  content: ''; position: absolute; bottom: -4px; left: 50%; transform: translateX(-50%);
+  width: 60px; height: 4px; border-radius: 2px;
+  background: linear-gradient(90deg, #6366f1, #a5b4fc, transparent);
+  opacity: 0.5;
+}
+.hero-subtitle {
+  font-size: 15px; color: var(--text-secondary);
+  margin-top: 10px; font-weight: 400; position: relative;
+}
+
+/* Feature Tags */
+.feature-tags {
+  display: flex; justify-content: center; gap: 10px;
+  margin-top: 18px; padding: 0 12px; position: relative; z-index: 2;
+}
+.feat-tag {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 12px; font-weight: 600;
+  background: #fff; padding: 8px 14px; border-radius: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.02);
+  transition: all 0.2s; position: relative; overflow: hidden;
+}
+.feat-tag::before {
+  content: ''; position: absolute; inset: 0; border-radius: 24px;
+  padding: 1.5px;
+  background: linear-gradient(135deg, var(--tag-color), transparent 70%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  pointer-events: none; opacity: 0.6;
+}
+.feat-tag:nth-child(1) { --tag-color: #6366f1; color: #4338ca; }
+.feat-tag:nth-child(2) { --tag-color: #10b981; color: #047857; }
+.feat-tag:nth-child(3) { --tag-color: #f59e0b; color: #b45309; }
+
+/* Star Map Visual */
+.starmap-container {
+  position: relative; width: 320px; height: 340px;
+  margin: 28px auto 16px; display: flex; align-items: center; justify-content: center;
+}
+.bg-circle-1 {
+  position: absolute; width: 290px; height: 290px;
+  border: 1.5px dashed rgba(196,181,253,0.5); border-radius: 50%;
+  animation: slowRotate 60s linear infinite;
+}
+.bg-circle-2 {
+  position: absolute; width: 230px; height: 230px;
+  border: 1px solid rgba(165,180,252,0.3); border-radius: 50%;
+  animation: slowRotate 45s linear infinite reverse;
+}
+.bg-circle-3 {
+  position: absolute; width: 180px; height: 180px;
+  border: 1px dashed rgba(196,181,253,0.2); border-radius: 50%;
+  animation: slowRotate 30s linear infinite;
+}
+
+.float-dot {
+  position: absolute; border-radius: 50%;
+  pointer-events: none; z-index: 0;
+}
+.float-dot-1 { width: 6px; height: 6px; background: rgba(99,102,241,0.2); top: 20px; left: 40px; animation: floatUp 4s ease-in-out infinite; }
+.float-dot-2 { width: 4px; height: 4px; background: rgba(52,211,153,0.3); top: 60px; right: 30px; animation: floatUp 5s ease-in-out 1s infinite; }
+.float-dot-3 { width: 5px; height: 5px; background: rgba(251,146,60,0.25); bottom: 50px; left: 25px; animation: floatUp 4.5s ease-in-out 0.5s infinite; }
+.float-dot-4 { width: 3px; height: 3px; background: rgba(167,139,250,0.3); bottom: 80px; right: 50px; animation: floatUp 3.5s ease-in-out 1.5s infinite; }
+.float-dot-5 { width: 7px; height: 7px; background: rgba(99,102,241,0.15); top: 100px; left: 15px; animation: floatUp 6s ease-in-out 2s infinite; }
+.float-dot-6 { width: 4px; height: 4px; background: rgba(96,165,250,0.25); bottom: 30px; right: 20px; animation: floatUp 5.5s ease-in-out 0.8s infinite; }
+
+.sparkle {
+  position: absolute; pointer-events: none; z-index: 0;
+  color: rgba(165,180,252,0.35); font-size: 12px;
+  animation: twinkle 3s ease-in-out infinite;
+}
+.sparkle-1 { top: 30px; left: 80px; animation-delay: 0s; font-size: 10px; }
+.sparkle-2 { top: 50px; right: 70px; animation-delay: 0.8s; font-size: 14px; }
+.sparkle-3 { bottom: 60px; left: 60px; animation-delay: 1.5s; font-size: 11px; }
+.sparkle-4 { bottom: 40px; right: 80px; animation-delay: 2.2s; font-size: 13px; }
+.sparkle-5 { top: 120px; right: 20px; animation-delay: 1s; font-size: 9px; }
+.sparkle-6 { bottom: 100px; left: 30px; animation-delay: 2.5s; font-size: 12px; }
+
+@keyframes slowRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes floatUp {
+  0%, 100% { transform: translateY(0) scale(1); opacity: 0.6; }
+  50% { transform: translateY(-12px) scale(1.2); opacity: 1; }
+}
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.3); }
+}
+
+.cube-center {
+  width: 90px; height: 90px; z-index: 2; position: relative;
+}
+.cube-center::before {
+  content: ''; position: absolute; inset: -20px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(99,102,241,0.08) 0%, transparent 70%);
+  animation: pulseGlow 3s ease-in-out infinite; pointer-events: none;
+}
+.cube-center::after {
+  content: ''; position: absolute; inset: -40px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(129,140,248,0.04) 0%, transparent 60%);
+  animation: pulseGlow 3s ease-in-out 1.5s infinite; pointer-events: none;
+}
+@keyframes pulseGlow {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.15); opacity: 1; }
+}
+.cube-svg {
+  width: 100%; height: 100%;
+  filter: drop-shadow(0 4px 12px rgba(99,102,241,0.15));
+  animation: starBob 4s ease-in-out infinite;
+}
+@keyframes starBob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.hex-item {
+  position: absolute; width: 80px; height: 90px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 2px;
+  z-index: 3; text-decoration: none;
+  transition: transform 0.3s ease, filter 0.3s;
+}
+.hex-item:hover { transform: scale(1.15); filter: brightness(1.08); }
+.hex-item:active { transform: scale(0.95); }
+.hex-shape {
+  width: 76px; height: 82px;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 3px; box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+  position: relative; transition: all 0.3s ease;
+}
+.hex-item::before {
+  content: ''; position: absolute; width: 86px; height: 92px;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  background: inherit; opacity: 0.15; filter: blur(8px);
+  transform: scale(1.1); z-index: -1; transition: all 0.3s ease;
+}
+.hex-item:hover::before { opacity: 0.3; transform: scale(1.2); }
+
+.hex-icon { font-size: 24px; line-height: 1; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1)); }
+.hex-label { font-size: 11px; font-weight: 700; color: #fff; letter-spacing: 0.5px; text-shadow: 0 1px 2px rgba(0,0,0,0.15); }
+
+.hex-assess { top: 10px; left: 120px; }
+.hex-consult { top: 68px; left: 220px; }
+.hex-articles { top: 183px; left: 220px; }
+.hex-templates { top: 240px; left: 120px; }
+.hex-goals { top: 183px; left: 20px; }
+.hex-resume { top: 68px; left: 20px; }
+
+.hex-assess .hex-shape { background: linear-gradient(145deg, #34D399, #10B981); }
+.hex-assess .hex-shape::before { background: linear-gradient(145deg, #34D399, #10B981); }
+.hex-consult .hex-shape { background: linear-gradient(145deg, #FB923C, #EA580C); }
+.hex-consult .hex-shape::before { background: linear-gradient(145deg, #FB923C, #EA580C); }
+.hex-articles .hex-shape { background: linear-gradient(145deg, #FB7185, #E11D48); }
+.hex-articles .hex-shape::before { background: linear-gradient(145deg, #FB7185, #E11D48); }
+.hex-templates .hex-shape { background: linear-gradient(145deg, #60A5FA, #2563EB); }
+.hex-templates .hex-shape::before { background: linear-gradient(145deg, #60A5FA, #2563EB); }
+.hex-goals .hex-shape { background: linear-gradient(145deg, #A78BFA, #8B5CF6); }
+.hex-goals .hex-shape::before { background: linear-gradient(145deg, #A78BFA, #8B5CF6); }
+.hex-resume .hex-shape { background: linear-gradient(145deg, #6366f1, #4338ca); }
+.hex-resume .hex-shape::before { background: linear-gradient(145deg, #6366f1, #4338ca); }
+
+.conn-lines { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
+
+/* CTA Section */
+.cta-section {
+  text-align: center; padding: 8px 28px 16px; position: relative; z-index: 2;
+}
+.cta-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  width: 300px; height: 54px; border-radius: 27px;
+  background: linear-gradient(135deg, #6366f1, #4338ca);
+  color: #fff; font-size: 17px; font-weight: 700; border: none;
+  cursor: pointer; text-decoration: none;
+  font-family: inherit; letter-spacing: 1px;
+  box-shadow: 0 6px 24px rgba(99,102,241,0.35), 0 0 0 1px rgba(99,102,241,0.1);
+  transition: all 0.25s; justify-content: center;
+  position: relative; overflow: hidden;
+}
+.cta-btn::before {
+  content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(255,255,255,0.15), transparent);
+  transform: rotate(45deg) translateX(-100%); transition: transform 0.6s;
+}
+.cta-btn:hover::before { transform: rotate(45deg) translateX(100%); }
+.cta-btn:active { transform: scale(0.96); box-shadow: 0 3px 12px rgba(99,102,241,0.25); }
+.cta-arrow { font-size: 19px; }
+.time-hint {
+  margin-top: 12px; font-size: 13px; color: var(--text-light);
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+}
+
+/* Bottom Nav */
+.bottom-nav {
+  height: 58px; background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-around;
+  z-index: 100; flex-shrink: 0; padding: 0 4px; position: relative;
+}
+.nav-item {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  text-decoration: none; cursor: pointer; flex: 1; padding: 6px 0;
+  -webkit-tap-highlight-color: transparent;
+  color: var(--text-light); transition: color 0.2s; position: relative;
+}
+.nav-item svg { width: 22px; height: 22px; transition: transform 0.2s; }
+.nav-item:hover svg { transform: translateY(-2px); }
+.nav-item span { font-size: 10px; font-weight: 500; }
+.nav-item.active { color: var(--primary); }
+.nav-item.active::after {
+  content: ''; position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%);
+  width: 20px; height: 3px; border-radius: 2px;
+  background: linear-gradient(90deg, #6366f1, #818cf8);
+}
+
+.phone-frame::after {
+  content: ''; position: absolute; bottom: 58px; left: 0; right: 0; height: 60px;
+  background: linear-gradient(to top, rgba(235,240,255,0.6), transparent);
+  pointer-events: none; z-index: 0;
+}
+
+/* ====== Login Overlay (removed) ====== */
+</style>
+</head>
+<body>
+
+<div class="phone-frame">
+
+  <!-- Career Background Elements -->
+  <div class="career-bg-layer">
+    <span class="career-icon career-icon-1">💼</span>
+    <span class="career-icon career-icon-2">🎓</span>
+    <span class="career-icon career-icon-3">📊</span>
+    <span class="career-icon career-icon-4">💡</span>
+    <span class="career-icon career-icon-5">🎯</span>
+    <span class="career-icon career-icon-6">📝</span>
+    <span class="career-icon career-icon-7">🏆</span>
+    <span class="career-icon career-icon-8">📈</span>
+    <span class="career-icon career-icon-9">🔧</span>
+    <span class="career-icon career-icon-10">⭐</span>
+    <div class="growth-bars"><div class="growth-bar"></div><div class="growth-bar"></div><div class="growth-bar"></div><div class="growth-bar"></div><div class="growth-bar"></div></div>
+    <svg class="career-path-svg" viewBox="0 0 390 200" fill="none" preserveAspectRatio="none">
+      <path d="M0,180 Q60,140 100,160 T200,120 T300,90 T390,40" stroke="#6366f1" stroke-width="2" stroke-dasharray="8 6" fill="none"/>
+      <circle cx="100" cy="160" r="4" fill="#6366f1"/><circle cx="200" cy="120" r="4" fill="#6366f1"/><circle cx="300" cy="90" r="4" fill="#6366f1"/><circle cx="390" cy="40" r="4" fill="#6366f1"/>
+    </svg>
+  </div>
+
+  <!-- Nav Header -->
+  <div class="nav-header">
+    <div class="mode-toggle">
+      <a href="index.html" class="mode-toggle-item active" title="学生端">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+        <span>学生端</span>
+      </a>
+      <a href="teacher.html" class="mode-toggle-item" title="教师端">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg>
+        <span>教师端</span>
+      </a>
+    </div>
+    <div class="nav-right">
+      <button class="nav-icon-btn" onclick="logoutApp()" title="退出登录">🚪</button>
+      <a href="javascript:void(0)" class="avatar-sm" title="我的" onclick="requireLogin('resume.html')">👤</a>
+    </div>
+  </div>
+
+  <!-- Scrollable Content -->
+  <div class="scroll-area">
+
+    <!-- Hero -->
+    <div class="hero-section">
+      <h1 class="hero-title">职趣星图</h1>
+      <p class="hero-subtitle">专业职业咨询，帮你找到适合的职业方向</p>
+    </div>
+
+    <!-- Feature Tags -->
+    <div class="feature-tags">
+      <span class="feat-tag">适合大学生</span>
+      <span class="feat-tag">结果好理解</span>
+      <span class="feat-tag">可生成海报</span>
+    </div>
+
+    <!-- Star Map Visual -->
+    <div class="starmap-container">
+      <div class="float-dot float-dot-1"></div>
+      <div class="float-dot float-dot-2"></div>
+      <div class="float-dot float-dot-3"></div>
+      <div class="float-dot float-dot-4"></div>
+      <div class="float-dot float-dot-5"></div>
+      <div class="float-dot float-dot-6"></div>
+      <div class="sparkle sparkle-1">✦</div>
+      <div class="sparkle sparkle-2">✧</div>
+      <div class="sparkle sparkle-3">✦</div>
+      <div class="sparkle sparkle-4">✧</div>
+      <div class="sparkle sparkle-5">✦</div>
+      <div class="sparkle sparkle-6">✧</div>
+
+      <div class="bg-circle-1"></div>
+      <div class="bg-circle-2"></div>
+      <div class="bg-circle-3"></div>
+
+      <svg class="conn-lines" viewBox="0 0 320 340" fill="none">
+        <defs>
+          <linearGradient id="lineGrad1" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#C7D2FE" stop-opacity="0.6"/>
+            <stop offset="100%" stop-color="#A5B4FC" stop-opacity="0.3"/>
+          </linearGradient>
+        </defs>
+        <line x1="160" y1="55" x2="260" y2="113" stroke="url(#lineGrad1)" stroke-width="1.5" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" values="0;-20" dur="3s" repeatCount="indefinite"/></line>
+        <line x1="260" y1="113" x2="260" y2="228" stroke="url(#lineGrad1)" stroke-width="1.5" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" values="0;-20" dur="3s" repeatCount="indefinite" begin="0.5s"/></line>
+        <line x1="260" y1="228" x2="160" y2="285" stroke="url(#lineGrad1)" stroke-width="1.5" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" values="0;-20" dur="3s" repeatCount="indefinite" begin="1s"/></line>
+        <line x1="160" y1="285" x2="60" y2="228" stroke="url(#lineGrad1)" stroke-width="1.5" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" values="0;-20" dur="3s" repeatCount="indefinite" begin="1.5s"/></line>
+        <line x1="60" y1="228" x2="60" y2="113" stroke="url(#lineGrad1)" stroke-width="1.5" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" values="0;-20" dur="3s" repeatCount="indefinite" begin="2s"/></line>
+        <line x1="60" y1="113" x2="160" y2="55" stroke="url(#lineGrad1)" stroke-width="1.5" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" values="0;-20" dur="3s" repeatCount="indefinite" begin="2.5s"/></line>
+        <line x1="160" y1="170" x2="160" y2="55" stroke="#A5B4FC" stroke-width="1.5" opacity="0.4"><animate attributeName="opacity" values="0.4;0.6;0.4" dur="3s" repeatCount="indefinite"/></line>
+        <line x1="160" y1="170" x2="260" y2="113" stroke="#A5B4FC" stroke-width="1.5" opacity="0.4"><animate attributeName="opacity" values="0.4;0.6;0.4" dur="3s" repeatCount="indefinite" begin="0.5s"/></line>
+        <line x1="160" y1="170" x2="260" y2="228" stroke="#A5B4FC" stroke-width="1.5" opacity="0.4"><animate attributeName="opacity" values="0.4;0.6;0.4" dur="3s" repeatCount="indefinite" begin="1s"/></line>
+        <line x1="160" y1="170" x2="160" y2="285" stroke="#A5B4FC" stroke-width="1.5" opacity="0.4"><animate attributeName="opacity" values="0.4;0.6;0.4" dur="3s" repeatCount="indefinite" begin="1.5s"/></line>
+        <line x1="160" y1="170" x2="60" y2="228" stroke="#A5B4FC" stroke-width="1.5" opacity="0.4"><animate attributeName="opacity" values="0.4;0.6;0.4" dur="3s" repeatCount="indefinite" begin="2s"/></line>
+        <line x1="160" y1="170" x2="60" y2="113" stroke="#A5B4FC" stroke-width="1.5" opacity="0.4"><animate attributeName="opacity" values="0.4;0.6;0.4" dur="3s" repeatCount="indefinite" begin="2.5s"/></line>
+        <circle cx="160" cy="170" r="55" fill="none" stroke="url(#lineGrad1)" stroke-width="0.8" stroke-dasharray="4 3" opacity="0.4"><animateTransform attributeName="transform" type="rotate" from="0 160 170" to="360 160 170" dur="20s" repeatCount="indefinite"/></circle>
+        <circle cx="160" cy="170" r="32" fill="none" stroke="url(#lineGrad1)" stroke-width="0.6" stroke-dasharray="3 2" opacity="0.3"><animateTransform attributeName="transform" type="rotate" from="360 160 170" to="0 160 170" dur="15s" repeatCount="indefinite"/></circle>
+      </svg>
+
+      <div class="cube-center">
+        <svg class="cube-svg" viewBox="0 0 80 80" fill="none">
+          <defs>
+            <linearGradient id="hexOuterGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#818cf8"/><stop offset="100%" stop-color="#6366f1"/></linearGradient>
+            <linearGradient id="hexMidGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#a5b4fc"/><stop offset="100%" stop-color="#818cf8"/></linearGradient>
+            <linearGradient id="hexInnerGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#4338ca"/></linearGradient>
+            <radialGradient id="centerSoftGlow" cx="0.5" cy="0.5"><stop offset="0%" stop-color="#6366f1" stop-opacity="0.15"/><stop offset="100%" stop-color="#6366f1" stop-opacity="0"/></radialGradient>
+          </defs>
+          <circle cx="40" cy="40" r="38" fill="url(#centerSoftGlow)"/>
+          <polygon points="40,6 68,22 68,58 40,74 12,58 12,22" fill="none" stroke="url(#hexOuterGrad)" stroke-width="2.5" stroke-linejoin="round"/>
+          <polygon points="40,18 58,28 58,52 40,62 22,52 22,28" fill="url(#hexMidGrad)" fill-opacity="0.12" stroke="url(#hexMidGrad)" stroke-width="1.2" stroke-linejoin="round"/>
+          <polygon points="40,28 52,34 52,46 40,52 28,46 28,34" fill="url(#hexInnerGrad)" filter="drop-shadow(0 2px 6px rgba(99,102,241,0.25))"/>
+          <circle cx="40" cy="40" r="5" fill="#fff" opacity="0.95"/>
+          <circle cx="40" cy="40" r="2.5" fill="#6366f1"><animate attributeName="r" values="2;3.2;2" dur="2.5s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0.7;1" dur="2.5s" repeatCount="indefinite"/></circle>
+        </svg>
+      </div>
+
+      <a class="hex-item hex-assess" href="javascript:void(0)" onclick="requireLogin('consult-flow.html')">
+        <div class="hex-shape"><span class="hex-icon">💬</span><span class="hex-label">预约咨询</span></div>
+      </a>
+      <a class="hex-item hex-consult" href="javascript:void(0)" onclick="requireLogin('articles.html')">
+        <div class="hex-shape"><span class="hex-icon">📚</span><span class="hex-label">资讯中心</span></div>
+      </a>
+      <a class="hex-item hex-articles" href="javascript:void(0)" onclick="requireLogin('resume-templates.html')">
+        <div class="hex-shape"><span class="hex-icon">🗺️</span><span class="hex-label">规划方案</span></div>
+      </a>
+      <a class="hex-item hex-templates" href="javascript:void(0)" onclick="requireLogin('goals.html')">
+        <div class="hex-shape"><span class="hex-icon">🎯</span><span class="hex-label">目标进度</span></div>
+      </a>
+      <a class="hex-item hex-goals" href="javascript:void(0)" onclick="requireLogin('resume.html')">
+        <div class="hex-shape"><span class="hex-icon">📄</span><span class="hex-label">我的</span></div>
+      </a>
+      <a class="hex-item hex-resume" href="javascript:void(0)" onclick="requireLogin('assessment.html')">
+        <div class="hex-shape"><span class="hex-icon">🧭</span><span class="hex-label">职业测评</span></div>
+      </a>
+    </div>
+
+  </div><!-- end scroll-area -->
+
+  <nav class="bottom-nav">
+    <a class="nav-item active" href="index.html">
+      <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      <span>首页</span>
+    </a>
+    <a class="nav-item" href="javascript:void(0)" onclick="requireLogin('assessment.html')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+      <span>测评</span>
+    </a>
+    <a class="nav-item" href="javascript:void(0)" onclick="requireLogin('consult-flow.html')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      <span>咨询</span>
+    </a>
+    <a class="nav-item" href="javascript:void(0)" onclick="requireLogin('goals.html')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+      <span>目标</span>
+    </a>
+    <a class="nav-item" href="javascript:void(0)" onclick="requireLogin('resume.html')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span>我的</span>
+    </a>
+  </nav>
+
+</div><!-- end phone -->
+
+<!-- Toast -->
+<div id="toastEl" style="
+  position:fixed;top:30px;left:50%;transform:translateX(-50%) translateY(-120px);
+  background:var(--text-primary);color:#fff;padding:11px 22px;border-radius:14px;
+  font-size:14px;font-weight:500;z-index:9999;
+  box-shadow:0 8px 24px rgba(0,0,0,0.15);pointer-events:none;
+  transition:transform .35s cubic-bezier(.175,.885,.32,1.275);white-space:nowrap;"></div>
+
+<script>
+// ====== Login Logic ======
+function requireLogin(targetUrl) {
+  if (checkLoginState()) {
+    window.location.href = targetUrl;
+  } else {
+    sessionStorage.setItem('login_redirect', targetUrl);
+    window.location.href = 'login.html';
+  }
+}
+function checkLoginState() {
+  try {
+    var saved = localStorage.getItem('app_user_info');
+    if (saved) {
+      var info = JSON.parse(saved);
+      if (info && info.name) return true;
+    }
+  } catch(e) {}
+  return false;
+}
+function logoutApp() {
+  try { localStorage.removeItem('app_user_info'); } catch(e) {}
+  showToast('已退出登录');
+  setTimeout(function() { location.reload(); }, 800);
+}
+function showToast(msg) {
+  var el = document.getElementById('toastEl');
+  el.textContent = msg;
+  el.style.transform = 'translateX(-50%) translateY(0)';
+  clearTimeout(window._toastT);
+  window._toastT = setTimeout(function() {
+    el.style.transform = 'translateX(-50%) translateY(-120px)';
+  }, 2000);
+}
+</script>
+</body>
+</html>

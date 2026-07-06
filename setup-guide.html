@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>配置指南 · 自在生涯工作室</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>">
+  <style>
+    .guide-step {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 28px;
+      margin-bottom: 20px;
+      border-left: 4px solid var(--primary);
+    }
+    .guide-step h3 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .step-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      border-radius: 50%;
+      font-size: 15px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .guide-step p { font-size: 15px; color: var(--text); line-height: 1.8; margin-bottom: 12px; }
+    .guide-step ol, .guide-step ul { padding-left: 20px; margin-bottom: 12px; }
+    .guide-step li { font-size: 15px; color: var(--text); line-height: 2; }
+    .code-block {
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 16px 20px;
+      border-radius: var(--radius-sm);
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      overflow-x: auto;
+      margin: 12px 0;
+      white-space: pre;
+    }
+    .highlight {
+      background: #fef3c7;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+    .note {
+      background: #dbeafe;
+      border-left: 4px solid #3b82f6;
+      padding: 14px 18px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      color: #1e40af;
+      margin: 12px 0;
+    }
+    .warning {
+      background: #fef3c7;
+      border-left: 4px solid #f59e0b;
+      padding: 14px 18px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      color: #92400e;
+      margin: 12px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <span class="logo">📖</span>
+      <span>配置指南</span>
+    </div>
+    <div class="navbar-links">
+      <a href="index.html">学生测评</a>
+      <a href="teacher.html">教师端</a>
+      <a href="setup-guide.html" class="active">配置指南</a>
+    </div>
+  </nav>
+
+  <div class="container">
+
+    <div class="card" style="text-align: center; margin-bottom: 28px;">
+      <div style="font-size: 48px; margin-bottom: 12px;">🚀</div>
+      <h1 style="font-size: 26px; font-weight: 800;">5分钟配置指南</h1>
+      <p style="color: var(--text-light); margin-top: 8px;">
+        按照以下步骤配置 Supabase 云数据库，让学生的测评数据自动同步到教师端
+      </p>
+    </div>
+
+    <div class="note">
+      <strong>为什么要配置？</strong><br>
+      目前学生端的数据只能保存在浏览器本地，无法同步到教师端。配置 Supabase 后，数据会存到云端，
+      学生提交后教师立即就能看到。Supabase 免费版提供 500MB 存储和 5万次/月访问量，完全够用，
+      而且链接永久有效不会过期。
+    </div>
+
+    <!-- Step 1 -->
+    <div class="guide-step">
+      <h3><span class="step-num">1</span>注册 Supabase 账号</h3>
+      <ol>
+        <li>打开 <a href="https://supabase.com" target="_blank" style="color: var(--primary); font-weight: 600;">https://supabase.com</a></li>
+        <li>点击右上角 <span class="highlight">Start your project</span></li>
+        <li>使用 GitHub 账号或邮箱注册（完全免费）</li>
+      </ol>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="guide-step">
+      <h3><span class="step-num">2</span>创建新项目</h3>
+      <ol>
+        <li>登录后点击 <span class="highlight">New Project</span></li>
+        <li>填写项目名称，如 <code>career-assessment</code></li>
+        <li>设置数据库密码（记住它，但代码中不需要用到）</li>
+        <li>选择离你最近的区域（如 Northeast Asia - Singapore）</li>
+        <li>点击 <span class="highlight">Create new project</span>，等待约 2 分钟初始化完成</li>
+      </ol>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="guide-step">
+      <h3><span class="step-num">3</span>创建数据库表</h3>
+      <ol>
+        <li>在左侧菜单点击 <span class="highlight">SQL Editor</span></li>
+        <li>点击 <span class="highlight">New query</span></li>
+        <li>将以下 SQL 完整复制粘贴到编辑器中：</li>
+      </ol>
+      <div class="code-block">-- 创建提交表
+CREATE TABLE IF NOT EXISTS submissions (
+  id BIGSERIAL PRIMARY KEY,
+  name TEXT NOT NULL,
+  school TEXT DEFAULT '',
+  student_id TEXT NOT NULL,
+  class_name TEXT NOT NULL,
+  test_type TEXT NOT NULL DEFAULT 'holland',
+  test_name TEXT,
+  answers JSONB NOT NULL DEFAULT '{}',
+  scores JSONB NOT NULL DEFAULT '{}',
+  result_code TEXT NOT NULL DEFAULT '',
+  result_summary TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 开启行级安全
+ALTER TABLE submissions ENABLE ROW LEVEL SECURITY;
+
+-- 允许学生提交数据
+CREATE POLICY "允许学生提交" ON submissions
+  FOR INSERT WITH CHECK (true);
+
+-- 允许教师查看数据
+CREATE POLICY "允许教师查看" ON submissions
+  FOR SELECT USING (true);
+
+-- 允许教师删除数据
+CREATE POLICY "允许教师删除" ON submissions
+  FOR DELETE USING (true);
+
+-- 创建索引
+CREATE INDEX IF NOT EXISTS idx_submissions_created_at
+  ON submissions(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_submissions_class
+  ON submissions(class_name);
+CREATE INDEX IF NOT EXISTS idx_submissions_school
+  ON submissions(school);</div>
+      <ol start="4">
+        <li>点击右下角 <span class="highlight">Run</span> 按钮，看到 "Success" 表示建表成功</li>
+      </ol>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="guide-step">
+      <h3><span class="step-num">4</span>获取 API 密钥</h3>
+      <ol>
+        <li>在左侧菜单点击 <span class="highlight">Project Settings</span>（齿轮图标）</li>
+        <li>点击 <span class="highlight">API</span></li>
+        <li>找到以下两项并复制：</li>
+      </ol>
+      <ul>
+        <li><strong>Project URL</strong>：形如 <code>https://xxxxx.supabase.co</code></li>
+        <li><strong>anon public</strong> key：一长串字母数字（<strong>不是</strong> service_role key）</li>
+      </ul>
+      <div class="warning">
+        <strong>注意：</strong>请复制 <code>anon public</code> 的 key，不要复制 <code>service_role</code> 的 key。
+        anon key 是公开安全的，专为前端使用设计。
+      </div>
+    </div>
+
+    <!-- Step 5 -->
+    <div class="guide-step">
+      <h3><span class="step-num">5</span>填入配置文件</h3>
+      <p>打开项目中的 <code>js/config.js</code> 文件，替换以下内容：</p>
+      <p><b>① Supabase 连接信息（约第31-32行）：</b></p>
+      <div class="code-block">const SUPABASE_URL  = "https://你的项目ID.supabase.co";
+const SUPABASE_KEY = "你的anon_public_key";</div>
+      <p><b>② 学校名称（约第24行）：</b>把 <code>SCHOOL_NAMES</code> 改成你们学校名称，学生填写的学校名与此匹配才能查看完整报告</p>
+      <div class="code-block">const SCHOOL_NAMES = "惠州学院";  // 改成你们学校</div>
+      <p>保存文件，重新打开页面即可。学生提交后，教师端就能实时看到数据了！</p>
+    </div>
+
+    <!-- 完成 -->
+    <div class="card" style="text-align: center; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white;">
+      <div style="font-size: 48px; margin-bottom: 12px;">✅</div>
+      <h2 style="font-size: 22px; font-weight: 700; color: white;">配置完成！</h2>
+      <p style="margin-top: 8px; opacity: 0.9;">学生端提交的数据现在会自动同步到教师端</p>
+      <div style="margin-top: 20px; display: flex; gap: 12px; justify-content: center;">
+        <a href="index.html" class="btn" style="background: white; color: var(--success);">打开学生端</a>
+        <a href="teacher.html" class="btn" style="background: white; color: var(--success);">打开教师端</a>
+      </div>
+    </div>
+
+    <!-- 常见问题 -->
+    <div class="card" style="margin-top: 28px;">
+      <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 16px;">❓ 常见问题</h2>
+
+      <div style="margin-bottom: 20px;">
+        <strong style="color: var(--primary);">Q: 配置后学生提交提示失败？</strong><br>
+        <span style="color: var(--text-light);">检查 config.js 中的 URL 和 KEY 是否正确，确保没有多余空格。打开浏览器控制台（F12）查看具体错误信息。</span>
+      </div>
+
+      <div style="margin-bottom: 20px;">
+        <strong style="color: var(--primary);">Q: 教师端看不到数据？</strong><br>
+        <span style="color: var(--text-light);">确认 SQL 已成功执行（在 Supabase → Table Editor 中能看到 submissions 表）。确认 RLS 策略已创建。</span>
+      </div>
+
+      <div style="margin-bottom: 20px;">
+        <strong style="color: var(--primary);">Q: 教师端密码是什么？</strong><br>
+        <span style="color: var(--text-light);">默认密码是 <code>teacher123</code>，可以在 <code>js/teacher.js</code> 第 6 行修改。</span>
+      </div>
+
+      <div style="margin-bottom: 20px;">
+        <strong style="color: var(--primary);">Q: 链接会过期吗？</strong><br>
+        <span style="color: var(--text-light);">Supabase 免费版项目不会过期，链接永久有效。但项目如果超过 7 天完全无活动会被暂停，重新登录即可恢复。</span>
+      </div>
+
+      <div>
+        <strong style="color: var(--primary);">Q: 数据安全吗？</strong><br>
+        <span style="color: var(--text-light);">目前为方便演示，数据读写是开放的。如需更安全，可在 Supabase 中添加 API 密钥验证。教师端有密码保护。</span>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>

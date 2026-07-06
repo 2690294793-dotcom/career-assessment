@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>资讯中心 · 自在生涯工作室</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --primary: #7e22ce;
+  --primary-dark: #4c1d95;
+  --primary-light: #faf5ff;
+  --accent: #a855f7;
+  --bg: #faf5ff;
+  --card: #FFFFFF;
+  --text-primary: #1e1b4b;
+  --text-secondary: #6B7280;
+  --text-light: #9ca3af;
+  --border: #E5E7EB;
+  --radius-sm: 12px;
+  --radius-md: 16px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background: #f0f0f5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.phone-frame {
+  width: 390px;
+  height: 844px;
+  background: var(--bg);
+  border-radius: 44px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 0 0 3px #1e1b4b, 0 0 0 6px #4c1d95, 0 20px 60px rgba(126,34,206,0.3), 0 10px 30px rgba(76,29,149,0.2);
+  display: flex; flex-direction: column;
+}
+
+.page-header {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  padding: 24px 20px 16px; color: white; flex-shrink: 0;
+}
+.page-header h1 { font-size: 22px; font-weight: 700; letter-spacing: 1px; }
+.page-header .subtitle { font-size: 12px; opacity: 0.85; margin-top: 4px; }
+
+/* Official Account */
+/* Search Bar */
+.search-bar { padding: 12px 16px; background: var(--card); flex-shrink: 0; border-bottom: 1px solid var(--border); }
+.search-input-wrap { position: relative; display: flex; align-items: center; }
+.search-icon { position: absolute; left: 12px; width: 16px; height: 16px; color: var(--text-light); pointer-events: none; }
+.search-input { width: 100%; padding: 9px 12px 9px 36px; border: 1px solid var(--border); border-radius: 20px; font-size: 13px; color: var(--text-primary); background: #f9f9fb; outline: none; transition: all 0.2s; }
+.search-input:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 3px rgba(126,34,206,0.08); }
+.search-input::placeholder { color: var(--text-light); }
+.search-clear { position: absolute; right: 10px; width: 20px; height: 20px; border-radius: 50%; background: #e5e5ea; color: var(--text-secondary); border: none; font-size: 12px; cursor: pointer; display: none; align-items: center; justify-content: center; line-height: 1; }
+.search-clear.show { display: flex; }
+
+/* Category Filter */
+.category-filter { padding: 0; flex-shrink: 0; border-bottom: 1px solid var(--border); background: var(--card); }
+.category-filter .scroll-inner { display: flex; gap: 0; padding: 0; overflow-x: auto; scrollbar-width: none; }
+.category-filter .scroll-inner::-webkit-scrollbar { display: none; }
+.category-pill { flex-shrink: 0; text-align: center; padding: 11px 16px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.25s; user-select: none; -webkit-tap-highlight-color: transparent; color: var(--text-secondary); border-bottom: 2px solid transparent; white-space: nowrap; }
+.category-pill.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 700; }
+
+/* Article List */
+.article-list { flex: 1; overflow-y: auto; padding: 12px 16px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+.article-list::-webkit-scrollbar { display: none; }
+
+.article-card { background: var(--card); border-radius: var(--radius-sm); padding: 14px; margin-bottom: 10px; display: flex; gap: 12px; cursor: pointer; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.06); -webkit-tap-highlight-color: transparent; }
+.article-card:active { transform: scale(0.98); }
+.article-cover { width: 90px; height: 64px; border-radius: 8px; flex-shrink: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 9px; color: rgba(255,255,255,0.7); }
+.article-cover img { width: 100%; height: 100%; object-fit: cover; }
+.cover-label { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.85); text-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+.article-info { flex: 1; display: flex; flex-direction: column; justify-content: space-between; min-width: 0; }
+.article-title { font-size: 14px; font-weight: 600; color: var(--text-primary); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.article-excerpt { font-size: 12px; color: var(--text-secondary); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; margin-top: 3px; }
+.article-meta { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+.article-meta-item { font-size: 11px; color: var(--text-light); white-space: nowrap; }
+
+/* Search Result Count */
+.search-result-info { padding: 8px 4px; font-size: 12px; color: var(--text-light); }
+.search-highlight { background: rgba(168,85,247,0.15); color: var(--primary); border-radius: 2px; padding: 0 1px; }
+
+/* No Result */
+.no-result { text-align: center; padding: 60px 20px; color: var(--text-light); }
+.no-result-icon { font-size: 40px; margin-bottom: 12px; }
+.no-result-text { font-size: 14px; }
+
+/* Bottom Nav */
+.bottom-nav { height: 56px; background: white; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-around; flex-shrink: 0; z-index: 100; }
+.nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; text-decoration: none; color: #9ca3af; font-size: 10px; transition: color 0.2s; -webkit-tap-highlight-color: transparent; padding: 4px 0; }
+.nav-item.active { color: var(--primary); }
+.nav-item svg { width: 22px; height: 22px; }
+
+/* Modal */
+.modal-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg); z-index: 200; display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.35s cubic-bezier(0.4,0,0.2,1); }
+.modal-overlay.show { transform: translateX(0); }
+.modal-header { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); padding: 20px 20px 16px; color: white; flex-shrink: 0; position: relative; }
+.modal-close { position: absolute; top: 16px; right: 16px; width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.2); border: none; color: white; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.modal-close:active { background: rgba(255,255,255,0.4); }
+.modal-title { font-size: 17px; font-weight: 700; line-height: 1.4; padding-right: 40px; }
+.modal-meta { display: flex; align-items: center; gap: 12px; margin-top: 8px; font-size: 12px; opacity: 0.8; flex-wrap: wrap; }
+.modal-meta span { white-space: nowrap; }
+.reading-progress { height: 3px; background: rgba(255,255,255,0.3); flex-shrink: 0; }
+.reading-progress-bar { height: 100%; background: white; width: 0%; transition: width 0.1s linear; border-radius: 0 2px 2px 0; }
+.modal-content { flex: 1; overflow-y: auto; padding: 20px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+.modal-content::-webkit-scrollbar { display: none; }
+.modal-content p { font-size: 15px; line-height: 1.85; color: var(--text-primary); margin-bottom: 16px; text-indent: 2em; }
+.modal-content .section-title { font-size: 16px; font-weight: 700; color: var(--primary); margin: 24px 0 10px; text-indent: 0; }
+.modal-content blockquote { border-left: 3px solid var(--primary); padding: 8px 14px; margin: 12px 0; background: var(--primary-light); border-radius: 0 8px 8px 0; font-size: 14px; color: var(--text-secondary); line-height: 1.7; text-indent: 0; }
+.modal-tag { display: inline-block; font-size: 11px; padding: 3px 10px; border-radius: 12px; background: rgba(255,255,255,0.25); color: white; font-weight: 500; }
+
+/* OA Footer */
+.oa-footer { margin-top: 32px; padding: 20px; background: #f8f9fa; border-radius: var(--radius-sm); text-align: center; }
+.oa-footer-avatar { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #C88EA7, #B8869F); display: flex; align-items: center; justify-content: center; font-size: 18px; color: white; margin: 0 auto 8px; }
+.oa-footer-name { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+.oa-footer-desc { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+.like-btn { display: inline-block; margin-top: 12px; padding: 8px 24px; border-radius: 20px; background: white; border: 1px solid var(--border); font-size: 13px; color: var(--text-secondary); cursor: pointer; transition: all 0.2s; }
+.like-btn:active { background: var(--primary-light); }
+.like-btn.liked { color: #e74c3c; border-color: #e74c3c; background: #fdf0ee; }
+</style>
+</head>
+<body>
+
+<div class="phone-frame" id="phoneFrame">
+  <div class="page-header">
+    <h1>资讯中心</h1>
+    <div class="subtitle">公众号精选 · 生涯资讯</div>
+  </div>
+
+  <div class="search-bar">
+    <div class="search-input-wrap">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" class="search-input" id="searchInput" placeholder="搜索文章标题、内容关键词...">
+      <button class="search-clear" id="searchClear">&times;</button>
+    </div>
+  </div>
+
+  <div class="category-filter" id="categoryFilter">
+    <div class="scroll-inner" id="categoryPills">
+      <div class="category-pill active" data-category="all">全部</div>
+      <div class="category-pill" data-category="new-species">职业新物种</div>
+      <div class="category-pill" data-category="insight">职场洞察</div>
+      <div class="category-pill" data-category="confusion">生涯解惑</div>
+      <div class="category-pill" data-category="book">好书推荐</div>
+      <div class="category-pill" data-category="activity">工作室动态</div>
+      <div class="category-pill" data-category="team">团队介绍</div>
+    </div>
+  </div>
+
+  <div class="article-list" id="articleList"></div>
+
+  <div class="bottom-nav">
+    <a class="nav-item" href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>首页</span></a>
+    <a class="nav-item" href="assessment.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>测评</span></a>
+    <a class="nav-item" href="consult-flow.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg><span>咨询</span></a>
+    <a class="nav-item" href="goals.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg><span>目标</span></a>
+    <a class="nav-item" href="resume.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>我的</span></a>
+  </div>
+
+  <div class="modal-overlay" id="detailModal">
+    <div class="reading-progress"><div class="reading-progress-bar" id="progressBar"></div></div>
+    <div class="modal-header">
+      <button class="modal-close" id="modalClose">&times;</button>
+      <div class="modal-title" id="modalTitle"></div>
+      <div class="modal-meta" id="modalMeta"></div>
+    </div>
+    <div class="modal-content" id="modalContent"></div>
+  </div>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/articles-data.js"></script>
+<script>
+// ============ 文章数据加载（Supabase优先 + 预设兜底）============
+var articles = [];
+
+function loadArticles() {
+  articleList.innerHTML = '<div class="no-result"><div class="no-result-icon">⏳</div><div class="no-result-text">正在加载文章...</div></div>';
+  // 先加载预设数据，确保页面立刻有内容
+  loadFromPreset();
+  renderArticles();
+  // 然后尝试从 Supabase 加载更新
+  if (typeof initSupabase === 'function') {
+    initSupabase();
+    if (typeof db !== 'undefined' && db) {
+      loadFromSupabaseAsync();
+    }
+  }
+}
+
+function loadFromSupabaseAsync() {
+  db.from('articles').select('*').order('date', { ascending: false }).then(function(res) {
+    if (res.error) {
+      console.error('[Supabase] 查询错误:', res.error);
+      return;
+    }
+    if (res.data && res.data.length > 0) {
+      var newArticles = res.data.map(parseSupabaseArticle);
+      // 合并预设数据（去重）
+      if (typeof PRESET_ARTICLES !== 'undefined') {
+        var existingIds = {};
+        newArticles.forEach(function(a) { existingIds[a.title] = true; });
+        PRESET_ARTICLES.forEach(function(p) {
+          if (!existingIds[p.title]) { newArticles.push(p); }
+        });
+      }
+      articles = sortArticlesByDate(newArticles);
+      renderArticles();
+    }
+  }).catch(function(err) {
+    console.error('[Supabase] 加载失败:', err);
+  });
+}
+
+function loadFromPreset() {
+  articles = sortArticlesByDate(PRESET_ARTICLES || []);
+}
+
+function parseSupabaseArticle(row) {
+  var content = [];
+  try { content = JSON.parse(row.content); } catch(e) { content = [{ type: 'text', value: row.content || '' }]; }
+  return {
+    id: 's' + row.id,
+    title: row.title || '',
+    excerpt: row.excerpt || row.content ? row.content.substring(0, 100) : '',
+    category: row.category || 'insight',
+    categoryName: row.category_name || '职场洞察',
+    date: row.date || '',
+    views: row.views || '阅读 0',
+    likes: row.likes || 0,
+    cover: row.cover || 'linear-gradient(135deg, #6366f1 0%, #4338ca 100%)',
+    author: row.author || '自在生涯工作室',
+    searchText: row.search_text || '',
+    content: content
+  };
+}
+
+// ============ 渲染逻辑 ============
+
+const articleList = document.getElementById('articleList');
+const categoryPills = document.getElementById('categoryPills');
+const detailModal = document.getElementById('detailModal');
+const modalTitle = document.getElementById('modalTitle');
+const modalMeta = document.getElementById('modalMeta');
+const modalContent = document.getElementById('modalContent');
+const modalClose = document.getElementById('modalClose');
+const progressBar = document.getElementById('progressBar');
+const modalContentEl = document.getElementById('modalContent');
+const searchInput = document.getElementById('searchInput');
+const searchClear = document.getElementById('searchClear');
+
+let currentCategory = 'all';
+let currentSearch = '';
+
+function escapeHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function highlightText(text, keyword) {
+  if (!keyword) return escapeHtml(text);
+  var escaped = escapeHtml(text);
+  var re = new RegExp('(' + keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+  return escaped.replace(re, '<span class="search-highlight">$1</span>');
+}
+
+function renderArticles() {
+  var filtered = articles;
+  
+  // 分类过滤
+  if (currentCategory !== 'all') {
+    filtered = filtered.filter(function(a) { return a.category === currentCategory; });
+  }
+  
+  // 搜索过滤
+  if (currentSearch) {
+    var kw = currentSearch.toLowerCase();
+    filtered = filtered.filter(function(a) {
+      return (a.title.toLowerCase().indexOf(kw) !== -1 ||
+              a.excerpt.toLowerCase().indexOf(kw) !== -1 ||
+              (a.searchText && a.searchText.toLowerCase().indexOf(kw) !== -1) ||
+              a.content.some(function(c) { return c.value.toLowerCase().indexOf(kw) !== -1; }));
+    });
+  }
+  
+  if (filtered.length === 0) {
+    articleList.innerHTML = '<div class="no-result"><div class="no-result-icon">🔍</div><div class="no-result-text">没有找到相关文章<br>试试其他关键词？</div></div>';
+    return;
+  }
+  
+  var html = '';
+  if (currentSearch) {
+    html += '<div class="search-result-info">找到 ' + filtered.length + ' 篇相关文章</div>';
+  }
+  
+  html += filtered.map(function(a) {
+    var title = currentSearch ? highlightText(a.title, currentSearch) : escapeHtml(a.title);
+    var excerpt = currentSearch ? highlightText(a.excerpt, currentSearch) : escapeHtml(a.excerpt);
+    return '<div class="article-card" data-id="' + a.id + '">' +
+      (a.cover && a.cover.startsWith('img/') ? '<div class="article-cover"><img src="' + a.cover + '" alt="" loading="lazy"></div>' : '<div class="article-cover" style="background: ' + (a.cover || 'linear-gradient(135deg, #6366f1, #4338ca)') + ';"><span class="cover-label">' + escapeHtml(a.categoryName) + '</span></div>') +
+      '<div class="article-info">' +
+        '<div class="article-title">' + title + '</div>' +
+        '<div class="article-excerpt">' + excerpt + '</div>' +
+        '<div class="article-meta">' +
+          '<span class="article-meta-item">' + a.date + '</span>' +
+          '<span class="article-meta-item">' + a.views + '</span>' +
+          '<span class="article-meta-item">' + a.categoryName + '</span>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+  
+  articleList.innerHTML = html;
+  
+  // 绑定点击
+  articleList.querySelectorAll('.article-card').forEach(function(card) {
+    card.addEventListener('click', function() {
+      openDetail(card.dataset.id);
+    });
+  });
+}
+
+function openDetail(id) {
+  var article = articles.find(function(a) { return a.id === id; });
+  if (!article) return;
+  
+  modalTitle.textContent = article.title;
+  modalMeta.innerHTML = '<span>' + article.author + '</span><span>' + article.date + '</span><span>' + article.views + '</span><span class="modal-tag">' + article.categoryName + '</span>';
+  
+  var contentHtml = article.content.map(function(item) {
+    if (item.type === 'section') return '<div class="section-title">' + item.value + '</div>';
+    return '<p>' + item.value + '</p>';
+  }).join('');
+  
+  contentHtml += '<div class="oa-footer">' +
+    '<div class="oa-footer-avatar">自</div>' +
+    '<div class="oa-footer-name">自在生涯工作室</div>' +
+    '<div class="oa-footer-desc">不定期分享生涯解惑/职场技能/成长感悟/好书推荐</div>' +
+    '<div class="like-btn" id="likeBtn">❤️ 赞 ' + article.likes + '</div>' +
+  '</div>';
+  
+  modalContent.innerHTML = contentHtml;
+  
+  // 点赞
+  setTimeout(function() {
+    var likeBtn = document.getElementById('likeBtn');
+    if (likeBtn) {
+      likeBtn.addEventListener('click', function() {
+        if (this.classList.contains('liked')) {
+          this.classList.remove('liked');
+          this.textContent = '❤️ 赞 ' + article.likes;
+        } else {
+          this.classList.add('liked');
+          this.textContent = '❤️ 已赞 ' + (article.likes + 1);
+        }
+      });
+    }
+  }, 0);
+  
+  modalContentEl.scrollTop = 0;
+  progressBar.style.width = '0%';
+  detailModal.classList.add('show');
+}
+
+function closeDetail() { detailModal.classList.remove('show'); }
+
+// 分类点击
+categoryPills.addEventListener('click', function(e) {
+  if (e.target.classList.contains('category-pill')) {
+    categoryPills.querySelectorAll('.category-pill').forEach(function(p) { p.classList.remove('active'); });
+    e.target.classList.add('active');
+    currentCategory = e.target.dataset.category;
+    renderArticles();
+  }
+});
+
+// 搜索
+searchInput.addEventListener('input', function() {
+  currentSearch = this.value.trim();
+  searchClear.classList.toggle('show', currentSearch.length > 0);
+  renderArticles();
+});
+
+searchClear.addEventListener('click', function() {
+  searchInput.value = '';
+  currentSearch = '';
+  searchClear.classList.remove('show');
+  renderArticles();
+  searchInput.focus();
+});
+
+modalClose.addEventListener('click', closeDetail);
+
+modalContentEl.addEventListener('scroll', function() {
+  var st = modalContentEl.scrollTop;
+  var sh = modalContentEl.scrollHeight - modalContentEl.clientHeight;
+  if (sh > 0) progressBar.style.width = Math.min((st / sh) * 100, 100) + '%';
+});
+
+var touchStartX = 0;
+detailModal.addEventListener('touchstart', function(e) { touchStartX = e.touches[0].clientX; });
+detailModal.addEventListener('touchend', function(e) {
+  if (e.changedTouches[0].clientX - touchStartX > 80) closeDetail();
+});
+
+loadArticles();
+</script>
+
+</body>
+</html>

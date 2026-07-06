@@ -1,0 +1,1419 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>预约咨询 · 自在生涯工作室</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<style>
+  :root {
+    --primary: #7e22ce;
+    --primary-dark: #4c1d95;
+    --primary-light: #faf5ff;
+    --accent: #a855f7;
+    --success: #059669;
+    --success-light: #D1FAE5;
+    --warning: #D97706;
+    --warning-light: #FEF3C7;
+    --danger: #EF4444;
+    --bg: #faf5ff;
+    --card: #FFFFFF;
+    --text-primary: #1e1b4b;
+    --text-secondary: #6B7280;
+    --text-light: #9CA3AF;
+    --border: #E5E7EB;
+    --radius-sm: 12px;
+    --radius-md: 16px;
+    --radius-lg: 20px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    display: flex; justify-content: center; align-items: center;
+    min-height: 100vh; padding: 20px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .phone {
+    width: 390px; height: 844px;
+    background: #faf5ff;
+    border-radius: 44px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    position: relative;
+    box-shadow: 0 30px 80px rgba(76,29,149,0.25), 0 0 0 2px #3b0764, inset 0 0 0 1px rgba(255,255,255,0.1);
+    display: flex; flex-direction: column;
+  }
+
+  /* ===== STATUS BAR ===== */
+  .status-bar {
+    height: 44px; background: var(--primary-dark);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 20px; flex-shrink: 0;
+  }
+  .status-bar .time { font-size: 15px; font-weight: 600; color: #fff; }
+  .status-bar .icons { display: flex; gap: 6px; align-items: center; color: #fff; font-size: 12px; }
+
+  /* ===== STEP PAGES ===== */
+  .step-page {
+    display: none;
+    flex: 1 0 auto;
+    flex-direction: column;
+  }
+  .step-page.active { display: flex; }
+
+  /* NAV HEADER */
+  .nav-header {
+    background: var(--primary-dark); color: #fff;
+    padding: 14px 20px 16px; display: flex; align-items: center; gap: 12px; flex-shrink: 0;
+  }
+  .nav-back-btn {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: rgba(255,255,255,0.15); border: none; color: #fff;
+    font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .nav-header .nav-title { font-size: 17px; font-weight: 600; flex: 1; }
+  .nav-header .nav-subtitle { font-size: 12px; opacity: 0.7; }
+
+  /* STEP INDICATOR */
+  .step-indicator {
+    background: var(--primary); padding: 14px 20px;
+    display: flex; align-items: center; gap: 0; flex-shrink: 0;
+  }
+  .step-dot {
+    display: flex; flex-direction: column; align-items: center; flex: 1; position: relative;
+  }
+  .step-dot:not(:last-child)::after {
+    content: ''; position: absolute; top: 13px; left: 50%;
+    width: 100%; height: 2px;
+    background: rgba(255,255,255,0.25);
+    z-index: 0;
+  }
+  .step-dot.done:not(:last-child)::after { background: rgba(255,255,255,0.8); }
+  .step-circle {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: rgba(255,255,255,0.25); border: 2px solid rgba(255,255,255,0.4);
+    color: rgba(255,255,255,0.7); font-size: 11px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    position: relative; z-index: 1; flex-shrink: 0;
+    transition: all 0.3s;
+  }
+  .step-dot.active .step-circle {
+    background: #fff; border-color: #fff; color: var(--primary); font-weight: 700;
+  }
+  .step-dot.done .step-circle {
+    background: rgba(255,255,255,0.9); border-color: rgba(255,255,255,0.9);
+    color: var(--success); font-size: 12px;
+  }
+  .step-label {
+    font-size: 9px; color: rgba(255,255,255,0.6); margin-top: 4px; text-align: center;
+    white-space: nowrap;
+  }
+  .step-dot.active .step-label, .step-dot.done .step-label { color: rgba(255,255,255,0.95); }
+
+  /* SCROLL BODY — content flows naturally, phone container handles scrolling */
+  .page-body {
+    flex: 1 0 auto;
+    padding: 16px 16px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  /* CARD */
+  .flow-card { background: var(--card); border-radius: var(--radius-md); overflow: hidden; }
+  .flow-card-header {
+    padding: 14px 16px 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .flow-card-header .card-icon {
+    width: 34px; height: 34px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;
+  }
+  .flow-card-header .card-title { font-size: 15px; font-weight: 600; color: var(--text-primary); }
+  .flow-card-header .card-desc { font-size: 12px; color: var(--text-secondary); margin-top: 1px; }
+  .flow-card-body { padding: 14px 16px; }
+
+  /* =========== STEP 1: 选择导师 =========== */
+  .mentor-pick-card {
+    background: var(--card); border-radius: var(--radius-md);
+    padding: 14px 16px; display: flex; align-items: flex-start; gap: 12px;
+    cursor: pointer; border: 2px solid transparent; transition: border-color 0.2s;
+  }
+  .mentor-pick-card.selected { border-color: var(--primary); background: var(--primary-light); }
+  .mentor-pick-avatar {
+    width: 64px; height: 64px; border-radius: 16px;
+    overflow: hidden; flex-shrink: 0;
+    object-fit: cover;
+    border: 2px solid rgba(126,34,206,0.1);
+    margin-top: 2px;
+  }
+  .mentor-pick-avatar img {
+    width: 100%; height: 100%; object-fit: cover;
+    object-position: center 15%;
+  }
+  .mentor-pick-info { flex: 1; min-width: 0; }
+  .mentor-pick-name { font-size: 15px; font-weight: 600; color: var(--text-primary); }
+  .mentor-pick-title { font-size: 12px; color: var(--text-secondary); font-weight: 500; margin-top: 2px; line-height: 1.5; }
+  .mentor-pick-bio { 
+    font-size: 12px; 
+    color: var(--primary); 
+    margin-top: 4px; 
+    font-weight: 500;
+    line-height: 1.5; 
+  }
+  .mentor-pick-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+  .mentor-pick-tag {
+    font-size: 10px; padding: 2px 8px; border-radius: 8px;
+    background: var(--primary-light); color: var(--primary);
+  }
+  .mentor-select-icon { font-size: 20px; display: none; flex-shrink: 0; margin-top: 2px; }
+  .mentor-pick-card.selected .mentor-select-icon { display: block; }
+
+  /* Time Picker */
+  .time-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .time-slot {
+    padding: 9px 6px; border-radius: 10px; border: 1.5px solid var(--border);
+    text-align: center; font-size: 12px; color: var(--text-secondary);
+    cursor: pointer; transition: all 0.18s; background: var(--card);
+  }
+  .time-slot:active { transform: scale(0.96); }
+  .time-slot.selected { border-color: var(--primary); background: var(--primary-light); color: var(--primary); font-weight: 600; }
+  .time-slot.unavailable { opacity: 0.4; cursor: not-allowed; background: #F9F9F9; }
+
+  /* Consult Type */
+  .consult-type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .consult-type-item {
+    padding: 12px 10px; border-radius: var(--radius-sm); border: 1.5px solid var(--border);
+    cursor: pointer; transition: all 0.18s; text-align: center; background: var(--card);
+  }
+  .consult-type-item.selected { border-color: var(--primary); background: var(--primary-light); }
+  .consult-type-item .ct-icon { font-size: 22px; margin-bottom: 6px; }
+  .consult-type-item .ct-name { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+  .consult-type-item .ct-desc { font-size: 10px; color: var(--text-secondary); margin-top: 2px; }
+
+  /* =========== STEP 2: 预约成功 =========== */
+  .success-hero {
+    background: linear-gradient(145deg, var(--primary-dark), #6b21a8);
+    border-radius: var(--radius-lg); padding: 28px 20px 24px; text-align: center; color: #fff;
+  }
+  .success-check {
+    width: 64px; height: 64px; border-radius: 50%;
+    background: rgba(255,255,255,0.15); border: 3px solid rgba(255,255,255,0.6);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; margin: 0 auto 14px; animation: popIn 0.5s ease;
+  }
+  @keyframes popIn {
+    0% { transform: scale(0.5); opacity: 0; }
+    70% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .success-title { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+  .success-subtitle { font-size: 13px; opacity: 0.8; }
+  .booking-detail-card { background: var(--card); border-radius: var(--radius-md); overflow: hidden; }
+  .booking-detail-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px; border-bottom: 1px solid var(--border);
+  }
+  .booking-detail-row:last-child { border-bottom: none; }
+  .bdr-label { font-size: 13px; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; }
+  .bdr-value { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+  .status-badge {
+    padding: 3px 10px; border-radius: 10px; font-size: 11px; font-weight: 600;
+  }
+  .status-confirmed { background: var(--success-light); color: var(--success); }
+  .status-pending { background: var(--warning-light); color: var(--warning); }
+  .next-step-hint {
+    background: linear-gradient(135deg, var(--primary-light), #f5f3ff);
+    border: 1.5px solid #e9d5ff; border-radius: var(--radius-sm);
+    padding: 14px 16px; display: flex; align-items: flex-start; gap: 10px;
+  }
+  .next-step-hint .hint-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .next-step-hint .hint-text { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+  .next-step-hint .hint-text strong { color: var(--primary); }
+
+  /* =========== STEP 3: 填表（页内表单+腾讯文档双通道） =========== */
+
+  /* 页内表单样式 */
+  .form-page-scroll {
+    flex: 1 0 auto;
+    padding: 0 20px;
+  }
+
+  .step-progress-mini {
+    display: flex; align-items: center; gap: 6px; margin-bottom: 4px;
+  }
+  .sp-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: #E5E7EB;
+  }
+  .sp-dot.filled { background: var(--primary); }
+  .sp-label {
+    font-size: 12px; color: var(--text-secondary); font-weight: 500;
+  }
+
+  .form-section-card {
+    background: var(--card); border-radius: 16px;
+    padding: 18px 16px; margin-bottom: 14px;
+    box-shadow: 0 1px 6px rgba(10,22,40,0.06);
+  }
+
+  .fsc-title {
+    font-size: 15px; font-weight: 600; color: var(--text-primary);
+    margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+  }
+  .fsc-title .fsc-icon { font-size: 17px; }
+
+  .f-input {
+    width: 100%; height: 46px; background: #F5F5F7;
+    border: 1.5px solid transparent; border-radius: 10px;
+    padding: 0 14px; font-size: 14px; color: var(--text-primary);
+    font-family: inherit; outline: none; transition: all 0.2s;
+    display: block; -webkit-appearance: none; appearance: none;
+  }
+  .f-input::placeholder { color: #9CA3AF; }
+  .f-input:focus {
+    background: #fff; border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(1,77,178,0.08);
+  }
+  .f-input.error { border-color: var(--danger); background: #FEF2F2; }
+
+  /* Select dropdown */
+  .f-select-wrap { position: relative; }
+  .f-select-wrap::after {
+    content: '▾'; position: absolute; right: 14px; top: 50%;
+    transform: translateY(-50%); color: #9CA3AF; pointer-events: none;
+    font-size: 12px;
+  }
+
+  /* Textarea */
+  .f-textarea {
+    width: 100%; min-height: 110px; background: #F5F5F7;
+    border: 1.5px solid transparent; border-radius: 10px;
+    padding: 12px 14px; font-size: 14px; color: var(--text-primary);
+    font-family: inherit; outline: none; resize: vertical;
+    transition: all 0.2s; line-height: 1.6;
+    display: block;
+  }
+  .f-textarea::placeholder { color: #9CA3AF; }
+  .f-textarea:focus {
+    background: #fff; border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(1,77,178,0.08);
+  }
+
+  .f-hint {
+    font-size: 11px; color: var(--text-secondary); line-height: 1.5;
+    margin-top: -8px; margin-bottom: 10px;
+  }
+
+  /* 腾讯文档底部链接 */
+  .tencent-link-bar {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 10px; cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .tencent-link-bar:active { opacity: 0.7; }
+  .tencent-link-bar .tl-icon { font-size: 15px; }
+  .tencent-link-bar .tl-text {
+    font-size: 13px; font-weight: 600; color: var(--primary);
+  }
+  .tencent-link-bar .tl-arrow { font-size: 14px; color: var(--primary); }
+
+  /* 表单验证错误提示 */
+  .field-error-msg {
+    font-size: 11px; color: var(--danger);
+    margin-top: 4px; display: none;
+  }
+  .field-error-msg.show { display: block; }
+
+  /* =========== STEP 4: 咨询反馈 =========== */
+  .rating-section { display: flex; flex-direction: column; align-items: center; padding: 20px 0 14px; gap: 10px; }
+  .rating-stars { display: flex; gap: 10px; }
+  .rating-star {
+    font-size: 36px; cursor: pointer; transition: transform 0.15s;
+    filter: grayscale(1); opacity: 0.4;
+  }
+  .rating-star.active { filter: none; opacity: 1; transform: scale(1.1); }
+  .rating-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-secondary); width: 100%; padding: 0 4px; }
+  .rating-text-result { font-size: 14px; font-weight: 600; color: var(--primary); min-height: 20px; text-align: center; }
+  .tag-select-group { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tag-sel {
+    padding: 7px 14px; border-radius: 20px; font-size: 12px; font-weight: 500;
+    border: 1.5px solid var(--border); background: var(--card); color: var(--text-secondary);
+    cursor: pointer; transition: all 0.18s;
+  }
+  .tag-sel.active { border-color: var(--primary); background: var(--primary-light); color: var(--primary); }
+  .textarea-field {
+    width: 100%; border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+    padding: 12px; font-size: 13px; font-family: inherit; resize: none;
+    color: var(--text-primary); outline: none; background: var(--card);
+    transition: border-color 0.2s; line-height: 1.5;
+  }
+  .textarea-field:focus { border-color: var(--primary); }
+  .textarea-counter { font-size: 11px; color: var(--text-light); text-align: right; margin-top: 4px; }
+  .feedback-doc-banner {
+    background: linear-gradient(135deg, #F0FDF4, #DCFCE7);
+    border: 1.5px solid #86EFAC; border-radius: var(--radius-sm);
+    padding: 14px 16px; display: flex; align-items: center; gap: 10px;
+  }
+  .feedback-doc-banner .fb-icon { font-size: 20px; flex-shrink: 0; }
+  .feedback-doc-banner .fb-text { flex: 1; font-size: 12px; color: #166534; line-height: 1.5; }
+  .feedback-doc-btn {
+    padding: 7px 12px; border-radius: 8px; background: #16A34A; color: #fff;
+    font-size: 12px; font-weight: 600; border: none; cursor: pointer; white-space: nowrap;
+  }
+
+  /* =========== STEP 5: 咨询报告 =========== */
+  .report-hero {
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+    border-radius: var(--radius-lg); padding: 22px 18px;
+    color: #fff; position: relative; overflow: hidden;
+  }
+  .report-hero::before {
+    content: '🎓'; position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+    font-size: 56px; opacity: 0.12;
+  }
+  .report-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(255,255,255,0.15); border-radius: 20px;
+    padding: 4px 12px; font-size: 11px; margin-bottom: 10px;
+  }
+  .report-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+  .report-meta { font-size: 12px; opacity: 0.75; display: flex; align-items: center; gap: 12px; }
+  .report-section { background: var(--card); border-radius: var(--radius-md); overflow: hidden; }
+  .report-section-header {
+    padding: 12px 16px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .report-section-header .rs-icon {
+    width: 30px; height: 30px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center; font-size: 14px;
+  }
+  .report-section-header .rs-title { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+  .report-section-body { padding: 14px 16px; }
+  .report-score-row {
+    display: flex; justify-content: space-between; gap: 8px; margin-bottom: 14px;
+  }
+  .report-score-item {
+    flex: 1; background: var(--primary-light); border-radius: 10px;
+    padding: 10px; text-align: center;
+  }
+  .report-score-item .rs-num { font-size: 20px; font-weight: 800; color: var(--primary); }
+  .report-score-item .rs-label { font-size: 10px; color: var(--text-secondary); margin-top: 2px; }
+  .report-list-item {
+    display: flex; align-items: flex-start; gap: 8px; padding: 6px 0;
+    border-bottom: 1px solid var(--border); font-size: 13px; line-height: 1.5;
+  }
+  .report-list-item:last-child { border-bottom: none; }
+  .report-list-item .rli-dot {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--primary);
+    flex-shrink: 0; margin-top: 7px;
+  }
+  .report-strengths .rli-dot { background: var(--success); }
+  .report-weakness .rli-dot { background: #F59E0B; }
+  .report-action-items { display: flex; flex-direction: column; gap: 8px; }
+  .report-action-item {
+    background: #F8F9FA; border-radius: 10px; padding: 10px 12px;
+    display: flex; align-items: flex-start; gap: 8px;
+  }
+  .report-action-item .rai-num {
+    width: 20px; height: 20px; border-radius: 50%;
+    background: var(--primary); color: #fff; font-size: 10px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .report-action-item .rai-text { font-size: 12px; color: var(--text-primary); line-height: 1.5; }
+  .report-download-section {
+    background: linear-gradient(135deg, var(--primary-light), #f5f3ff);
+    border: 1.5px solid #e9d5ff; border-radius: var(--radius-md);
+    padding: 16px; display: flex; align-items: center; gap: 14px;
+  }
+  .report-download-section .rd-icon { font-size: 32px; flex-shrink: 0; }
+  .report-download-section .rd-info { flex: 1; }
+  .report-download-section .rd-title { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+  .report-download-section .rd-desc { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+  .rd-download-btn {
+    padding: 8px 14px; border-radius: 10px;
+    background: var(--primary); color: #fff; font-size: 12px; font-weight: 600;
+    border: none; cursor: pointer; white-space: nowrap;
+  }
+  .report-share-row { display: flex; gap: 10px; }
+  .report-share-btn {
+    flex: 1; padding: 12px; border-radius: var(--radius-sm);
+    border: none; cursor: pointer; font-size: 13px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .rsb-wechat { background: #07C160; color: #fff; }
+  .rsb-link { background: #F3F4F6; color: var(--text-primary); }
+  .rsb-wechat:active, .rsb-link:active { opacity: 0.85; }
+
+  /* ===== BOTTOM CTA ===== */
+  .bottom-cta {
+    padding: 12px 16px 20px; background: var(--card);
+    border-top: 1px solid var(--border); flex-shrink: 0;
+  }
+  .cta-btn {
+    width: 100%; padding: 16px; border-radius: var(--radius-md); border: none;
+    font-size: 16px; font-weight: 700; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: all 0.2s;
+  }
+  .cta-btn:active { transform: scale(0.98); opacity: 0.9; }
+  .cta-primary { background: var(--primary); color: #fff; }
+  .cta-success { background: var(--success); color: #fff; }
+  .cta-secondary { background: #F3F4F6; color: var(--text-primary); }
+  .cta-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  /* SECTION LABEL */
+  .section-label {
+    font-size: 12px; font-weight: 600; color: var(--text-secondary);
+    text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: -4px;
+  }
+
+  /* TOAST */
+  .toast-bar {
+    position: fixed; top: 24px; left: 50%; transform: translateX(-50%);
+    background: rgba(30,27,75,0.9); color: #fff; padding: 10px 20px;
+    border-radius: 20px; font-size: 13px; z-index: 9999;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s;
+    white-space: nowrap;
+  }
+  .toast-bar.show { opacity: 1; }
+
+  /* DIVIDER */
+  .divider { height: 1px; background: var(--border); }
+
+  /* MENTOR SMALL CARD (used in step 2+) */
+  .mentor-mini {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--primary-light); border-radius: var(--radius-sm); padding: 12px 14px;
+  }
+  .mentor-mini-avatar {
+    width: 42px; height: 42px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 17px; font-weight: 700; color: #fff; flex-shrink: 0;
+  }
+  .mentor-mini-name { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+  .mentor-mini-role { font-size: 11px; color: var(--text-secondary); margin-top: 1px; }
+
+
+  /* ===== 打印样式 ===== */
+  @media print {
+    body { background: #fff; padding: 0; }
+    .phone { box-shadow: none; border-radius: 0; width: 100%; height: auto; border: none; }
+    .status-bar, .nav-header, .step-indicator, .bottom-cta, .report-download-section,
+    .report-share-row, .step-page:not(#step5) { display: none !important; }
+    #step5 { display: flex !important; }
+    .page-body { overflow: visible; }
+    .report-hero { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ===== Bottom Nav ===== */
+  .bottom-nav {
+    height: 64px; background: #fff; border-top: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-around;
+    flex-shrink: 0; z-index: 100; padding-bottom: 8px;
+  }
+  .nav-item {
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    text-decoration: none; cursor: pointer; padding: 6px 12px;
+    transition: all 0.2s; font-size: 10px; color: var(--text-light);
+  }
+  .nav-item svg { width: 22px; height: 22px; }
+  .nav-item.active { color: var(--primary); }
+</style>
+<script src="https://cdn.bootcdn.net/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" defer></script>
+<script src="https://beacon.cdn.qq.com/sdk/4.5.9/beacon_web.min.js"></script>
+<script>
+(function(){
+  try{
+    var beacon=new BeaconAction({
+      appkey:'0WEB06U85YBSLJNL',
+      versionCode:'1.0.0',
+      channelID:'share',
+      delay:1000,
+      sessionDuration:30*60*1000,
+      isOversea:false,
+      needReportRqdEvent:false
+    });
+    beacon.onDirectUserAction('preview_page_view',{
+      'url':location.href,
+      'referrer':document.referrer,
+      'title':document.title,
+      'sandbox_id':'fa36b86aff3c44c5a750cdf276e0da0c'
+    });
+  }catch(e){}
+})();
+</script></head>
+<body>
+
+<div class="phone">
+  <!-- ==================== STEP 1: 咨询报名 ==================== -->
+  <div class="step-page active" id="step1">
+    <div class="step-indicator">
+      <div class="step-dot active"><div class="step-circle">1</div><div class="step-label">选导师</div></div>
+      <div class="step-dot"><div class="step-circle">2</div><div class="step-label">确认</div></div>
+      <div class="step-dot"><div class="step-circle">3</div><div class="step-label">填表</div></div>
+      <div class="step-dot"><div class="step-circle">4</div><div class="step-label">反馈</div></div>
+      <div class="step-dot"><div class="step-circle">5</div><div class="step-label">报告</div></div>
+    </div>
+    <div class="page-body">
+      <div class="section-label">选择咨询师</div>
+
+      <!-- Mentor Card: 何霞 -->
+      <div class="mentor-pick-card" id="mc-hexia" onclick="selectMentor('hexia', this)">
+        <div class="mentor-pick-avatar">
+          <img src="img/mentor-hexia.jpg" alt="何霞">
+        </div>
+        <div class="mentor-pick-info">
+          <div class="mentor-pick-name">何霞</div>
+          <div class="mentor-pick-title">企业管理教授 · 广东省就业特色示范课负责人</div>
+          <div class="mentor-pick-bio">擅长领域：职业定位 / 优势萃取</div>
+        </div>
+        <div class="mentor-select-icon">✅</div>
+      </div>
+
+      <!-- Mentor Card: 王丽娜 -->
+      <div class="mentor-pick-card" id="mc-wanglina" onclick="selectMentor('wanglina', this)">
+        <div class="mentor-pick-avatar">
+          <img src="img/mentor-wanglina.png" alt="王丽娜">
+        </div>
+        <div class="mentor-pick-info">
+          <div class="mentor-pick-name">王丽娜</div>
+          <div class="mentor-pick-title">CVCC职业规划师</div>
+          <div class="mentor-pick-bio">擅长领域：行业分析 / 创业指导</div>
+        </div>
+        <div class="mentor-select-icon">✅</div>
+      </div>
+
+      <!-- Mentor Card: 龚静娴 -->
+      <div class="mentor-pick-card" id="mc-gongjingxian" onclick="selectMentor('gongjingxian', this)">
+        <div class="mentor-pick-avatar">
+          <img src="img/mentor-gongjingxian.jpg" alt="龚静娴">
+        </div>
+        <div class="mentor-pick-info">
+          <div class="mentor-pick-name">龚静娴</div>
+          <div class="mentor-pick-title">GCDF职业规划师</div>
+          <div class="mentor-pick-bio">擅长领域：情绪管理 / 人际沟通</div>
+        </div>
+        <div class="mentor-select-icon">✅</div>
+      </div>
+
+      <!-- Mentor Card: 黄洁琦 -->
+      <div class="mentor-pick-card" id="mc-huangjieqi" onclick="selectMentor('huangjieqi', this)">
+        <div class="mentor-pick-avatar">
+          <img src="img/mentor-huangjieqi.jpg" alt="黄洁琦">
+        </div>
+        <div class="mentor-pick-info">
+          <div class="mentor-pick-name">黄洁琦</div>
+          <div class="mentor-pick-title">管理学副教授 · 创新创业导师</div>
+          <div class="mentor-pick-bio">擅长领域：简历优化 / 面试指导</div>
+        </div>
+        <div class="mentor-select-icon">✅</div>
+      </div>
+
+      <!-- Mentor Card: 潘文灏 -->
+      <div class="mentor-pick-card" id="mc-panwenhao" onclick="selectMentor('panwenhao', this)">
+        <div class="mentor-pick-avatar">
+          <img src="img/mentor-panwenhao.jpg" alt="潘文灏">
+        </div>
+        <div class="mentor-pick-info">
+          <div class="mentor-pick-name">潘文灏</div>
+          <div class="mentor-pick-title">管理学博士 · 创新创业导师</div>
+          <div class="mentor-pick-bio">擅长领域：行业分析 / 创业指导</div>
+        </div>
+        <div class="mentor-select-icon">✅</div>
+      </div>
+
+      <!-- Consult Type -->
+      <div class="section-label">咨询方向</div>
+      <div class="consult-type-grid">
+        <div class="consult-type-item" onclick="selectType('career', this)">
+          <div class="ct-icon">🧭</div>
+          <div class="ct-name">职业规划</div>
+          <div class="ct-desc">方向定位 · 规划路径</div>
+        </div>
+        <div class="consult-type-item" onclick="selectType('industry', this)">
+          <div class="ct-icon">📊</div>
+          <div class="ct-name">行业分析</div>
+          <div class="ct-desc">赛道趋势 · 薪资水平</div>
+        </div>
+        <div class="consult-type-item" onclick="selectType('resume', this)">
+          <div class="ct-icon">📄</div>
+          <div class="ct-name">简历优化</div>
+          <div class="ct-desc">结构调整 · 关键词</div>
+        </div>
+        <div class="consult-type-item" onclick="selectType('interview', this)">
+          <div class="ct-icon">🎤</div>
+          <div class="ct-name">面试辅导</div>
+          <div class="ct-desc">模拟面试 · 复盘点评</div>
+        </div>
+      </div>
+
+      <!-- Date -->
+      <div class="section-label">选择时间</div>
+      <div class="flow-card" style="padding:14px 16px;">
+        <div id="dateChipsContainer" style="display:flex; gap:8px; overflow-x:auto; padding-bottom:2px; margin-bottom:12px;">
+          <!-- JS 动态生成从今天起10天 -->
+        </div>
+        <div class="time-grid">
+          <div class="time-slot selected" onclick="selectTime('09:00', this)">09:00</div>
+          <div class="time-slot" onclick="selectTime('10:00', this)">10:00</div>
+          <div class="time-slot unavailable">11:00</div>
+          <div class="time-slot" onclick="selectTime('14:00', this)">14:00</div>
+          <div class="time-slot" onclick="selectTime('15:00', this)">15:00</div>
+          <div class="time-slot unavailable">16:00</div>
+          <div class="time-slot" onclick="selectTime('19:00', this)">19:00</div>
+          <div class="time-slot" onclick="selectTime('20:00', this)">20:00</div>
+          <div class="time-slot" onclick="selectTime('21:00', this)">21:00</div>
+        </div>
+        <div style="margin-top:8px; font-size:11px; color:var(--text-light); text-align:center;">灰色时段已约满 · 每次咨询约60分钟</div>
+      </div>
+    </div>
+    <div class="bottom-cta">
+      <div id="step1Hint" style="text-align:center; font-size:12px; color:var(--text-light); margin-bottom:8px;">请先选择导师和咨询方向</div>
+      <button class="cta-btn cta-primary" id="step1Btn" onclick="goStep(2)" disabled>
+        确认预约 →
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================== STEP 2: 预约成功 ==================== -->
+  <div class="step-page" id="step2">
+    <div class="step-indicator">
+      <div class="step-dot done"><div class="step-circle">✓</div><div class="step-label">选导师</div></div>
+      <div class="step-dot active"><div class="step-circle">2</div><div class="step-label">确认</div></div>
+      <div class="step-dot"><div class="step-circle">3</div><div class="step-label">填表</div></div>
+      <div class="step-dot"><div class="step-circle">4</div><div class="step-label">反馈</div></div>
+      <div class="step-dot"><div class="step-circle">5</div><div class="step-label">报告</div></div>
+    </div>
+    <div class="page-body">
+      <div class="success-hero">
+        <div class="success-check">✅</div>
+        <div class="success-title">预约已提交！</div>
+        <div class="success-subtitle">导师将在2小时内确认，请注意微信通知</div>
+      </div>
+
+      <div class="booking-detail-card">
+        <div class="booking-detail-row">
+          <span class="bdr-label">📋 预约编号</span>
+          <span class="bdr-value" style="font-family:monospace;color:var(--primary);">#ZT20260701</span>
+        </div>
+        <div class="booking-detail-row">
+          <span class="bdr-label">👤 咨询师</span>
+          <span class="bdr-value" id="confirm-mentor">张导师</span>
+        </div>
+        <div class="booking-detail-row">
+          <span class="bdr-label">🧭 咨询方向</span>
+          <span class="bdr-value" id="confirm-type">职业规划</span>
+        </div>
+        <div class="booking-detail-row">
+          <span class="bdr-label">📅 咨询时间</span>
+          <span class="bdr-value" id="confirm-time">--/-- 09:00</span>
+        </div>
+        <div class="booking-detail-row">
+          <span class="bdr-label">✅ 状态</span>
+          <span class="status-badge status-pending">待确认</span>
+        </div>
+      </div>
+
+      <div class="next-step-hint">
+        <div class="hint-icon">💡</div>
+        <div class="hint-text">
+          预约确认后，请在<strong>咨询前48小时</strong>完成信息表填写，帮助导师提前了解你的情况，让咨询更有针对性 ↓
+        </div>
+      </div>
+    </div>
+    <div class="bottom-cta">
+      <button class="cta-btn cta-primary" onclick="goStep(3)">
+        填写咨询信息表 →
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================== STEP 3: 填表（页内表单+腾讯文档） ==================== -->
+  <div class="step-page" id="step3">
+    <!-- 进度条 -->
+    <div style="padding: 12px 20px;">
+      <div class="step-progress-mini">
+        <span class="sp-dot filled"></span><span class="sp-dot filled"></span>
+        <span class="sp-dot filled"></span><span class="sp-dot"></span><span class="sp-dot"></span>
+        <span class="sp-label">步骤 3 / 5 · 填写信息</span>
+      </div>
+    </div>
+
+    <!-- 表单滚动区 -->
+    <div class="form-page-scroll">
+
+      <!-- ===== 卡片1：个人信息 ===== -->
+      <div class="form-section-card">
+        <div class="fsc-title"><span class="fsc-icon">👤</span> 个人信息</div>
+
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div>
+            <input type="text" class="f-input" id="formName"
+              placeholder="姓名（必填）" maxlength="20">
+            <div class="field-error-msg" id="errName">请输入你的姓名</div>
+          </div>
+          <input type="tel" class="f-input" id="formPhone"
+            placeholder="手机号码（用于接收咨询通知）" maxlength="11">
+          <input type="email" class="f-input" id="formEmail"
+            placeholder="邮箱地址" maxlength="50">
+          <input type="text" class="f-input" id="formSchool"
+            placeholder="学校 / 专业（如：清华大学 计算机科学与技术）" maxlength="40">
+        </div>
+      </div>
+
+      <!-- ===== 卡片3：问题描述 ===== -->
+      <div class="form-section-card">
+        <div class="fsc-title"><span class="fsc-icon">💬</span> 你的问题</div>
+        <div class="f-hint">请描述你想咨询的具体问题，越详细越好，导师会提前了解并准备</div>
+        <textarea class="f-textarea" id="formProblem" rows="4"
+          placeholder="例如：我是计算机专业大三学生，对前端开发和 AI 方向都感兴趣，不知道该怎么选择。目前有一段后端实习经历..."
+          maxlength="500"></textarea>
+        <div style="display:flex;justify-content:flex-end;margin-top:4px;">
+          <span style="font-size:11px;color:#9CA3AF;" id="problemCounter">0/500</span>
+        </div>
+        <div class="field-error-msg" id="errProblem" style="margin-top:4px;">请描述你想要咨询的问题（至少20字）</div>
+      </div>
+
+      <!-- 提示信息 -->
+      <div style="background:var(--primary-light); border:1.5px solid #e9d5ff; border-radius:12px; padding:12px 14px; font-size:12px; color:var(--primary); line-height:1.6; margin-bottom:14px;">
+        💡 <strong>Tips：</strong>填写的信息将仅用于本次咨询准备，不会对外公开
+      </div>
+
+      <!-- 页内表单为唯一填表通道，无需跳转外部文档 -->
+    </div>
+
+    <!-- 底部提交按钮 -->
+    <div class="bottom-cta">
+      <button class="cta-btn cta-primary" id="submitFormBtn" onclick="submitConsultForm()">
+        ✅ 提交咨询预约
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================== STEP 4: 咨询反馈 ==================== -->
+  <div class="step-page" id="step4">
+    <div class="step-indicator">
+      <div class="step-dot done"><div class="step-circle">✓</div><div class="step-label">选导师</div></div>
+      <div class="step-dot done"><div class="step-circle">✓</div><div class="step-label">确认</div></div>
+      <div class="step-dot done"><div class="step-circle">✓</div><div class="step-label">填表</div></div>
+      <div class="step-dot active"><div class="step-circle">4</div><div class="step-label">反馈</div></div>
+      <div class="step-dot"><div class="step-circle">5</div><div class="step-label">报告</div></div>
+    </div>
+    <div class="page-body">
+      <!-- 总体评分 -->
+      <div class="flow-card">
+        <div class="flow-card-header">
+          <div class="card-icon" style="background:#FEF3C7;">⭐</div>
+          <div>
+            <div class="card-title">总体评分</div>
+            <div class="card-desc">对本次咨询整体满意度</div>
+          </div>
+        </div>
+        <div class="flow-card-body">
+          <div class="rating-section">
+            <div class="rating-stars">
+              <span class="rating-star" onclick="setRating(1)">⭐</span>
+              <span class="rating-star" onclick="setRating(2)">⭐</span>
+              <span class="rating-star" onclick="setRating(3)">⭐</span>
+              <span class="rating-star" onclick="setRating(4)">⭐</span>
+              <span class="rating-star" onclick="setRating(5)">⭐</span>
+            </div>
+            <div class="rating-labels">
+              <span>很不满意</span><span style="margin-left:auto;">非常满意</span>
+            </div>
+            <div class="rating-text-result" id="ratingText">点击星星评分</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 标签评价 -->
+      <div class="flow-card">
+        <div class="flow-card-header">
+          <div class="card-icon" style="background:var(--primary-light);">💬</div>
+          <div>
+            <div class="card-title">这次咨询如何？</div>
+            <div class="card-desc">可多选</div>
+          </div>
+        </div>
+        <div class="flow-card-body">
+          <div class="tag-select-group" id="tagGroup">
+            <div class="tag-sel" onclick="toggleTag(this)">🎯 针对性强</div>
+            <div class="tag-sel" onclick="toggleTag(this)">💡 思路清晰</div>
+            <div class="tag-sel" onclick="toggleTag(this)">🔥 干货满满</div>
+            <div class="tag-sel" onclick="toggleTag(this)">😊 态度友好</div>
+            <div class="tag-sel" onclick="toggleTag(this)">⏰ 准时高效</div>
+            <div class="tag-sel" onclick="toggleTag(this)">📝 建议实用</div>
+            <div class="tag-sel" onclick="toggleTag(this)">🌟 超出预期</div>
+            <div class="tag-sel" onclick="toggleTag(this)">❓ 内容较浅</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 文字评价 -->
+      <div class="flow-card">
+        <div class="flow-card-header">
+          <div class="card-icon" style="background:#F0FDF4;">✍️</div>
+          <div>
+            <div class="card-title">详细评价</div>
+            <div class="card-desc">你的反馈对导师非常重要</div>
+          </div>
+        </div>
+        <div class="flow-card-body">
+          <textarea class="textarea-field" id="feedbackText" rows="4"
+            placeholder="分享你的感受：导师哪些建议让你印象深刻？哪些地方还可以改进？…"
+            oninput="updateCounter('feedbackText','feedbackCount',200)"></textarea>
+          <div class="textarea-counter"><span id="feedbackCount">0</span>/200 字</div>
+        </div>
+      </div>
+
+      <!-- 反馈提交后直接进入下一步 -->
+    </div>
+    <div class="bottom-cta">
+      <button class="cta-btn cta-success" id="submitFeedbackBtn" onclick="submitFeedback()" disabled>
+        提交反馈 · 获取报告 →
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================== STEP 5: 咨询报告 ==================== -->
+  <div class="step-page" id="step5">
+    <div class="step-indicator">
+      <div class="step-dot done"><div class="step-circle">✓</div><div class="step-label">选导师</div></div>
+      <div class="step-dot done"><div class="step-circle">✓</div><div class="step-label">确认</div></div>
+      <div class="step-dot done"><div class="step-circle">✓</div><div class="step-label">填表</div></div>
+      <div class="step-dot done"><div class="step-circle">✓</div><div class="step-label">反馈</div></div>
+      <div class="step-dot active"><div class="step-circle">5</div><div class="step-label">报告</div></div>
+    </div>
+    <div class="page-body">
+      <!-- ===== 导出容器（PDF 将捕获此区域） ===== -->
+      <div id="reportExportContent">
+      <!-- Report Hero -->
+      <div class="report-hero">
+        <div class="report-tag">🎓 <span>职业规划咨询报告</span></div>
+        <div class="report-title">张导师 · 个人职业发展报告</div>
+        <div class="report-meta">
+          <span>📅 2026-07-01</span>
+          <span>⏱️ 约60分钟</span>
+          <span>由导师撰写</span>
+        </div>
+      </div>
+
+      <!-- 综合评估 -->
+      <div class="report-section">
+        <div class="report-section-header">
+          <div class="rs-icon" style="background:var(--primary-light);">📊</div>
+          <div class="rs-title">综合评估</div>
+        </div>
+        <div class="report-section-body">
+          <div class="report-score-row">
+            <div class="report-score-item">
+              <div class="rs-num">83</div>
+              <div class="rs-label">竞争力评分</div>
+            </div>
+            <div class="report-score-item">
+              <div class="rs-num">A</div>
+              <div class="rs-label">简历质量</div>
+            </div>
+            <div class="report-score-item">
+              <div class="rs-num">B+</div>
+              <div class="rs-label">面试准备</div>
+            </div>
+          </div>
+          <div style="font-size:13px; color:var(--text-secondary); line-height:1.7;">
+            你的背景整体较强，CS专业基础扎实，有一段实习经历。主要短板在于缺少大厂项目亮点、面试表达需要系统训练。建议优先攻克面试关，配合简历精修，秋招成功率可提升至75%以上。
+          </div>
+        </div>
+      </div>
+
+      <!-- 优势与不足 -->
+      <div class="report-section">
+        <div class="report-section-header">
+          <div class="rs-icon" style="background:#D1FAE5;">✨</div>
+          <div class="rs-title">优势亮点</div>
+        </div>
+        <div class="report-section-body report-strengths">
+          <div class="report-list-item"><div class="rli-dot"></div><span>名校CS背景，技术基础扎实，在产品岗竞争中具备差异化优势</span></div>
+          <div class="report-list-item"><div class="rli-dot"></div><span>有互联网公司实习经历，了解产品流程，简历不空洞</span></div>
+          <div class="report-list-item"><div class="rli-dot"></div><span>表达逻辑清晰，沟通能力强，适合偏策略型产品岗</span></div>
+        </div>
+      </div>
+
+      <div class="report-section">
+        <div class="report-section-header">
+          <div class="rs-icon" style="background:#FEF3C7;">⚠️</div>
+          <div class="rs-title">待提升方向</div>
+        </div>
+        <div class="report-section-body report-weakness">
+          <div class="report-list-item"><div class="rli-dot"></div><span>项目数据支撑不足，建议量化每段经历的贡献（转化率/DAU/效率提升）</span></div>
+          <div class="report-list-item"><div class="rli-dot"></div><span>面试中「STAR法则」运用生疏，容易回答散乱，需专项训练</span></div>
+          <div class="report-list-item"><div class="rli-dot"></div><span>对目标公司的产品了解不深，建议深度体验并形成竞品分析</span></div>
+        </div>
+      </div>
+
+      <!-- 行动计划 -->
+      <div class="report-section">
+        <div class="report-section-header">
+          <div class="rs-icon" style="background:#f5f3ff;">🗓️</div>
+          <div class="rs-title">30天行动计划</div>
+        </div>
+        <div class="report-section-body">
+          <div class="report-action-items">
+            <div class="report-action-item">
+              <div class="rai-num">1</div>
+              <div class="rai-text"><strong>第1-7天</strong>：重写简历，每段经历加3个量化数据，参考提供的模板修改项目描述</div>
+            </div>
+            <div class="report-action-item">
+              <div class="rai-num">2</div>
+              <div class="rai-text"><strong>第8-14天</strong>：深度体验目标公司产品（腾讯/字节/美团），写一份竞品分析作为面试素材</div>
+            </div>
+            <div class="report-action-item">
+              <div class="rai-num">3</div>
+              <div class="rai-text"><strong>第15-21天</strong>：每天练习2道面试题（STAR法则），录音回放找问题</div>
+            </div>
+            <div class="report-action-item">
+              <div class="rai-num">4</div>
+              <div class="rai-text"><strong>第22-30天</strong>：内推+海投启动，优先字节/腾讯暑期实习，保底网易/京东</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 推荐资源 -->
+      <div class="report-section">
+        <div class="report-section-header">
+          <div class="rs-icon" style="background:#F0FDF4;">📚</div>
+          <div class="rs-title">导师推荐资源</div>
+        </div>
+        <div class="report-section-body">
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <div style="display:flex; align-items:center; gap:10px; padding:8px 10px; background:#F8F9FA; border-radius:10px; font-size:12px;">
+              <span>📖</span><span style="flex:1;">《腾讯产品面试100题》— 腾讯产品核心考察点全覆盖</span>
+              <span style="color:var(--primary); font-weight:600;">PDF</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px; padding:8px 10px; background:#F8F9FA; border-radius:10px; font-size:12px;">
+              <span>🎯</span><span style="flex:1;">简历量化表达模板（导师定制版）</span>
+              <span style="color:var(--primary); font-weight:600;">腾讯文档</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px; padding:8px 10px; background:#F8F9FA; border-radius:10px; font-size:12px;">
+              <span>🔗</span><span style="flex:1;">字节跳动产品岗内推通道（7月截止）</span>
+              <span style="color:var(--primary); font-weight:600;">链接</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      </div>
+      <!-- ===== /导出容器 ===== -->
+
+      <!-- 下载/分享 -->
+      <div class="report-download-section">
+        <div class="rd-icon">📄</div>
+        <div class="rd-info">
+          <div class="rd-title">导出完整版报告</div>
+          <div class="rd-desc">PDF版本 · 约4页 · 含详细建议</div>
+        </div>
+        <button class="rd-download-btn" onclick="downloadReport()">下载</button>
+      </div>
+
+      <div class="report-share-row">
+        <button class="report-share-btn rsb-wechat" onclick="shareReport('wechat')">
+          💬 分享给朋友
+        </button>
+        <button class="report-share-btn rsb-link" onclick="shareReport('link')">
+          🔗 复制链接
+        </button>
+      </div>
+
+      <!-- 追加咨询 -->
+      <div style="background:var(--card); border-radius:var(--radius-md); padding:16px; text-align:center;">
+        <div style="font-size:14px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">还有疑问？</div>
+        <div style="font-size:12px; color:var(--text-secondary); margin-bottom:12px;">可预约追加咨询，享九折优惠</div>
+        <button class="cta-btn cta-primary" style="padding:12px;" onclick="goStep(1)">
+          再次预约咨询
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Nav -->
+  <div class="bottom-nav">
+    <a class="nav-item" href="index.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>首页</span>
+    </a>
+    <a class="nav-item" href="assessment.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      <span>测评</span>
+    </a>
+    <a class="nav-item active" href="consult-flow.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <span>咨询</span>
+    </a>
+    <a class="nav-item" href="goals.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      <span>目标</span>
+    </a>
+    <a class="nav-item" href="resume.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span>我的</span>
+    </a>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-bar" id="toastBar"></div>
+
+<script>
+/* ========== STATE ========== */
+var selectedMentor = null;
+var selectedType = null;
+var selectedDate = '07-01';
+var selectedTime = '09:00'; // 默认选中第一个时间槽
+var currentRating = 0;
+
+var MENTOR_DATA = {
+  hexia:       { name:'何霞', title:'企业管理教授 · 广东省就业特色示范课负责人', bio:'擅长领域：职业定位 / 优势萃取' },
+  wanglina:    { name:'王丽娜', title:'CVCC职业规划师', bio:'擅长领域：行业分析 / 创业指导' },
+  gongjingxian:{ name:'龚静娴', title:'GCDF职业规划师', bio:'擅长领域：情绪管理 / 人际沟通' },
+  huangjieqi:  { name:'黄洁琦', title:'管理学副教授 · 创新创业导师', bio:'擅长领域：简历优化 / 面试指导' },
+  panwenhao:   { name:'潘文灏', title:'管理学博士 · 创新创业导师', bio:'擅长领域：行业分析 / 创业指导' }
+};
+
+var TYPE_NAMES = {
+  career:'职业规划', resume:'简历优化', interview:'面试辅导', industry:'行业分析'
+};
+
+/* ========== STEP NAVIGATION ========== */
+function goStep(n) {
+  document.querySelectorAll('.step-page').forEach(function(p) { p.classList.remove('active'); });
+  var page = document.getElementById('step' + n);
+  if (page) {
+    page.classList.add('active');
+    if (n === 2) populateConfirm();
+  }
+}
+
+function goBack() {
+  // Return to main mini-program
+  showToast('返回首页');
+}
+
+/* ========== STEP 1 ========== */
+function selectMentor(id, el) {
+  document.querySelectorAll('.mentor-pick-card').forEach(function(c) { c.classList.remove('selected'); });
+  el.classList.add('selected');
+  selectedMentor = id;
+  checkStep1Ready();
+}
+
+function selectType(type, el) {
+  document.querySelectorAll('.consult-type-item').forEach(function(c) { c.classList.remove('selected'); });
+  el.classList.add('selected');
+  selectedType = type;
+  checkStep1Ready();
+}
+
+function selectDate(d, el) {
+  document.querySelectorAll('.date-chip').forEach(function(c) {
+    c.style.background = '#F3F4F6';
+    c.style.color = 'var(--text-secondary)';
+  });
+  el.style.background = 'var(--primary)';
+  el.style.color = '#fff';
+  selectedDate = d;
+  checkStep1Ready();
+}
+
+function selectTime(t, el) {
+  if (el.classList.contains('unavailable')) return;
+  document.querySelectorAll('.time-slot').forEach(function(c) { c.classList.remove('selected'); });
+  el.classList.add('selected');
+  selectedTime = t;
+  checkStep1Ready();
+}
+
+function initDateChips() {
+  var container = document.getElementById('dateChipsContainer');
+  if (!container) return;
+  var days = ['周日','周一','周二','周三','周四','周五','周六'];
+  var today = new Date();
+  var html = '';
+  for (var i = 0; i < 10; i++) {
+    var d = new Date(today);
+    d.setDate(today.getDate() + i);
+    var mm = String(d.getMonth() + 1).padStart(2, '0');
+    var dd = String(d.getDate()).padStart(2, '0');
+    var val = mm + '-' + dd;
+    var display = mm + '/' + dd;
+    var dayName = days[d.getDay()];
+    var isActive = i === 0;
+    var bg = isActive ? 'var(--primary)' : '#F3F4F6';
+    var color = isActive ? '#fff' : 'var(--text-secondary)';
+    var opacity = isActive ? 'opacity:0.8;' : '';
+    html += '<div class="date-chip' + (isActive ? ' active' : '') + '" onclick="selectDate(\'' + val + '\', this)" style="padding:8px 14px; border-radius:20px; background:' + bg + '; color:' + color + '; font-size:12px; white-space:nowrap; cursor:pointer; flex-shrink:0;">' +
+            '<div style="font-weight:600;">' + display + '</div><div style="font-size:10px;' + opacity + '">' + dayName + '</div></div>';
+  }
+  container.innerHTML = html;
+  selectedDate = String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+}
+
+function checkStep1Ready() {
+  var btn = document.getElementById('step1Btn');
+  var hint = document.getElementById('step1Hint');
+  if (selectedMentor && selectedType && selectedTime) {
+    btn.disabled = false;
+    if (hint) hint.style.display = 'none';
+  } else {
+    btn.disabled = true;
+    if (hint) {
+      var missing = [];
+      if (!selectedMentor) missing.push('选择导师');
+      if (!selectedType) missing.push('选择咨询方向');
+      if (!selectedTime) missing.push('选择时间');
+      hint.style.display = 'block';
+      hint.textContent = '还需：' + missing.join(' · ');
+    }
+  }
+}
+
+/* ========== STEP 2 ========== */
+function populateConfirm() {
+  var m = selectedMentor ? MENTOR_DATA[selectedMentor] : MENTOR_DATA.wanglina;
+  var t = selectedType ? TYPE_NAMES[selectedType] : '职业规划';
+  var dt = (selectedDate || '--') + ' ' + (selectedTime || '09:00');
+
+  document.getElementById('confirm-mentor').textContent = m.name;
+  document.getElementById('confirm-type').textContent = t;
+  document.getElementById('confirm-time').textContent = dt;
+}
+
+/* ========== STEP 3: 表单验证与提交 ========== */
+
+// 问题字数计数器
+document.addEventListener('DOMContentLoaded', function() {
+  initSupabase();
+  initDateChips();
+  var probTa = document.getElementById('formProblem');
+  if (probTa) {
+    probTa.addEventListener('input', function() {
+      document.getElementById('problemCounter').textContent =
+        this.value.length + '/500';
+    });
+  }
+  // 自动预填学生信息（从简历数据 + 首页登录信息）
+  prefillStudentInfo();
+});
+
+function prefillStudentInfo() {
+  var resume = null, user = null;
+  try { resume = JSON.parse(localStorage.getItem('resumeData') || 'null'); } catch(e) {}
+  try { user = JSON.parse(localStorage.getItem('app_user_info') || 'null'); } catch(e) {}
+
+  var basic = resume ? (resume.basic || {}) : {};
+  // 姓名：优先简历，其次登录信息
+  if (basic.name) document.getElementById('formName').value = basic.name;
+  else if (user && user.name) document.getElementById('formName').value = user.name;
+  // 手机
+  if (basic.phone) document.getElementById('formPhone').value = basic.phone;
+  // 邮箱
+  if (basic.email) document.getElementById('formEmail').value = basic.email;
+  // 学校/专业
+  var schoolParts = [];
+  if (basic.school || (user && user.school)) schoolParts.push(basic.school || user.school);
+  if (resume && resume.education && resume.education.length > 0 && resume.education[0].major) {
+    schoolParts.push(resume.education[0].major);
+  }
+  if (schoolParts.length > 0) document.getElementById('formSchool').value = schoolParts.join(' / ');
+}
+
+async function submitConsultForm() {
+  clearFormErrors();
+
+  var valid = true;
+  var name = document.getElementById('formName').value.trim();
+  var problem = document.getElementById('formProblem').value.trim();
+
+  if (!name) { showError('formName', 'errName'); valid = false; }
+  if (!problem || problem.length < 20) { showError('formProblem', 'errProblem'); valid = false; }
+
+  if (!valid) {
+    showToast('请完善标红的必填信息', '#EF4444');
+    return;
+  }
+
+  var m = selectedMentor ? MENTOR_DATA[selectedMentor] : null;
+  var btn = document.getElementById('submitFormBtn');
+  btn.textContent = '⏳ 提交中…';
+  btn.disabled = true;
+
+  try {
+    var result = await createAppointment({
+      student_name: name,
+      student_phone: document.getElementById('formPhone').value.trim(),
+      student_email: document.getElementById('formEmail').value.trim(),
+      student_school: document.getElementById('formSchool').value.trim(),
+      mentor_id: selectedMentor || '',
+      mentor_name: m ? m.name : '',
+      consult_type: selectedType || '',
+      consult_type_name: TYPE_NAMES[selectedType] || '',
+      appointment_date: selectedDate || '',
+      appointment_time: selectedTime || '',
+      problem_desc: problem,
+      direction: '',
+      direction_label: ''
+    });
+
+    var aptNo = result.appointment_no || result.id;
+    showToast('预约成功！编号: ' + aptNo + ' ✅');
+    btn.textContent = '✅ 已提交';
+
+    // 保存预约编号到本地数组，方便学生在个人中心查看
+    var myApts = JSON.parse(localStorage.getItem('my_appointments') || '[]');
+    if (myApts.indexOf(aptNo) === -1) {
+      myApts.push(aptNo);
+      localStorage.setItem('my_appointments', JSON.stringify(myApts));
+    }
+    localStorage.setItem('my_last_appointment', aptNo);
+
+    setTimeout(function() { goStep(4); }, 1500);
+  } catch(e) {
+    console.error('提交失败:', e);
+    var errMsg = (e && e.message) ? e.message : '请重试';
+    showToast('提交失败：' + errMsg, '#EF4444');
+    btn.textContent = '✅ 提交咨询预约';
+    btn.disabled = false;
+  }
+}
+
+function showError(inputId, errId) {
+  var input = document.getElementById(inputId);
+  var err = document.getElementById(errId);
+  input.classList.add('error');
+  err.classList.add('show');
+}
+
+function clearFormErrors() {
+  document.querySelectorAll('.f-input.error').forEach(function(el) {
+    el.classList.remove('error');
+  });
+  document.querySelectorAll('.field-error-msg.show').forEach(function(el) {
+    el.classList.remove('show');
+  });
+}
+
+// 兼容旧的 markFormDone 调用
+function markFormDone() { submitConsultForm(); }
+
+/* ========== STEP 4 ========== */
+var ratingTexts = ['', '很不满意 😞', '不满意 😕', '一般 😐', '满意 😊', '非常满意 🎉'];
+
+function setRating(n) {
+  currentRating = n;
+  var stars = document.querySelectorAll('.rating-star');
+  stars.forEach(function(s, i) {
+    if (i < n) s.classList.add('active');
+    else s.classList.remove('active');
+  });
+  document.getElementById('ratingText').textContent = ratingTexts[n];
+  checkFeedbackReady();
+}
+
+function toggleTag(el) {
+  el.classList.toggle('active');
+}
+
+function updateCounter(textareaId, counterId, max) {
+  var ta = document.getElementById(textareaId);
+  var cnt = document.getElementById(counterId);
+  var len = ta.value.length;
+  if (len > max) { ta.value = ta.value.substring(0, max); len = max; }
+  cnt.textContent = len;
+  checkFeedbackReady();
+}
+
+function checkFeedbackReady() {
+  var btn = document.getElementById('submitFeedbackBtn');
+  btn.disabled = (currentRating === 0);
+}
+
+function submitFeedback() {
+  showToast('反馈提交成功！正在生成报告…');
+  setTimeout(function() { goStep(5); }, 1500);
+}
+
+/* ========== STEP 5 ========== */
+function downloadReport() {
+  var el = document.getElementById('reportExportContent');
+  if (!el) {
+    showToast('报告内容未找到，请刷新重试');
+    return;
+  }
+
+  showToast('正在生成 PDF 报告…');
+
+  html2pdf().set({
+    margin: [10, 12, 10, 12],
+    filename: '职途咨询-个人职业发展报告.pdf',
+    image: { type: 'jpeg', quality: 0.95 },
+    html2canvas: {
+      scale: 2,
+      useCORS: true,
+      letterRendering: true,
+      logging: false
+    },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+  }).from(el).save().then(function() {
+    showToast('报告已下载 ✅');
+  }).catch(function(err) {
+    console.error('PDF 生成失败:', err);
+    showToast('生成失败，请使用浏览器打印(Ctrl+P)保存为 PDF');
+  });
+}
+
+function shareReport(type) {
+  if (type === 'link') {
+    var text = '职途咨询 · 个人职业发展报告\n' + window.location.href;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function() {
+        showToast('链接已复制到剪贴板 🔗');
+      }).catch(function() {
+        fallbackCopy(text);
+      });
+    } else {
+      fallbackCopy(text);
+    }
+  } else {
+    showToast('微信分享功能开发中，请先下载报告后发送 💬');
+  }
+}
+
+function fallbackCopy(text) {
+  var ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.left = '-9999px';
+  ta.style.top = '-9999px';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); showToast('链接已复制到剪贴板 🔗'); }
+  catch(e) { showToast('复制失败，请手动复制链接'); }
+  document.body.removeChild(ta);
+}
+
+/* ========== TOAST ========== */
+var toastTimer;
+function showToast(msg) {
+  var bar = document.getElementById('toastBar');
+  bar.textContent = msg;
+  bar.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function() { bar.classList.remove('show'); }, 2200);
+}
+</script>
+</body>
+</html>
