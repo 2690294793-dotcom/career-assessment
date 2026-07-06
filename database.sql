@@ -118,3 +118,44 @@ DROP TRIGGER IF EXISTS update_appointments_updated_at ON appointments;
 CREATE TRIGGER update_appointments_updated_at
   BEFORE UPDATE ON appointments
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- ============================================
+-- 4. 公众号文章表（自动同步）
+-- ============================================
+CREATE TABLE IF NOT EXISTS articles (
+  id BIGSERIAL PRIMARY KEY,
+  title TEXT NOT NULL,
+  excerpt TEXT DEFAULT '',
+  content TEXT DEFAULT '',
+  category TEXT DEFAULT 'insight',
+  category_name TEXT DEFAULT '职场洞察',
+  date TEXT DEFAULT '',
+  views TEXT DEFAULT '阅读 0',
+  likes INTEGER DEFAULT 0,
+  cover TEXT DEFAULT '',
+  author TEXT DEFAULT '自在生涯工作室',
+  search_text TEXT DEFAULT '',
+  wx_url TEXT DEFAULT '',
+  wx_media_id TEXT DEFAULT '',
+  source TEXT DEFAULT 'preset',
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(wx_media_id)
+);
+
+-- articles RLS
+ALTER TABLE articles ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "允许任何人查看文章" ON articles FOR SELECT USING (true);
+CREATE POLICY "允许服务端同步写入" ON articles FOR INSERT WITH CHECK (true);
+CREATE POLICY "允许服务端同步更新" ON articles FOR UPDATE USING (true);
+
+-- articles 索引
+CREATE INDEX IF NOT EXISTS idx_articles_date ON articles(date DESC);
+CREATE INDEX IF NOT EXISTS idx_articles_category ON articles(category);
+CREATE INDEX IF NOT EXISTS idx_articles_source ON articles(source);
+
+-- articles updated_at 触发器
+DROP TRIGGER IF EXISTS update_articles_updated_at ON articles;
+CREATE TRIGGER update_articles_updated_at
+  BEFORE UPDATE ON articles
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
