@@ -125,6 +125,14 @@ body {
 .like-btn { display: inline-block; margin-top: 12px; padding: 8px 24px; border-radius: 20px; background: white; border: 1px solid var(--border); font-size: 13px; color: var(--text-secondary); cursor: pointer; transition: all 0.2s; }
 .like-btn:active { background: var(--primary-light); }
 .like-btn.liked { color: #e74c3c; border-color: #e74c3c; background: #fdf0ee; }
+
+/* WeChat Article HTML Content */
+.wx-article-content { font-size: 15px; line-height: 1.8; color: var(--text-primary); word-break: break-word; }
+.wx-article-content img { max-width: 100%; height: auto; border-radius: 8px; margin: 12px 0; }
+.wx-article-content p { margin-bottom: 12px; text-indent: 0; }
+.wx-article-content strong, .wx-article-content b { color: var(--primary); }
+.wx-article-content a { color: var(--primary); text-decoration: underline; }
+.wx-article-content section, .wx-article-content div { margin-bottom: 8px; }
 </style>
 </head>
 <body>
@@ -226,11 +234,19 @@ function loadFromPreset() {
 
 function parseSupabaseArticle(row) {
   var content = [];
-  try { content = JSON.parse(row.content); } catch(e) { content = [{ type: 'text', value: row.content || '' }]; }
+  var isHtml = false;
+  // 判断内容类型：HTML 或 JSON 结构化
+  if (row.content && row.content.trim().charAt(0) === '<') {
+    // 微信公众号 HTML 内容
+    isHtml = true;
+    content = [{ type: 'html', value: row.content }];
+  } else {
+    try { content = JSON.parse(row.content); } catch(e) { content = [{ type: 'text', value: row.content || '' }]; }
+  }
   return {
     id: 's' + row.id,
     title: row.title || '',
-    excerpt: row.excerpt || row.content ? row.content.substring(0, 100) : '',
+    excerpt: row.excerpt || (row.content ? row.content.substring(0, 100) : ''),
     category: row.category || 'insight',
     categoryName: row.category_name || '职场洞察',
     date: row.date || '',
@@ -239,7 +255,10 @@ function parseSupabaseArticle(row) {
     cover: row.cover || 'linear-gradient(135deg, #6366f1 0%, #4338ca 100%)',
     author: row.author || '自在生涯工作室',
     searchText: row.search_text || '',
-    content: content
+    content: content,
+    wxUrl: row.wx_url || '',
+    source: row.source || 'preset',
+    isHtml: isHtml
   };
 }
 
@@ -334,16 +353,24 @@ function openDetail(id) {
   modalTitle.textContent = article.title;
   modalMeta.innerHTML = '<span>' + article.author + '</span><span>' + article.date + '</span><span>' + article.views + '</span><span class="modal-tag">' + article.categoryName + '</span>';
   
-  var contentHtml = article.content.map(function(item) {
-    if (item.type === 'section') return '<div class="section-title">' + item.value + '</div>';
-    return '<p>' + item.value + '</p>';
-  }).join('');
+  var contentHtml = '';
+  if (article.isHtml) {
+    // 微信公众号 HTML 内容：直接渲染 HTML，添加样式适配
+    contentHtml = '<div class="wx-article-content">' + article.content[0].value + '</div>';
+  } else {
+    // 预设结构化内容
+    contentHtml = article.content.map(function(item) {
+      if (item.type === 'section') return '<div class="section-title">' + item.value + '</div>';
+      return '<p>' + item.value + '</p>';
+    }).join('');
+  }
   
   contentHtml += '<div class="oa-footer">' +
     '<div class="oa-footer-avatar">自</div>' +
     '<div class="oa-footer-name">自在生涯工作室</div>' +
     '<div class="oa-footer-desc">不定期分享生涯解惑/职场技能/成长感悟/好书推荐</div>' +
     '<div class="like-btn" id="likeBtn">❤️ 赞 ' + article.likes + '</div>' +
+    (article.wxUrl ? '<a href="' + article.wxUrl + '" target="_blank" style="display:inline-block;margin-top:8px;padding:8px 20px;border-radius:20px;background:var(--primary);color:white;font-size:13px;text-decoration:none;">📖 在微信中查看原文</a>' : '') +
   '</div>';
   
   modalContent.innerHTML = contentHtml;
