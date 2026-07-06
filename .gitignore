@@ -2,3 +2,5 @@ node_modules/
 .workbuddy/
 *.tmp
 .DS_Store
+sync/setup-secrets.js
+sync/push-files.js
