@@ -591,7 +591,7 @@ tr:last-child td { border-bottom: none; }
         <input type="date" id="scheduleDate" value="" min="">
         <input type="time" id="scheduleStart" value="09:00" step="3600">
         <input type="time" id="scheduleEnd" value="12:00" step="3600">
-        <button class="schedule-add-btn" onclick="addScheduleSlot()">添加</button>
+        <button class="schedule-add-btn" onclick="handleAddScheduleSlot()">添加</button>
       </div>
     </div>
 
@@ -1223,7 +1223,7 @@ async function toggleAccepting() {
   }
 }
 
-async function addScheduleSlot() {
+async function handleAddScheduleSlot() {
   var dateInput = document.getElementById("scheduleDate");
   var date = dateInput ? dateInput.value : '';
   var start = document.getElementById("scheduleStart").value;
@@ -1243,7 +1243,8 @@ async function addScheduleSlot() {
   }
 
   try {
-    await addScheduleSlotDB({
+    // 直接调用 config.js 的 addScheduleSlot（不再被内联同名函数覆盖）
+    await addScheduleSlot({
       mentor_id: scheduleMentorId,
       specific_date: date,
       start_time: start,
@@ -1255,11 +1256,6 @@ async function addScheduleSlot() {
     console.error("添加时间段失败:", err);
     showToast("添加失败：" + (err.message || err), "error");
   }
-}
-
-// 避免和 config.js 的 addScheduleSlot 同名
-async function addScheduleSlotDB(slot) {
-  return await addScheduleSlot(slot);
 }
 
 async function deleteSlot(id) {
