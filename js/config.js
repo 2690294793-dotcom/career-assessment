@@ -495,10 +495,31 @@ async function createMentorSettings(mentorId) {
   return record;
 }
 
-// 更新导师预约开关
+// 更新导师预约开关（不存在则自动创建）
 async function updateMentorSettings(mentorId, updates) {
   if (db) {
+    // 先查询记录是否存在
+    const { data: existing, error: selectErr } = await db
+      .from("mentor_settings")
+      .select("id")
+      .eq("mentor_id", mentorId)
+      .single();
+
+    if (selectErr && selectErr.code !== 'PGRST116') throw selectErr;
+
     const payload = { ...updates, updated_at: new Date().toISOString() };
+
+    if (!existing) {
+      // 不存在则创建
+      const { data, error } = await db
+        .from("mentor_settings")
+        .insert({ ...payload, mentor_id: mentorId })
+        .select();
+      if (error) throw error;
+      return data[0];
+    }
+
+    // 存在则更新
     const { data, error } = await db
       .from("mentor_settings")
       .update(payload)
@@ -511,9 +532,11 @@ async function updateMentorSettings(mentorId, updates) {
   var idx = local.findIndex(function(s) { return s.mentor_id === mentorId; });
   if (idx >= 0) {
     local[idx] = { ...local[idx], ...updates, updated_at: new Date().toISOString() };
-    localStorage.setItem("zt_mentor_settings", JSON.stringify(local));
+  } else {
+    local.push({ mentor_id: mentorId, accepting_appointments: true, closed_message: '导师暂时不接受预约，请稍后再试', ...updates, updated_at: new Date().toISOString() });
   }
-  return local[idx];
+  localStorage.setItem("zt_mentor_settings", JSON.stringify(local));
+  return local[idx >= 0 ? idx : local.length - 1];
 }
 
 // ============================================
