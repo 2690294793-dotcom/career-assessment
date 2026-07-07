@@ -379,12 +379,13 @@ tr:last-child td { border-bottom: none; }
   flex-shrink: 0;
 }
 .schedule-form-row select { min-width: 90px; }
-.schedule-form-row input { width: 95px; text-align: center; padding: 10px 8px; }
+.schedule-form-row input[type="date"] { min-width: 130px; width: 130px; }
+.schedule-form-row input[type="time"] { width: 95px; text-align: center; padding: 10px 8px; }
 .schedule-add-btn { padding: 10px 16px; }
 @media (max-width: 400px) {
   .schedule-form-row { gap: 8px; }
-  .schedule-form-row select { min-width: 82px; }
-  .schedule-form-row input { width: 86px; }
+  .schedule-form-row input[type="date"] { min-width: 115px; width: 115px; }
+  .schedule-form-row input[type="time"] { width: 86px; }
   .schedule-add-btn { padding: 10px 12px; }
 }
 .schedule-add-btn {
@@ -587,15 +588,7 @@ tr:last-child td { border-bottom: none; }
     <div class="schedule-add-card">
       <div class="schedule-add-title">➕ 添加可预约时间段</div>
       <div class="schedule-form-row">
-        <select id="scheduleDay">
-          <option value="1">周一</option>
-          <option value="2">周二</option>
-          <option value="3">周三</option>
-          <option value="4">周四</option>
-          <option value="5">周五</option>
-          <option value="6">周六</option>
-          <option value="0">周日</option>
-        </select>
+        <input type="date" id="scheduleDate" value="" min="">
         <input type="time" id="scheduleStart" value="09:00" step="3600">
         <input type="time" id="scheduleEnd" value="12:00" step="3600">
         <button class="schedule-add-btn" onclick="addScheduleSlot()">添加</button>
@@ -1128,7 +1121,27 @@ var MENTOR_LIST = {
 
 var DAY_NAMES = { 0:'周日', 1:'周一', 2:'周二', 3:'周三', 4:'周四', 5:'周五', 6:'周六' };
 
+function formatDateCN(dateStr) {
+  var d = new Date(dateStr + 'T00:00:00');
+  if (isNaN(d.getTime())) return dateStr;
+  var month = d.getMonth() + 1;
+  var day = d.getDate();
+  var week = DAY_NAMES[d.getDay()];
+  return month + '月' + day + '日 (' + week + ')';
+}
+
 async function loadSchedule() {
+  // 设置日期选择器默认值为今天
+  var todayInput = document.getElementById("scheduleDate");
+  if (todayInput) {
+    var today = new Date();
+    var yyyy = today.getFullYear();
+    var mm = String(today.getMonth() + 1).padStart(2, '0');
+    var dd = String(today.getDate()).padStart(2, '0');
+    todayInput.value = yyyy + '-' + mm + '-' + dd;
+    todayInput.min = yyyy + '-' + mm + '-' + dd;
+  }
+
   // 渲染导师选择标签
   var tabsHtml = '';
   for (var mid in MENTOR_LIST) {
@@ -1163,39 +1176,28 @@ function renderScheduleList(slots) {
     return;
   }
 
-  // 按星期分组
+  // 按日期分组
   var groups = {};
   slots.forEach(function(s) {
-    if (!groups[s.day_of_week]) groups[s.day_of_week] = [];
-    groups[s.day_of_week].push(s);
+    var d = s.specific_date;
+    if (!groups[d]) groups[d] = [];
+    groups[d].push(s);
   });
 
   var html = '';
-  // 按星期排序
-  for (var d = 1; d <= 6; d++) { // 周一到周六
-    if (groups[d]) {
-      html += '<div class="schedule-day-group">';
-      html += '<div class="schedule-day-name">'+DAY_NAMES[d]+'</div>';
-      groups[d].forEach(function(s) {
-        html += '<div class="schedule-slot-item">' +
-          '<span class="schedule-slot-time">'+s.start_time+' - '+s.end_time+'</span>' +
-          '<button class="schedule-slot-del" onclick="deleteSlot('+s.id+')">删除</button>' +
-        '</div>';
-      });
-      html += '</div>';
-    }
-  }
-  if (groups[0]) { // 周日
+  // 按日期排序
+  var dates = Object.keys(groups).sort();
+  dates.forEach(function(dateKey) {
     html += '<div class="schedule-day-group">';
-    html += '<div class="schedule-day-name">'+DAY_NAMES[0]+'</div>';
-    groups[0].forEach(function(s) {
+    html += '<div class="schedule-day-name">' + formatDateCN(dateKey) + '</div>';
+    groups[dateKey].forEach(function(s) {
       html += '<div class="schedule-slot-item">' +
-        '<span class="schedule-slot-time">'+s.start_time+' - '+s.end_time+'</span>' +
-        '<button class="schedule-slot-del" onclick="deleteSlot('+s.id+')">删除</button>' +
+        '<span class="schedule-slot-time">' + s.start_time + ' - ' + s.end_time + '</span>' +
+        '<button class="schedule-slot-del" onclick="deleteSlot(' + s.id + ')">删除</button>' +
       '</div>';
     });
     html += '</div>';
-  }
+  });
 
   document.getElementById("scheduleList").innerHTML = html;
 }
@@ -1222,10 +1224,15 @@ async function toggleAccepting() {
 }
 
 async function addScheduleSlot() {
-  var day = parseInt(document.getElementById("scheduleDay").value);
+  var dateInput = document.getElementById("scheduleDate");
+  var date = dateInput ? dateInput.value : '';
   var start = document.getElementById("scheduleStart").value;
   var end = document.getElementById("scheduleEnd").value;
 
+  if (!date) {
+    showToast("请选择日期", "error");
+    return;
+  }
   if (!start || !end) {
     showToast("请填写开始和结束时间", "error");
     return;
@@ -1236,12 +1243,17 @@ async function addScheduleSlot() {
   }
 
   try {
-    await addScheduleSlotDB({ mentor_id: scheduleMentorId, day_of_week: day, start_time: start, end_time: end });
+    await addScheduleSlotDB({
+      mentor_id: scheduleMentorId,
+      specific_date: date,
+      start_time: start,
+      end_time: end
+    });
     showToast("时间段已添加 ✅", "success");
     loadSchedule();
   } catch(err) {
     console.error("添加时间段失败:", err);
-    showToast("添加失败", "error");
+    showToast("添加失败：" + (err.message || err), "error");
   }
 }
 
