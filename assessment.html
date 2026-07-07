@@ -227,7 +227,7 @@ body {
 .score-bar { height: 100%; border-radius: 5px; transition: width 1s ease; }
 .score-val { width: 38px; text-align: right; font-size: 13px; font-weight: 700; color: var(--text-primary); flex-shrink: 0; }
 
-/* ====== HOLLAND TABLE RESULT (mini-program style) ====== */
+/* ====== HOLLAND TABLE RESULT (reference image style) ====== */
 .hl-hero {
   background: linear-gradient(135deg, var(--primary-dark), var(--primary));
   border-radius: var(--radius-lg); padding: 26px 20px;
@@ -253,32 +253,45 @@ body {
   box-shadow: 0 2px 12px rgba(0,0,0,0.05); margin-bottom: 14px;
 }
 .hl-table-title { font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 14px; }
-.hl-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-.hl-table th {
-  padding: 10px 8px; font-weight: 600; color: #fff;
-  background: linear-gradient(135deg, var(--primary), var(--accent));
-  text-align: center; font-size: 12px;
+
+/* Reference-image style: R I A S E C columns */
+.hl-table {
+  width: 100%; border-collapse: separate; border-spacing: 0;
+  font-size: 13px; border: 1px solid #e2e8f0;
+  border-radius: 10px; overflow: hidden;
 }
-.hl-table th:first-child { border-radius: 8px 0 0 0; }
-.hl-table th:last-child { border-radius: 0 8px 0 0; }
-.hl-table td { padding: 12px 8px; border-bottom: 1px solid var(--border); text-align: center; }
-.hl-table tbody tr:last-child td { border-bottom: none; }
-.hl-table tbody tr:nth-child(even) { background: rgba(99,102,241,0.03); }
-.hl-cell-dim { display: flex; align-items: center; gap: 8px; justify-content: flex-start; }
-.hl-dim-icon {
-  width: 28px; height: 28px; border-radius: 8px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 14px; color: #fff; flex-shrink: 0;
+.hl-table thead th {
+  padding: 12px 8px; font-weight: 700; font-size: 13px;
+  text-align: center; border-bottom: 1px solid #e2e8f0;
+  background: #f8fafc;
 }
-.hl-dim-name { font-weight: 600; color: var(--text-primary); }
-.hl-cell-raw { font-weight: 700; color: var(--text-primary); font-size: 14px; }
-.hl-cell-score { color: var(--text-secondary); font-weight: 500; }
-.hl-cell-score.hl-top { font-weight: 700; }
-.hl-cell-rank { width: 40px; }
-.hl-rank { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; font-size: 12px; font-weight: 700; color: #fff; }
-.hl-rank-0 { background: #FFD700; }
-.hl-rank-1 { background: #C0C0C0; }
-.hl-rank-2 { background: #CD7F32; }
+.hl-table thead th.hl-th-dim {
+  background: #f1f5f9; text-align: left; padding-left: 14px;
+  color: var(--text-primary); font-weight: 700;
+}
+.hl-table thead th.hl-th-code {
+  width: 42px; font-weight: 800; font-size: 14px;
+}
+
+.hl-table tbody td {
+  padding: 12px 8px; text-align: center;
+  border-bottom: 1px solid #e2e8f0; font-weight: 600; color: var(--text-primary);
+}
+.hl-table tbody td:first-child {
+  text-align: left; padding-left: 14px; font-weight: 600;
+  color: var(--text-secondary); background: #fafbfc;
+  border-right: 1px solid #e2e8f0;
+}
+.hl-table tbody tr:last-child td {
+  border-bottom: none;
+}
+.hl-table tbody tr:last-child td:first-child {
+  background: #eef0f5; font-weight: 700; color: var(--text-primary);
+}
+.hl-table tbody tr:last-child td:not(:first-child) {
+  background: #f5f7fa; font-weight: 700;
+}
+.hl-table .hl-cell-empty { color: #c0c5d0; font-weight: 400; }
 
 .hl-analysis-text { font-size: 13px; color: var(--text-secondary); line-height: 1.8; }
 .hl-dim-list { display: flex; flex-direction: column; gap: 10px; }
@@ -1211,21 +1224,29 @@ function renderHolland(scores) {
   // 三码头部分析文字
   var analysisText = getHollandAnalysis(code, sorted);
 
-  // 构建表格：按降序排列，前三名突出颜色
-  var tableRows = sorted.map(function(e, i) {
-    var dimName = test.dimNames[e.dim].split(' ')[0];
-    var color = test.dimColors[e.dim];
-    var isTop3 = i < 3;
-    var scoreClass = isTop3 ? 'hl-cell-score hl-top' : 'hl-cell-score';
-    var rank = isTop3 ? '<span class="hl-rank hl-rank-'+i+'">'+['①','②','③'][i]+'</span>' : '';
+  // 参考图表格：R I A S E C 列，兴趣/能力/回馈/总分 四行
+  var raw = state.rawScores || {};
+  var dims = test.dimensions;
+
+  // R I A S E C 表头（每列带维度颜色）
+  var headerCells = dims.map(function(d) {
+    return '<th class="hl-th-code" style="background:'+test.dimColors[d]+'15;color:'+test.dimColors[d]+'">'+d+'</th>';
+  }).join('');
+
+  // 四行数据
+  var rows = [
+    { label: '您所感兴趣的活动（兴趣）', scores: dims.map(function(d){ return raw[d] || 0; }) },
+    { label: '您所擅长的活动（能力）',   scores: dims.map(function(){ return null; }) },
+    { label: '您所喜欢的职业（回馈）',    scores: dims.map(function(){ return null; }) },
+    { label: '总分',                     scores: dims.map(function(d){ return raw[d] || 0; }), isTotal: true }
+  ];
+
+  var tableRows = rows.map(function(row){
     return '<tr>'+
-      '<td class="hl-cell-dim">'+
-        '<span class="hl-dim-icon" style="background:'+color+'">'+test.dimIcons[e.dim]+'</span>'+
-        '<span class="hl-dim-name">'+dimName+'</span>'+
-      '</td>'+
-      '<td class="hl-cell-raw">'+e.raw+'</td>'+
-      '<td class="'+scoreClass+'" style="color:'+(isTop3?color:'')+'">'+scores[e.dim]+'%</td>'+
-      '<td class="hl-cell-rank">'+rank+'</td>'+
+      '<td class="hl-row-label">'+row.label+'</td>'+
+      row.scores.map(function(s){
+        return '<td class="'+(s===null?'hl-cell-empty':'hl-cell-score')+'">'+(s===null?'—':s)+'</td>';
+      }).join('')+
     '</tr>';
   }).join('');
 
@@ -1233,12 +1254,7 @@ function renderHolland(scores) {
     '<div class="hl-table-title">📊 以下得分表示了您的职业倾向性程度</div>'+
     '<table class="hl-table">'+
       '<thead>'+
-        '<tr>'+
-          '<th class="hl-th-dim">维度</th>'+
-          '<th class="hl-th-raw">原始分</th>'+
-          '<th class="hl-th-pct">百分位</th>'+
-          '<th class="hl-th-rank">排序</th>'+
-        '</tr>'+
+        '<tr><th class="hl-th-dim"></th>'+headerCells+'</tr>'+
       '</thead>'+
       '<tbody>'+tableRows+'</tbody>'+
     '</table>'+
