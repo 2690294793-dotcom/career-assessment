@@ -1071,7 +1071,7 @@ var currentAppointmentNo = null;
 var currentAppointmentData = null;
 var mentorScheduleSlots = [];  // 当前导师的时间表
 var mentorAccepting = true;    // 当前导师是否接受预约
-var mentorClosedMsg = '';      // 关闭预约时的提示
+var mentorClosedMsg = '导师暂时不接受预约，请稍后再试';
 
 var MENTOR_DATA = {
   hexia:       { name:'何霞', title:'企业管理教授 · 广东省就业特色示范课负责人', bio:'擅长领域：职业定位 / 优势萃取' },
@@ -1260,13 +1260,13 @@ async function loadMentorSchedule(mentorId) {
   try {
     // 加载预约开关
     var settings = await getMentorSettings(mentorId);
-    mentorAccepting = settings.accepting_appointments;
+    mentorAccepting = settings.booking_open;
     mentorClosedMsg = settings.closed_message || '';
 
     if (!mentorAccepting) {
       // 导师暂停预约
       noticeEl.style.display = 'block';
-      noticeEl.textContent = '🔒 ' + mentorClosedMsg;
+      noticeEl.textContent = '🔒 导师暂时不接受预约，请稍后再试';
       timeSection.style.display = 'none';
       selectedTime = null;
       checkStep1Ready();
