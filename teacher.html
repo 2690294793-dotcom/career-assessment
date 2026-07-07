@@ -373,15 +373,20 @@ tr:last-child td { border-bottom: none; }
 }
 .schedule-add-title { font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 14px; }
 .schedule-form-row {
-  display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+  display: flex; gap: 10px; align-items: center;
 }
-.schedule-form-row select, .schedule-form-row input {
-  padding: 10px 14px; border: 2px solid var(--border); border-radius: 10px;
-  font-size: 14px; outline: none; background: var(--card); color: var(--text-primary);
+.schedule-form-row select, .schedule-form-row input, .schedule-form-row button {
+  flex-shrink: 0;
 }
-.schedule-form-row select:focus, .schedule-form-row input:focus { border-color: var(--primary); }
-.schedule-form-row select { min-width: 100px; }
-.schedule-form-row input { width: 110px; text-align: center; }
+.schedule-form-row select { min-width: 90px; }
+.schedule-form-row input { width: 95px; text-align: center; padding: 10px 8px; }
+.schedule-add-btn { padding: 10px 16px; }
+@media (max-width: 400px) {
+  .schedule-form-row { gap: 8px; }
+  .schedule-form-row select { min-width: 82px; }
+  .schedule-form-row input { width: 86px; }
+  .schedule-add-btn { padding: 10px 12px; }
+}
 .schedule-add-btn {
   padding: 10px 20px; border: none; border-radius: 10px; font-size: 14px;
   font-weight: 700; cursor: pointer; background: var(--primary); color: #fff;
