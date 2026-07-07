@@ -369,6 +369,154 @@ async function getAppointmentStats() {
 }
 
 // ============================================
+// 5. 导师时间表 (mentor_schedule)
+// ============================================
+
+// 获取某个导师的时间表
+async function getMentorSchedule(mentorId) {
+  if (db) {
+    const { data, error } = await db
+      .from("mentor_schedule")
+      .select("*")
+      .eq("mentor_id", mentorId)
+      .order("day_of_week", { ascending: true });
+    if (error) throw error;
+    return data;
+  }
+  var local = JSON.parse(localStorage.getItem("zt_mentor_schedule") || "[]");
+  return local.filter(function(s) { return s.mentor_id === mentorId; });
+}
+
+// 获取所有导师的时间表
+async function getAllMentorSchedules() {
+  if (db) {
+    const { data, error } = await db
+      .from("mentor_schedule")
+      .select("*")
+      .order("mentor_id", { ascending: true });
+    if (error) throw error;
+    return data;
+  }
+  return JSON.parse(localStorage.getItem("zt_mentor_schedule") || "[]");
+}
+
+// 添加时间段
+async function addScheduleSlot(slot) {
+  if (db) {
+    const { data, error } = await db
+      .from("mentor_schedule")
+      .insert(slot)
+      .select();
+    if (error) throw error;
+    return data[0];
+  }
+  var local = JSON.parse(localStorage.getItem("zt_mentor_schedule") || "[]");
+  var record = { ...slot, id: Date.now(), created_at: new Date().toISOString() };
+  local.push(record);
+  localStorage.setItem("zt_mentor_schedule", JSON.stringify(local));
+  return record;
+}
+
+// 删除时间段
+async function deleteScheduleSlot(id) {
+  if (db) {
+    const { error } = await db.from("mentor_schedule").delete().eq("id", id);
+    if (error) throw error;
+    return true;
+  }
+  var local = JSON.parse(localStorage.getItem("zt_mentor_schedule") || "[]");
+  local = local.filter(function(s) { return s.id !== id && String(s.id) !== String(id); });
+  localStorage.setItem("zt_mentor_schedule", JSON.stringify(local));
+  return true;
+}
+
+// ============================================
+// 6. 导师预约开关 (mentor_settings)
+// ============================================
+
+// 获取某个导师的预约开关设置
+async function getMentorSettings(mentorId) {
+  if (db) {
+    const { data, error } = await db
+      .from("mentor_settings")
+      .select("*")
+      .eq("mentor_id", mentorId)
+      .single();
+    if (error) {
+      // 如果不存在，创建默认设置
+      if (error.code === 'PGRST116') {
+        return await createMentorSettings(mentorId);
+      }
+      throw error;
+    }
+    return data;
+  }
+  var local = JSON.parse(localStorage.getItem("zt_mentor_settings") || "[]");
+  var found = local.find(function(s) { return s.mentor_id === mentorId; });
+  if (!found) {
+    found = { mentor_id: mentorId, accepting_appointments: true, closed_message: '导师暂时不接受预约，请稍后再试' };
+    local.push(found);
+    localStorage.setItem("zt_mentor_settings", JSON.stringify(local));
+  }
+  return found;
+}
+
+// 获取所有导师的预约开关设置
+async function getAllMentorSettings() {
+  if (db) {
+    const { data, error } = await db
+      .from("mentor_settings")
+      .select("*");
+    if (error) throw error;
+    return data;
+  }
+  return JSON.parse(localStorage.getItem("zt_mentor_settings") || "[]");
+}
+
+// 创建导师设置（如果不存在）
+async function createMentorSettings(mentorId) {
+  var setting = {
+    mentor_id: mentorId,
+    accepting_appointments: true,
+    closed_message: '导师暂时不接受预约，请稍后再试'
+  };
+  if (db) {
+    const { data, error } = await db
+      .from("mentor_settings")
+      .insert(setting)
+      .select();
+    if (error) throw error;
+    return data[0];
+  }
+  var local = JSON.parse(localStorage.getItem("zt_mentor_settings") || "[]");
+  var record = { ...setting, id: Date.now(), updated_at: new Date().toISOString() };
+  local.push(record);
+  localStorage.setItem("zt_mentor_settings", JSON.stringify(local));
+  return record;
+}
+
+// 更新导师预约开关
+async function updateMentorSettings(mentorId, updates) {
+  if (db) {
+    const payload = { ...updates, updated_at: new Date().toISOString() };
+    const { data, error } = await db
+      .from("mentor_settings")
+      .update(payload)
+      .eq("mentor_id", mentorId)
+      .select();
+    if (error) throw error;
+    return data[0];
+  }
+  var local = JSON.parse(localStorage.getItem("zt_mentor_settings") || "[]");
+  var idx = local.findIndex(function(s) { return s.mentor_id === mentorId; });
+  if (idx >= 0) {
+    local[idx] = { ...local[idx], ...updates, updated_at: new Date().toISOString() };
+    localStorage.setItem("zt_mentor_settings", JSON.stringify(local));
+  }
+  return local[idx];
+}
+
+// ============================================
 // 4. Supabase Realtime 实时订阅
 // ============================================
 
