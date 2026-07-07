@@ -128,11 +128,61 @@ body {
 
 /* WeChat Article HTML Content */
 .wx-article-content { font-size: 15px; line-height: 1.8; color: var(--text-primary); word-break: break-word; }
-.wx-article-content img { max-width: 100%; height: auto; border-radius: 8px; margin: 12px 0; }
-.wx-article-content p { margin-bottom: 12px; text-indent: 0; }
-.wx-article-content strong, .wx-article-content b { color: var(--primary); }
+.wx-article-content img { max-width: 100%; height: auto; border-radius: 8px; margin: 12px 0; display: block; }
+.wx-article-content p { margin-bottom: 12px; text-indent: 0; line-height: 1.85; }
+.wx-article-content strong, .wx-article-content b { color: var(--primary); font-weight: 600; }
 .wx-article-content a { color: var(--primary); text-decoration: underline; }
 .wx-article-content section, .wx-article-content div { margin-bottom: 8px; }
+.wx-article-content h1, .wx-article-content h2, .wx-article-content h3,
+.wx-article-content h4, .wx-article-content h5, .wx-article-content h6 {
+  font-weight: 700; color: var(--primary-dark); margin: 20px 0 10px; line-height: 1.4;
+}
+.wx-article-content h1 { font-size: 20px; }
+.wx-article-content h2 { font-size: 18px; }
+.wx-article-content h3 { font-size: 16px; }
+.wx-article-content ul, .wx-article-content ol { padding-left: 20px; margin: 10px 0; }
+.wx-article-content li { margin-bottom: 6px; line-height: 1.7; }
+.wx-article-content table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13px; }
+.wx-article-content th, .wx-article-content td { border: 1px solid var(--border); padding: 8px 10px; text-align: left; }
+.wx-article-content th { background: var(--primary-light); color: var(--primary-dark); font-weight: 600; }
+.wx-article-content blockquote { border-left: 3px solid var(--primary); padding: 10px 16px; margin: 14px 0; background: var(--primary-light); border-radius: 0 8px 8px 0; color: var(--text-secondary); }
+.wx-article-content figure { margin: 16px 0; text-align: center; }
+.wx-article-content figcaption { font-size: 12px; color: var(--text-light); margin-top: 6px; }
+.wx-article-content video { max-width: 100%; border-radius: 8px; }
+.wx-article-content hr { border: none; height: 1px; background: var(--border); margin: 16px 0; }
+.wx-article-content .rich_pages { display: block; }
+
+/* Source Badge */
+.source-badge { display: inline-block; font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 600; vertical-align: middle; margin-left: 4px; }
+.source-badge.wechat { background: #07c160; color: white; }
+.source-badge.summary { background: #f0a020; color: white; }
+
+/* Summary Notice */
+.summary-notice { background: linear-gradient(135deg, #fff8e1, #ffecb3); border: 1px solid #ffe082; border-radius: 10px; padding: 12px 14px; margin-bottom: 16px; display: flex; align-items: flex-start; gap: 10px; }
+.summary-notice-icon { width: 28px; height: 28px; border-radius: 50%; background: #f0a020; color: white; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; flex-shrink: 0; }
+.summary-notice-text { font-size: 13px; color: #8d6e00; line-height: 1.5; }
+.summary-notice-text strong { color: #c77700; }
+
+/* Improved Section Title */
+.modal-content .section-title { 
+  font-size: 16px; font-weight: 700; color: var(--primary); margin: 22px 0 10px; 
+  text-indent: 0; padding-left: 10px; border-left: 3px solid var(--accent); 
+  position: relative;
+}
+.modal-content .section-title::before { content: ''; position: absolute; left: -3px; top: 50%; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); transform: translateY(-50%); }
+
+/* Improved paragraph */
+.modal-content p { font-size: 15px; line-height: 1.85; color: var(--text-primary); margin-bottom: 14px; text-indent: 2em; }
+.modal-content p:first-of-type { text-indent: 0; }
+
+/* View Original Link */
+.view-original-btn { 
+  display: block; margin: 16px 0; padding: 10px 0; text-align: center;
+  background: var(--primary); color: white; font-size: 14px; font-weight: 600;
+  border-radius: 20px; cursor: pointer; text-decoration: none; transition: all 0.2s;
+}
+.view-original-btn:active { transform: scale(0.97); opacity: 0.9; }
+
 </style>
 </head>
 <body>
@@ -211,16 +261,20 @@ function loadFromSupabaseAsync() {
       return;
     }
     if (res.data && res.data.length > 0) {
-      var newArticles = res.data.map(parseSupabaseArticle);
-      // 合并预设数据（去重）
+      var supabaseArticles = res.data.map(parseSupabaseArticle);
+      // 合并预设数据（去重：同名时优先保留微信原文版本）
       if (typeof PRESET_ARTICLES !== 'undefined') {
-        var existingIds = {};
-        newArticles.forEach(function(a) { existingIds[a.title] = true; });
+        var supabaseTitles = {};
+        supabaseArticles.forEach(function(a) { supabaseTitles[a.title] = true; });
         PRESET_ARTICLES.forEach(function(p) {
-          if (!existingIds[p.title]) { newArticles.push(p); }
+          if (!supabaseTitles[p.title]) {
+            // 预设文章标记为摘要
+            p.source = 'preset';
+            supabaseArticles.push(p);
+          }
         });
       }
-      articles = sortArticlesByDate(newArticles);
+      articles = sortArticlesByDate(supabaseArticles);
       renderArticles();
     }
   }).catch(function(err) {
@@ -229,7 +283,11 @@ function loadFromSupabaseAsync() {
 }
 
 function loadFromPreset() {
-  articles = sortArticlesByDate(PRESET_ARTICLES || []);
+  var preset = (PRESET_ARTICLES || []).map(function(p) {
+    if (!p.source) p.source = 'preset';
+    return p;
+  });
+  articles = sortArticlesByDate(preset);
 }
 
 function parseSupabaseArticle(row) {
@@ -322,10 +380,11 @@ function renderArticles() {
   html += filtered.map(function(a) {
     var title = currentSearch ? highlightText(a.title, currentSearch) : escapeHtml(a.title);
     var excerpt = currentSearch ? highlightText(a.excerpt, currentSearch) : escapeHtml(a.excerpt);
+    var sourceBadge = (a.source === 'wechat') ? '<span class="source-badge wechat">原文</span>' : '<span class="source-badge summary">摘要</span>';
     return '<div class="article-card" data-id="' + a.id + '">' +
       (a.cover && a.cover.startsWith('img/') ? '<div class="article-cover"><img src="' + a.cover + '" alt="" loading="lazy"></div>' : '<div class="article-cover" style="background: ' + (a.cover || 'linear-gradient(135deg, #6366f1, #4338ca)') + ';"><span class="cover-label">' + escapeHtml(a.categoryName) + '</span></div>') +
       '<div class="article-info">' +
-        '<div class="article-title">' + title + '</div>' +
+        '<div class="article-title">' + title + sourceBadge + '</div>' +
         '<div class="article-excerpt">' + excerpt + '</div>' +
         '<div class="article-meta">' +
           '<span class="article-meta-item">' + a.date + '</span>' +
@@ -351,18 +410,37 @@ function openDetail(id) {
   if (!article) return;
   
   modalTitle.textContent = article.title;
-  modalMeta.innerHTML = '<span>' + article.author + '</span><span>' + article.date + '</span><span>' + article.views + '</span><span class="modal-tag">' + article.categoryName + '</span>';
+  var sourceLabel = (article.source === 'wechat') ? '<span class="source-badge wechat">微信原文</span>' : '<span class="source-badge summary">内容摘要</span>';
+  modalMeta.innerHTML = '<span>' + article.author + '</span><span>' + article.date + '</span><span>' + article.views + '</span>' + sourceLabel + '<span class="modal-tag">' + article.categoryName + '</span>';
   
   var contentHtml = '';
+  
+  // 非微信原文的文章，添加摘要提示
+  if (article.source !== 'wechat') {
+    contentHtml += '<div class="summary-notice">' +
+      '<div class="summary-notice-icon">摘</div>' +
+      '<div class="summary-notice-text"><strong>本文为内容摘要</strong>，仅展示文章核心要点。如需查看完整的微信公众号原文（含图片、排版等），请点击下方按钮。</div>' +
+    '</div>';
+  }
+  
   if (article.isHtml) {
     // 微信公众号 HTML 内容：直接渲染 HTML，添加样式适配
-    contentHtml = '<div class="wx-article-content">' + article.content[0].value + '</div>';
+    contentHtml = '<div class="summary-notice" style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9);border-color:#a5d6a7;">' +
+      '<div class="summary-notice-icon" style="background:#07c160;">原</div>' +
+      '<div class="summary-notice-text" style="color:#2e7d32;"><strong>微信公众号原文</strong>，以下内容为公众号发布的完整文章，包含原始排版和图片。</div>' +
+    '</div>' +
+    '<div class="wx-article-content">' + article.content[0].value + '</div>';
   } else {
     // 预设结构化内容
-    contentHtml = article.content.map(function(item) {
+    contentHtml += article.content.map(function(item) {
       if (item.type === 'section') return '<div class="section-title">' + item.value + '</div>';
       return '<p>' + item.value + '</p>';
     }).join('');
+  }
+  
+  // 查看原文按钮（如果有微信链接）
+  if (article.wxUrl) {
+    contentHtml += '<a href="' + article.wxUrl + '" target="_blank" class="view-original-btn">📖 在微信中查看完整原文</a>';
   }
   
   contentHtml += '<div class="oa-footer">' +
@@ -370,7 +448,6 @@ function openDetail(id) {
     '<div class="oa-footer-name">自在生涯工作室</div>' +
     '<div class="oa-footer-desc">不定期分享生涯解惑/职场技能/成长感悟/好书推荐</div>' +
     '<div class="like-btn" id="likeBtn">❤️ 赞 ' + article.likes + '</div>' +
-    (article.wxUrl ? '<a href="' + article.wxUrl + '" target="_blank" style="display:inline-block;margin-top:8px;padding:8px 20px;border-radius:20px;background:var(--primary);color:white;font-size:13px;text-decoration:none;">📖 在微信中查看原文</a>' : '') +
   '</div>';
   
   modalContent.innerHTML = contentHtml;
