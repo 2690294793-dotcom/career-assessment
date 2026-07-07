@@ -87,6 +87,7 @@ CREATE POLICY "允许教师删除" ON submissions FOR DELETE USING (true);
 CREATE POLICY "允许任何人提交预约" ON appointments FOR INSERT WITH CHECK (true);
 CREATE POLICY "允许任何人查看预约" ON appointments FOR SELECT USING (true);
 CREATE POLICY "允许教师更新预约状态" ON appointments FOR UPDATE USING (true);
+CREATE POLICY "允许教师删除预约" ON appointments FOR DELETE USING (true);
 
 -- report_exports
 CREATE POLICY "允许任何人提交报告" ON report_exports FOR INSERT WITH CHECK (true);
@@ -164,8 +165,54 @@ CREATE INDEX IF NOT EXISTS idx_articles_date ON articles(date DESC);
 CREATE INDEX IF NOT EXISTS idx_articles_category ON articles(category);
 CREATE INDEX IF NOT EXISTS idx_articles_source ON articles(source);
 
+-- 5. 导师时间表（教师端设定可预约时段）
+CREATE TABLE IF NOT EXISTS mentor_schedule (
+  id BIGSERIAL PRIMARY KEY,
+  mentor_id TEXT NOT NULL,
+  day_of_week INTEGER NOT NULL,  -- 0=周日, 1=周一, 2=周二, ..., 6=周六
+  start_time TEXT NOT NULL,      -- HH:MM 格式, 如 '09:00'
+  end_time TEXT NOT NULL,        -- HH:MM 格式, 如 '12:00'
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 6. 导师预约开关设置
+CREATE TABLE IF NOT EXISTS mentor_settings (
+  id BIGSERIAL PRIMARY KEY,
+  mentor_id TEXT NOT NULL UNIQUE,
+  accepting_appointments BOOLEAN DEFAULT true,  -- 是否接受预约（全局开关）
+  closed_message TEXT DEFAULT '导师暂时不接受预约，请稍后再试',
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- mentor_schedule RLS
+ALTER TABLE mentor_schedule ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "允许任何人查看导师时间表" ON mentor_schedule FOR SELECT USING (true);
+CREATE POLICY "允许教师管理时间表" ON mentor_schedule FOR INSERT WITH CHECK (true);
+CREATE POLICY "允许教师更新时间表" ON mentor_schedule FOR UPDATE USING (true);
+CREATE POLICY "允许教师删除时间表" ON mentor_schedule FOR DELETE USING (true);
+
+-- mentor_settings RLS
+ALTER TABLE mentor_settings ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "允许任何人查看导师设置" ON mentor_settings FOR SELECT USING (true);
+CREATE POLICY "允许教师更新设置" ON mentor_settings FOR INSERT WITH CHECK (true);
+CREATE POLICY "允许教师修改设置" ON mentor_settings FOR UPDATE USING (true);
+CREATE POLICY "允许教师删除设置" ON mentor_settings FOR DELETE USING (true);
+
 -- articles updated_at 触发器
 DROP TRIGGER IF EXISTS update_articles_updated_at ON articles;
 CREATE TRIGGER update_articles_updated_at
   BEFORE UPDATE ON articles
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- mentor_schedule 索引
+CREATE INDEX IF NOT EXISTS idx_mentor_schedule_mentor ON mentor_schedule(mentor_id);
+CREATE INDEX IF NOT EXISTS idx_mentor_schedule_day ON mentor_schedule(day_of_week);
+
+-- 为每个导师初始化默认设置
+INSERT INTO mentor_settings (mentor_id, accepting_appointments) VALUES
+  ('hexia', true),
+  ('wanglina', true),
+  ('gongjingxian', true),
+  ('huangjieqi', true),
+  ('panwenhao', true)
+ON CONFLICT (mentor_id) DO NOTHING;
