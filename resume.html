@@ -225,6 +225,25 @@ body {
 }
 @keyframes miniSpin { to { transform: rotate(360deg); } }
 
+/* Appointment action buttons */
+.apt-actions {
+  display: flex; gap: 10px; margin-top: 12px; padding-top: 10px;
+  border-top: 1px dashed var(--border);
+}
+.apt-action-btn {
+  flex: 1; text-align: center; padding: 10px 0; border-radius: 12px;
+  font-size: 13px; font-weight: 600; text-decoration: none; cursor: pointer;
+  transition: all 0.15s; border: 1.5px solid transparent;
+}
+.apt-action-btn:active { transform: scale(0.98); opacity: 0.9; }
+.apt-action-primary {
+  background: var(--primary); color: #fff;
+  box-shadow: 0 4px 10px rgba(99,102,241,0.22);
+}
+.apt-action-default {
+  background: #fff; color: var(--text-primary); border-color: var(--border);
+}
+
 /* Assessment list */
 .assess-list-item {
   background: var(--card); border-radius: var(--radius-sm); padding: 14px 16px; margin-bottom: 10px;
@@ -658,6 +677,19 @@ function renderAppointmentList(appointments) {
     if (apt.teacher_response) html += '<div class="apt-detail-row"><span class="apt-detail-label">教师回复</span><span class="apt-detail-val" style="color:var(--accent);">' + esc(apt.teacher_response) + '</span></div>';
     if (apt.consultation_notes) html += '<div style="margin-top:8px;padding:10px 12px;background:#FAF8F5;border-radius:10px;font-size:12px;color:var(--text-secondary);line-height:1.6;"><strong>📝 咨询记录</strong><br>' + formatNotes(apt.consultation_notes) + '</div>';
     if (apt.updated_at) html += '<div class="apt-detail-row"><span class="apt-detail-label">最近更新</span><span class="apt-detail-val" style="color:var(--text-light);font-size:12px;">' + new Date(apt.updated_at).toLocaleString('zh-CN') + '</span></div>';
+
+    // 已完成预约：提供反馈/查看报告入口
+    if (status === 'completed') {
+      var hasFeedback = apt.has_feedback || apt.feedback_at || apt.student_rating > 0;
+      html += '<div class="apt-actions">';
+      if (!hasFeedback) {
+        html += '<a class="apt-action-btn apt-action-primary" href="consult-flow.html?apt=' + encodeURIComponent(no) + '">✍️ 提交反馈</a>';
+      } else {
+        html += '<a class="apt-action-btn apt-action-primary" href="consult-flow.html?apt=' + encodeURIComponent(no) + '">📄 查看报告</a>';
+      }
+      html += '</div>';
+    }
+
     html += '</div>';
     html += '<div style="font-size:11px;color:var(--text-light);margin-top:4px;" id="apt-expand-hint-' + idx + '">点击查看详情 ▼</div>';
     html += '</div>';
