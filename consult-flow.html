@@ -893,9 +893,9 @@
       <div id="reportExportContent">
       <!-- Report Hero -->
       <div class="report-hero">
-        <div class="report-tag">🎓 <span>职业规划咨询报告</span></div>
-        <div class="report-title">张导师 · 个人职业发展报告</div>
-        <div class="report-meta">
+        <div class="report-tag">🎓 <span id="reportTypeName">职业规划咨询报告</span></div>
+        <div class="report-title" id="reportTitle">张导师 · 个人职业发展报告</div>
+        <div class="report-meta" id="reportMeta">
           <span>📅 2026-07-01</span>
           <span>⏱️ 约60分钟</span>
           <span>由导师撰写</span>
@@ -903,13 +903,13 @@
       </div>
 
       <!-- 综合评估 -->
-      <div class="report-section">
+      <div class="report-section" id="reportOverviewSection">
         <div class="report-section-header">
           <div class="rs-icon" style="background:var(--primary-light);">📊</div>
           <div class="rs-title">综合评估</div>
         </div>
         <div class="report-section-body">
-          <div class="report-score-row">
+          <div class="report-score-row" id="reportScores">
             <div class="report-score-item">
               <div class="rs-num">83</div>
               <div class="rs-label">竞争力评分</div>
@@ -923,31 +923,31 @@
               <div class="rs-label">面试准备</div>
             </div>
           </div>
-          <div style="font-size:13px; color:var(--text-secondary); line-height:1.7;">
+          <div id="reportOverviewText" style="font-size:13px; color:var(--text-secondary); line-height:1.7;">
             你的背景整体较强，CS专业基础扎实，有一段实习经历。主要短板在于缺少大厂项目亮点、面试表达需要系统训练。建议优先攻克面试关，配合简历精修，秋招成功率可提升至75%以上。
           </div>
         </div>
       </div>
 
       <!-- 优势与不足 -->
-      <div class="report-section">
+      <div class="report-section" id="reportStrengthSection">
         <div class="report-section-header">
           <div class="rs-icon" style="background:#D1FAE5;">✨</div>
           <div class="rs-title">优势亮点</div>
         </div>
-        <div class="report-section-body report-strengths">
+        <div class="report-section-body report-strengths" id="reportStrengths">
           <div class="report-list-item"><div class="rli-dot"></div><span>名校CS背景，技术基础扎实，在产品岗竞争中具备差异化优势</span></div>
           <div class="report-list-item"><div class="rli-dot"></div><span>有互联网公司实习经历，了解产品流程，简历不空洞</span></div>
           <div class="report-list-item"><div class="rli-dot"></div><span>表达逻辑清晰，沟通能力强，适合偏策略型产品岗</span></div>
         </div>
       </div>
 
-      <div class="report-section">
+      <div class="report-section" id="reportWeaknessSection">
         <div class="report-section-header">
           <div class="rs-icon" style="background:#FEF3C7;">⚠️</div>
           <div class="rs-title">待提升方向</div>
         </div>
-        <div class="report-section-body report-weakness">
+        <div class="report-section-body report-weakness" id="reportWeaknesses">
           <div class="report-list-item"><div class="rli-dot"></div><span>项目数据支撑不足，建议量化每段经历的贡献（转化率/DAU/效率提升）</span></div>
           <div class="report-list-item"><div class="rli-dot"></div><span>面试中「STAR法则」运用生疏，容易回答散乱，需专项训练</span></div>
           <div class="report-list-item"><div class="rli-dot"></div><span>对目标公司的产品了解不深，建议深度体验并形成竞品分析</span></div>
@@ -955,13 +955,13 @@
       </div>
 
       <!-- 行动计划 -->
-      <div class="report-section">
+      <div class="report-section" id="reportActionSection">
         <div class="report-section-header">
           <div class="rs-icon" style="background:#f5f3ff;">🗓️</div>
           <div class="rs-title">30天行动计划</div>
         </div>
         <div class="report-section-body">
-          <div class="report-action-items">
+          <div class="report-action-items" id="reportActions">
             <div class="report-action-item">
               <div class="rai-num">1</div>
               <div class="rai-text"><strong>第1-7天</strong>：重写简历，每段经历加3个量化数据，参考提供的模板修改项目描述</div>
@@ -983,12 +983,12 @@
       </div>
 
       <!-- 推荐资源 -->
-      <div class="report-section">
+      <div class="report-section" id="reportResourceSection">
         <div class="report-section-header">
           <div class="rs-icon" style="background:#F0FDF4;">📚</div>
           <div class="rs-title">导师推荐资源</div>
         </div>
-        <div class="report-section-body">
+        <div class="report-section-body" id="reportResources">
           <div style="display:flex; flex-direction:column; gap:8px;">
             <div style="display:flex; align-items:center; gap:10px; padding:8px 10px; background:#F8F9FA; border-radius:10px; font-size:12px;">
               <span>📖</span><span style="flex:1;">《腾讯产品面试100题》— 腾讯产品核心考察点全覆盖</span>
@@ -1074,6 +1074,8 @@ var selectedType = null;
 var selectedDate = '07-01';
 var selectedTime = '09:00'; // 默认选中第一个时间槽
 var currentRating = 0;
+var currentAppointmentNo = null;
+var currentAppointmentData = null;
 
 var MENTOR_DATA = {
   hexia:       { name:'何霞', title:'企业管理教授 · 广东省就业特色示范课负责人', bio:'擅长领域：职业定位 / 优势萃取' },
@@ -1206,7 +1208,45 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   // 自动预填学生信息（从简历数据 + 首页登录信息）
   prefillStudentInfo();
+  // 处理从"我的预约"返回继续反馈/查看报告的场景
+  handleAptUrlParam();
 });
+
+// 从 URL 参数 ?apt=APTxxx 恢复预约反馈/报告流程
+async function handleAptUrlParam() {
+  var params = new URLSearchParams(window.location.search);
+  var aptNo = params.get('apt');
+  if (!aptNo) return;
+  try {
+    var apt = await getAppointmentByNo(aptNo);
+    if (!apt) {
+      showToast('未找到预约：' + aptNo, '#EF4444');
+      return;
+    }
+    currentAppointmentNo = aptNo;
+    currentAppointmentData = apt;
+    // 确保该预约在学生本地记录中
+    var myApts = JSON.parse(localStorage.getItem('my_appointments') || '[]');
+    if (myApts.indexOf(aptNo) === -1) {
+      myApts.push(aptNo);
+      localStorage.setItem('my_appointments', JSON.stringify(myApts));
+    }
+    if (apt.has_feedback || apt.feedback_at) {
+      // 已反馈，直接跳到报告页（回填数据后展示）
+      renderReportFromAppointment(apt);
+      goStep(5);
+    } else if (apt.status === 'completed') {
+      // 已完成但未反馈，跳到反馈页
+      goStep(4);
+      showToast('请为本次咨询提交反馈，随后查看报告');
+    } else {
+      showToast('该预约尚未完成，请在"我的预约"中查看进度', '#EF4444');
+    }
+  } catch(e) {
+    console.error('加载预约失败:', e);
+    showToast('加载预约失败', '#EF4444');
+  }
+}
 
 function prefillStudentInfo() {
   var resume = null, user = null;
@@ -1268,6 +1308,8 @@ async function submitConsultForm() {
     });
 
     var aptNo = result.appointment_no || result.id;
+    currentAppointmentNo = aptNo;
+    currentAppointmentData = result;
     showToast('预约成功！编号: ' + aptNo + ' ✅');
     btn.textContent = '✅ 已提交';
 
@@ -1340,9 +1382,135 @@ function checkFeedbackReady() {
   btn.disabled = (currentRating === 0);
 }
 
-function submitFeedback() {
-  showToast('反馈提交成功！正在生成报告…');
-  setTimeout(function() { goStep(5); }, 1500);
+async function submitFeedback() {
+  var btn = document.getElementById('submitFeedbackBtn');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ 提交中…'; }
+
+  // 收集反馈数据
+  var tags = [];
+  document.querySelectorAll('#tagGroup .tag-sel.active').forEach(function(el) {
+    tags.push(el.textContent.trim());
+  });
+  var text = (document.getElementById('feedbackText').value || '').trim();
+
+  // 使用 URL 带入的预约编号，或刚刚提交生成的编号
+  var aptNo = currentAppointmentNo || localStorage.getItem('my_last_appointment');
+  if (!aptNo) {
+    showToast('未找到预约记录，无法提交反馈', '#EF4444');
+    if (btn) { btn.disabled = false; btn.textContent = '提交反馈 · 获取报告 →'; }
+    return;
+  }
+
+  try {
+    await saveFeedback(aptNo, { rating: currentRating, tags: tags, text: text });
+    showToast('反馈提交成功！正在生成报告…');
+    // 刷新本地缓存的预约数据
+    try {
+      var refreshed = await getAppointmentByNo(aptNo);
+      if (refreshed) currentAppointmentData = refreshed;
+    } catch(e) {}
+    if (currentAppointmentData) renderReportFromAppointment(currentAppointmentData);
+    setTimeout(function() { goStep(5); }, 1200);
+  } catch(e) {
+    console.error('反馈提交失败:', e);
+    showToast('反馈提交失败：' + (e.message || '请重试'), '#EF4444');
+    if (btn) { btn.disabled = false; btn.textContent = '提交反馈 · 获取报告 →'; }
+  }
+}
+
+// 根据预约数据（特别是 consultation_notes）渲染报告页
+function renderReportFromAppointment(apt) {
+  if (!apt) return;
+  var typeName = apt.consult_type_name || TYPE_NAMES[apt.consult_type] || '职业规划咨询';
+  var titleEl = document.getElementById('reportTitle');
+  var typeEl = document.getElementById('reportTypeName');
+  var metaEl = document.getElementById('reportMeta');
+  if (titleEl) titleEl.textContent = (apt.mentor_name || '导师') + ' · ' + typeName + '报告';
+  if (typeEl) typeEl.textContent = typeName + '报告';
+  if (metaEl) {
+    metaEl.innerHTML = '<span>📅 ' + (apt.appointment_date || '--') + '</span>' +
+      '<span>⏱️ ' + (apt.appointment_time || '--') + '</span>' +
+      '<span>由导师撰写</span>';
+  }
+
+  var notes = {};
+  if (apt.consultation_notes) {
+    try { notes = JSON.parse(apt.consultation_notes); } catch(e) { notes = { summary: apt.consultation_notes }; }
+  }
+
+  // 综合评估
+  var overviewTextEl = document.getElementById('reportOverviewText');
+  var scoresEl = document.getElementById('reportScores');
+  var overviewSection = document.getElementById('reportOverviewSection');
+  if (notes.summary || notes.analysis) {
+    if (overviewTextEl) overviewTextEl.textContent = notes.summary || notes.analysis || '';
+    if (scoresEl) scoresEl.style.display = 'none';
+  } else {
+    if (overviewSection) overviewSection.style.display = 'none';
+  }
+
+  // 优势亮点
+  var strengthEl = document.getElementById('reportStrengths');
+  var strengthSection = document.getElementById('reportStrengthSection');
+  if (notes.strengths && notes.strengths.length > 0) {
+    strengthEl.innerHTML = notes.strengths.map(function(s) {
+      return '<div class="report-list-item"><div class="rli-dot"></div><span>' + esc(String(s)) + '</span></div>';
+    }).join('');
+  } else if (notes.goals) {
+    strengthEl.innerHTML = '<div class="report-list-item"><div class="rli-dot"></div><span>' + esc(String(notes.goals)) + '</span></div>';
+  } else {
+    if (strengthSection) strengthSection.style.display = 'none';
+  }
+
+  // 待提升方向
+  var weaknessEl = document.getElementById('reportWeaknesses');
+  var weaknessSection = document.getElementById('reportWeaknessSection');
+  if (notes.weaknesses && notes.weaknesses.length > 0) {
+    weaknessEl.innerHTML = notes.weaknesses.map(function(s) {
+      return '<div class="report-list-item"><div class="rli-dot"></div><span>' + esc(String(s)) + '</span></div>';
+    }).join('');
+  } else if (notes.solution) {
+    weaknessEl.innerHTML = '<div class="report-list-item"><div class="rli-dot"></div><span>' + esc(String(notes.solution)) + '</span></div>';
+  } else {
+    if (weaknessSection) weaknessSection.style.display = 'none';
+  }
+
+  // 行动计划
+  var actionEl = document.getElementById('reportActions');
+  var actionSection = document.getElementById('reportActionSection');
+  var actions = notes.actions || notes.action || [];
+  if (typeof actions === 'string') actions = [actions];
+  if (actions.length > 0) {
+    actionEl.innerHTML = actions.map(function(item, i) {
+      return '<div class="report-action-item"><div class="rai-num">' + (i + 1) + '</div><div class="rai-text">' + esc(String(item)) + '</div></div>';
+    }).join('');
+  } else {
+    if (actionSection) actionSection.style.display = 'none';
+  }
+
+  // 推荐资源
+  var resourceEl = document.getElementById('reportResources');
+  var resourceSection = document.getElementById('reportResourceSection');
+  var resources = notes.resources || notes.resource || [];
+  if (typeof resources === 'string') resources = [resources];
+  if (resources.length > 0) {
+    resourceEl.innerHTML = '<div style="display:flex; flex-direction:column; gap:8px;">' + resources.map(function(r) {
+      return '<div style="display:flex; align-items:center; gap:10px; padding:8px 10px; background:#F8F9FA; border-radius:10px; font-size:12px;"><span>📚</span><span style="flex:1;">' + esc(String(r)) + '</span></div>';
+    }).join('') + '</div>';
+  } else {
+    if (resourceSection) resourceSection.style.display = 'none';
+  }
+
+  // 如果没有教师填写任何咨询记录，提示学生
+  if (!notes.summary && !notes.analysis && !notes.goals && !notes.strengths && !notes.actions && !notes.resources) {
+    if (overviewTextEl) overviewTextEl.innerHTML = '<div style="background:#FEF3C7;padding:12px 14px;border-radius:10px;color:#92400E;font-size:13px;line-height:1.6;">📋 导师尚未填写详细咨询记录。本页展示的是咨询完成后的默认模板，您可以在下方下载或分享。</div>';
+    if (scoresEl) scoresEl.style.display = 'none';
+  }
+}
+
+function esc(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
 /* ========== STEP 5 ========== */
