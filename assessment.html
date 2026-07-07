@@ -227,6 +227,69 @@ body {
 .score-bar { height: 100%; border-radius: 5px; transition: width 1s ease; }
 .score-val { width: 38px; text-align: right; font-size: 13px; font-weight: 700; color: var(--text-primary); flex-shrink: 0; }
 
+/* ====== HOLLAND TABLE RESULT (mini-program style) ====== */
+.hl-hero {
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+  border-radius: var(--radius-lg); padding: 26px 20px;
+  text-align: center; color: #fff; margin-bottom: 14px;
+}
+.hl-hero-label { font-size: 13px; opacity: 0.85; margin-bottom: 8px; }
+.hl-hero-code { font-size: 42px; font-weight: 900; letter-spacing: 10px; margin-bottom: 6px; }
+.hl-hero-type { font-size: 17px; font-weight: 700; margin-bottom: 16px; }
+.hl-hero-code-row { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+.hl-hero-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 12px 6px 6px; border-radius: 18px;
+  font-size: 13px; font-weight: 600; backdrop-filter: blur(4px);
+}
+.hl-hero-pill-letter {
+  width: 22px; height: 22px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; color: #fff;
+}
+
+.hl-table-card, .hl-analysis-card {
+  background: var(--card); border-radius: var(--radius-md); padding: 18px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.05); margin-bottom: 14px;
+}
+.hl-table-title { font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 14px; }
+.hl-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.hl-table th {
+  padding: 10px 8px; font-weight: 600; color: #fff;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  text-align: center; font-size: 12px;
+}
+.hl-table th:first-child { border-radius: 8px 0 0 0; }
+.hl-table th:last-child { border-radius: 0 8px 0 0; }
+.hl-table td { padding: 12px 8px; border-bottom: 1px solid var(--border); text-align: center; }
+.hl-table tbody tr:last-child td { border-bottom: none; }
+.hl-table tbody tr:nth-child(even) { background: rgba(99,102,241,0.03); }
+.hl-cell-dim { display: flex; align-items: center; gap: 8px; justify-content: flex-start; }
+.hl-dim-icon {
+  width: 28px; height: 28px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; color: #fff; flex-shrink: 0;
+}
+.hl-dim-name { font-weight: 600; color: var(--text-primary); }
+.hl-cell-raw { font-weight: 700; color: var(--text-primary); font-size: 14px; }
+.hl-cell-score { color: var(--text-secondary); font-weight: 500; }
+.hl-cell-score.hl-top { font-weight: 700; }
+.hl-cell-rank { width: 40px; }
+.hl-rank { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; font-size: 12px; font-weight: 700; color: #fff; }
+.hl-rank-0 { background: #FFD700; }
+.hl-rank-1 { background: #C0C0C0; }
+.hl-rank-2 { background: #CD7F32; }
+
+.hl-analysis-text { font-size: 13px; color: var(--text-secondary); line-height: 1.8; }
+.hl-dim-list { display: flex; flex-direction: column; gap: 10px; }
+.hl-dim-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px; border-radius: 10px; background: var(--bg); }
+.hl-dim-item.hl-dim-highlight { background: rgba(99,102,241,0.06); }
+.hl-dim-tag {
+  flex-shrink: 0; padding: 4px 10px; border-radius: 10px;
+  font-size: 12px; font-weight: 700; white-space: nowrap;
+}
+.hl-dim-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; padding-top: 2px; }
+
 /* 16personalities style dimension bars */
 .dim-section { margin-bottom: 20px; }
 .dim-section:last-child { margin-bottom: 0; }
@@ -1066,6 +1129,8 @@ function calcResults() {
   });
 
   state.scores = maxScore;
+  // 保存原始分数（供霍兰德结果页展示原始分数表）
+  state.rawScores = scores;
 
   // Submit to Supabase (teacher can see results)
   submitToSupabase(maxScore);
@@ -1132,61 +1197,101 @@ function renderBigFive(scores) {
 // ============================================================
 function renderHolland(scores) {
   var test = TESTS.holland;
-  var sorted = test.dimensions.map(function(d){return {dim:d,score:scores[d]};}).sort(function(a,b){return b.score-a.score;});
-  var top3 = sorted.slice(0,3).map(function(e){return e.dim;});
-  var code = top3.join('');
+  var raw = state.rawScores || {};
+  var sorted = test.dimensions.map(function(d){return {dim:d, score:scores[d], raw: raw[d] || 0};}).sort(function(a,b){return b.score-a.score;});
+  var top3 = sorted.slice(0,3);
+  var code = top3.map(function(e){return e.dim;}).join('');
   var typeNames = getHollandTypeNames();
   var typeName = typeNames[code];
   if (!typeName) {
-    var dims = top3.map(function(d){return test.dimNames[d].split(' ')[0];});
+    var dims = top3.map(function(d){return test.dimNames[d.dim].split(' ')[0];});
     typeName = dims[0] + '·' + dims[1] + '·' + dims[2] + '型';
   }
 
-  var heroHtml = buildHero(scores, test);
-  var scoresHtml = buildScoresHtml(scores, test);
+  // 三码头部分析文字
+  var analysisText = getHollandAnalysis(code, sorted);
+
+  // 构建表格：按降序排列，前三名突出颜色
+  var tableRows = sorted.map(function(e, i) {
+    var dimName = test.dimNames[e.dim].split(' ')[0];
+    var color = test.dimColors[e.dim];
+    var isTop3 = i < 3;
+    var scoreClass = isTop3 ? 'hl-cell-score hl-top' : 'hl-cell-score';
+    var rank = isTop3 ? '<span class="hl-rank hl-rank-'+i+'">'+['①','②','③'][i]+'</span>' : '';
+    return '<tr>'+
+      '<td class="hl-cell-dim">'+
+        '<span class="hl-dim-icon" style="background:'+color+'">'+test.dimIcons[e.dim]+'</span>'+
+        '<span class="hl-dim-name">'+dimName+'</span>'+
+      '</td>'+
+      '<td class="hl-cell-raw">'+e.raw+'</td>'+
+      '<td class="'+scoreClass+'" style="color:'+(isTop3?color:'')+'">'+scores[e.dim]+'%</td>'+
+      '<td class="hl-cell-rank">'+rank+'</td>'+
+    '</tr>';
+  }).join('');
+
+  var tableHtml = '<div class="hl-table-card">'+
+    '<div class="hl-table-title">📊 以下得分表示了您的职业倾向性程度</div>'+
+    '<table class="hl-table">'+
+      '<thead>'+
+        '<tr>'+
+          '<th class="hl-th-dim">维度</th>'+
+          '<th class="hl-th-raw">原始分</th>'+
+          '<th class="hl-th-pct">百分位</th>'+
+          '<th class="hl-th-rank">排序</th>'+
+        '</tr>'+
+      '</thead>'+
+      '<tbody>'+tableRows+'</tbody>'+
+    '</table>'+
+  '</div>';
+
+  // 各维度简述
+  var dimDescs = {
+    R: '喜欢动手操作、使用工具，偏好具体实际的工作。',
+    I: '喜欢独立思考、探索规律，偏好研究和分析。',
+    A: '喜欢创新表达、追求美感，偏好创意和艺术。',
+    S: '喜欢与人交往、帮助他人，偏好服务和教育。',
+    E: '喜欢领导组织、说服他人，偏好管理和商业。',
+    C: '喜欢规范有序、处理数据，偏好行政和事务。'
+  };
+  var dimAnalysisHtml = '<div class="hl-analysis-card">'+
+    '<div class="hl-table-title">📝 六维分析解读</div>'+
+    '<div class="hl-dim-list">'+
+    sorted.map(function(e, i) {
+      var name = test.dimNames[e.dim].split(' ')[0];
+      return '<div class="hl-dim-item'+(i<3?' hl-dim-highlight':'')+'">'+
+        '<span class="hl-dim-tag" style="background:'+test.dimColors[e.dim]+'20;color:'+test.dimColors[e.dim]+'">'+name+'</span>'+
+        '<span class="hl-dim-desc">'+dimDescs[e.dim]+' 你的得分'+e.raw+'分，'+(i<3?'属于优势领域':'相对较弱')+'。</span>'+
+      '</div>';
+    }).join('')+
+    '</div>'+
+  '</div>';
 
   document.getElementById('pageBody').innerHTML =
     '<div class="page-header"><div class="page-title">霍兰德报告</div><div class="page-subtitle">RIASEC 职业兴趣分析</div></div>'+
     '<div class="report-export-wrap" id="reportExportWrap">'+
     buildReportInfoBar()+
-    heroHtml+
-    '<div class="chart-card"><div class="chart-title">📊 六维雷达图</div><div class="chart-wrap"><canvas id="radarChart"></canvas></div></div>'+
-    '<div class="score-card"><div class="score-title">📋 职业兴趣特征</div>'+scoresHtml+'</div>'+
+    '<div class="hl-hero">'+
+      '<div class="hl-hero-label">你的霍兰德职业兴趣代码</div>'+
+      '<div class="hl-hero-code">'+code+'</div>'+
+      '<div class="hl-hero-type">'+typeName+'</div>'+
+      '<div class="hl-hero-code-row">'+
+        top3.map(function(e, i){
+          var name = test.dimNames[e.dim].split(' ')[0];
+          return '<div class="hl-hero-pill" style="background:'+test.dimColors[e.dim]+'15;color:'+test.dimColors[e.dim]+';border:1.5px solid '+test.dimColors[e.dim]+'40">'+
+            '<span class="hl-hero-pill-letter" style="background:'+test.dimColors[e.dim]+'">'+e.dim+'</span>'+
+            '<span>'+name+'</span>'+
+          '</div>';
+        }).join('')+
+      '</div>'+
+    '</div>'+
+    tableHtml+
+    '<div class="hl-analysis-card">'+
+      '<div class="hl-table-title">🔍 三码分析</div>'+
+      '<div class="hl-analysis-text">'+analysisText+'</div>'+
+    '</div>'+
+    dimAnalysisHtml+
     '</div>'+
     buildExportBtnRow();
-
-  setTimeout(function() {
-    var ctx = document.getElementById('radarChart');
-    if (!ctx) return;
-    if (state.chartInstance) state.chartInstance.destroy();
-    var labels = test.dimensions.map(function(d){return test.dimNames[d].split(' ')[0];});
-    var data = test.dimensions.map(function(d){return scores[d];});
-    state.chartInstance = new Chart(ctx, {
-      type: 'radar',
-      data: {
-        labels: labels,
-        datasets: [{
-          label: '你的得分', data: data,
-          backgroundColor: 'rgba(99,102,241,0.2)',
-          borderColor: '#6366f1', borderWidth: 2,
-          pointBackgroundColor: '#6366f1', pointBorderColor: '#fff',
-          pointBorderWidth: 2, pointRadius: 5
-        }]
-      },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          r: {
-            beginAtZero: true, max: 100,
-            ticks: { stepSize: 20, backdropColor: 'transparent', font:{size:10} },
-            pointLabels: { font:{size:13,weight:'600'}, color:'#1a1a2e' },
-            grid: { color:'#E8ECF2' }, angleLines: { color:'#E8ECF2' }
-          }
-        }
-      }
-    });
-  }, 300);
 }
 
 // ============================================================
@@ -1685,6 +1790,44 @@ function buildScoresHtml(scores, test) {
       '</div>'+
     '</div>';
   }).join('');
+}
+
+// ============================================================
+//  HOLLAND ANALYSIS TEXT
+// ============================================================
+function getHollandAnalysis(code, sorted) {
+  var test = TESTS.holland;
+  var top3 = sorted.slice(0,3);
+  var typeNames = getHollandTypeNames();
+  var typeName = typeNames[code] || '综合型';
+
+  var dimDescs = {
+    R: '动手能力强，偏好使用工具和机械',
+    I: '善于思考分析，偏好研究和探索',
+    A: '富有创意想象，偏好艺术和表达',
+    S: '乐于帮助他人，偏好服务和沟通',
+    E: '具有领导才能，偏好管理和说服',
+    C: '注重规范细节，偏好数据和事务'
+  };
+
+  var intro = '你的霍兰德职业兴趣代码为 <b>' + code + '</b>（' + typeName + '）。';
+
+  var top = top3[0], second = top3[1], third = top3[2];
+  var d1 = test.dimNames[top.dim].split(' ')[0];
+  var d2 = test.dimNames[second.dim].split(' ')[0];
+  var d3 = test.dimNames[third.dim].split(' ')[0];
+
+  var analysis =
+    '你最突出的维度是 <b>' + d1 + '（' + top.dim + '）</b>，得分 ' + top.score + '%，说明' + dimDescs[top.dim] + '。' +
+    '其次是 <b>' + d2 + '（' + second.dim + '）</b>，得分 ' + second.score + '%，反映你' + dimDescs[second.dim].replace('偏好','同时具备').replace('善于','同时具备') + '。';
+
+  if (third.score >= 40) {
+    analysis += '第三维度 <b>' + d3 + '（' + third.dim + '）</b>也有一定倾向，说明' + dimDescs[third.dim].replace('偏好','在某些场景下也') + '。';
+  }
+
+  analysis += '<br><br><b>适合方向：</b>你的三码组合暗示你适合从事与 "' + d1 + '、' + d2 + '、' + d3 + '" 相关的职业领域，可重点考虑融合这些特质的工作。';
+
+  return intro + '<br><br>' + analysis;
 }
 
 // ============================================================
