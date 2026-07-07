@@ -152,28 +152,22 @@ body {
 .q-opt.sel .q-bubble { box-shadow: 0 0 0 4px #fff, 0 0 0 7px rgba(0,0,0,0.15); }
 .q-opt.sel.l0 .q-bubble { box-shadow: 0 0 0 4px #fff, 0 0 0 7px rgba(239,68,68,0.4); }
 .q-opt.sel.l1 .q-bubble { box-shadow: 0 0 0 4px #fff, 0 0 0 7px rgba(248,113,113,0.4); }
-.q-opt.sel.l2 .q-bubble { box-shadow: 0 0 0 4px #fff, 0 0 0 7px rgba(252,165,165,0.4); }
-.q-opt.sel.l3 .q-bubble { box-shadow: 0 0 0 4px #fff, 0 0 0 7px rgba(209,213,219,0.5); }
-.q-opt.sel.l4 .q-bubble { box-shadow: 0 0 0 4px #fff, 0 0 0 7px rgba(134,239,172,0.4); }
-.q-opt.sel.l5 .q-bubble { box-shadow: 0 0 0 4px #fff, 0 0 0 7px rgba(74,222,128,0.4); }
-.q-opt.sel.l6 .q-bubble { box-shadow: 0 0 0 4px #fff, 0 0 0 7px rgba(34,197,94,0.4); }
+.q-opt.sel.l2 .q-bubble { box-shadow: 0 0 0 4px #fff, 0 0 0 7px rgba(209,213,219,0.5); }
+.q-opt.sel.l3 .q-bubble { box-shadow: 0 0 0 4px #fff, 0 0 0 7px rgba(134,239,172,0.4); }
+.q-opt.sel.l4 .q-bubble { box-shadow: 0 0 0 4px #fff, 0 0 0 7px rgba(34,197,94,0.4); }
 .q-opt-label { display: none; }
-/* bubble colors — 7 levels: red(disagree) → gray(neutral) → green(agree) */
-.q-opt.l0 .q-bubble { background: #EF4444; width:38px; height:38px; }  /* 非常不同意 - largest red */
-.q-opt.l1 .q-bubble { background: #F87171; width:34px; height:34px; }  /* 不同意 */
-.q-opt.l2 .q-bubble { background: #FCA5A5; width:30px; height:30px; }  /* 有点不同意 */
-.q-opt.l3 .q-bubble { background: #D1D5DB; width:26px; height:26px; }  /* 中立 - smallest gray */
-.q-opt.l4 .q-bubble { background: #86EFAC; width:30px; height:30px; }  /* 有点同意 */
-.q-opt.l5 .q-bubble { background: #4ADE80; width:34px; height:34px; }  /* 同意 */
-.q-opt.l6 .q-bubble { background: #22C55E; width:38px; height:38px; }  /* 非常同意 - largest green */
+/* bubble colors — 5 levels: red(disagree) → gray(neutral) → green(agree) */
+.q-opt.l0 .q-bubble { background: #EF4444; width:38px; height:38px; }  /* 完全不符合 - largest red */
+.q-opt.l1 .q-bubble { background: #FCA5A5; width:30px; height:30px; }  /* 不太符合 */
+.q-opt.l2 .q-bubble { background: #D1D5DB; width:24px; height:24px; }  /* 一般 - smallest gray */
+.q-opt.l3 .q-bubble { background: #86EFAC; width:30px; height:30px; }  /* 比较符合 */
+.q-opt.l4 .q-bubble { background: #22C55E; width:38px; height:38px; }  /* 非常符合 - largest green */
 /* Unselected = slightly muted */
 .q-opt:not(.sel).l0 .q-bubble { opacity:0.55; }
-.q-opt:not(.sel).l1 .q-bubble { opacity:0.50; }
-.q-opt:not(.sel).l2 .q-bubble { opacity:0.45; }
-.q-opt:not(.sel).l3 .q-bubble { opacity:0.40; }
-.q-opt:not(.sel).l4 .q-bubble { opacity:0.45; }
-.q-opt:not(.sel).l5 .q-bubble { opacity:0.50; }
-.q-opt:not(.sel).l6 .q-bubble { opacity:0.55; }
+.q-opt:not(.sel).l1 .q-bubble { opacity:0.45; }
+.q-opt:not(.sel).l2 .q-bubble { opacity:0.40; }
+.q-opt:not(.sel).l3 .q-bubble { opacity:0.45; }
+.q-opt:not(.sel).l4 .q-bubble { opacity:0.55; }
 /* Scale ends labels */
 .q-scale-labels {
   display: flex; justify-content: space-between; padding: 0 8px;
@@ -820,7 +814,7 @@ var TESTS = {
 // ============================================================
 //  ANSWER OPTIONS
 // ============================================================
-var ANSWER_OPTS = ['非常不同意','不同意','有点不同意','中立','有点同意','同意','非常同意'];
+var ANSWER_OPTS = ['完全不符合','不太符合','一般','比较符合','非常符合'];
 
 
 // ============================================================
@@ -988,7 +982,7 @@ function renderQuestion(animate) {
       '<div class="q-num">Q'+(state.currentQ+1)+'</div>'+
       '<div class="q-text">'+q.q+'</div>'+
       '<div class="q-options" id="optsWrap">'+optsHtml+'</div>'+
-      '<div class="q-scale-labels"><span>非常不同意</span><span style="color:#9CA3AF;">中立</span><span>非常同意</span></div>'+
+      '<div class="q-scale-labels"><span>完全不符合</span><span>非常符合</span></div>'+
     '</div>'+
     '<div class="q-nav-row">'+
       (state.currentQ>0 ? '<button class="btn-back" onclick="prevQ()">← 上一题</button>' : '<div></div>')+
@@ -1120,19 +1114,20 @@ function calcResults() {
   test.dimensions.forEach(function(d) { scores[d]=0; counts[d]=0; });
 
   test.questions.forEach(function(q, i) {
-    var rawScore = state.answers[i] !== undefined ? state.answers[i] : 3;
-    // Handle reverse items
+    var rawScore = state.answers[i] !== undefined ? state.answers[i] : 2;
+    // Handle reverse items: 1↔5, 2↔4, 3↔3
+    var pointValue = rawScore + 1;  // idx 0-4 → 1-5 points
     if (test.reverseItems.indexOf(i) !== -1) {
-      rawScore = 6 - rawScore;
+      pointValue = 6 - pointValue;
     }
-    scores[q.dim] += rawScore;
+    scores[q.dim] += pointValue;
     counts[q.dim] += 1;
   });
 
   // Normalize to 0-100%
   var maxScore = {};
   test.dimensions.forEach(function(d) {
-    maxScore[d] = Math.round((scores[d] / (counts[d] * 6)) * 100);
+    maxScore[d] = Math.round((scores[d] / (counts[d] * 5)) * 100);
   });
 
   state.scores = maxScore;
@@ -1218,7 +1213,7 @@ function renderHolland(scores) {
   // 三码头部分析文字
   var analysisText = getHollandAnalysis(code, sorted);
 
-  // 参考图表格：R I A S E C 列，兴趣/能力/回馈/总分 四行
+  // 参考图表格：R I A S E C 列，总分一行（当前仅有兴趣测评）
   var raw = state.rawScores || {};
   var dims = test.dimensions;
 
@@ -1227,22 +1222,12 @@ function renderHolland(scores) {
     return '<th class="hl-th-code" style="background:'+test.dimColors[d]+'15;color:'+test.dimColors[d]+'">'+d+'</th>';
   }).join('');
 
-  // 四行数据
-  var rows = [
-    { label: '您所感兴趣的活动（兴趣）', scores: dims.map(function(d){ return raw[d] || 0; }) },
-    { label: '您所擅长的活动（能力）',   scores: dims.map(function(){ return null; }) },
-    { label: '您所喜欢的职业（回馈）',    scores: dims.map(function(){ return null; }) },
-    { label: '总分',                     scores: dims.map(function(d){ return raw[d] || 0; }), isTotal: true }
-  ];
-
-  var tableRows = rows.map(function(row){
-    return '<tr>'+
-      '<td class="hl-row-label">'+row.label+'</td>'+
-      row.scores.map(function(s){
-        return '<td class="'+(s===null?'hl-cell-empty':'hl-cell-score')+'">'+(s===null?'—':s)+'</td>';
-      }).join('')+
-    '</tr>';
-  }).join('');
+  // 只保留总分行（当前仅有兴趣测评，能力/回馈未测）
+  var totalScores = dims.map(function(d){ return raw[d] || 0; });
+  var tableRow = '<tr>'+
+    '<td class="hl-row-label">总分</td>'+
+    totalScores.map(function(s){ return '<td class="hl-cell-score">'+s+'</td>'; }).join('')+
+  '</tr>';
 
   var tableHtml = '<div class="hl-table-card">'+
     '<div class="hl-table-title">📊 以下得分表示了您的职业倾向性程度</div>'+
@@ -1250,7 +1235,7 @@ function renderHolland(scores) {
       '<thead>'+
         '<tr><th class="hl-th-dim"></th>'+headerCells+'</tr>'+
       '</thead>'+
-      '<tbody>'+tableRows+'</tbody>'+
+      '<tbody>'+tableRow+'</tbody>'+
     '</table>'+
   '</div>';
 
