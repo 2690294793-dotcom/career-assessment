@@ -343,16 +343,26 @@ body {
         <label>目标职业方向 <span class="req">*</span></label>
         <select id="inpCareer">
           <option value="">请选择目标方向</option>
-          <option value="互联网产品">互联网产品（产品经理）</option>
-          <option value="软件开发">软件开发（前端/后端/移动端）</option>
-          <option value="数据分析">数据分析 / 数据科学</option>
-          <option value="市场营销">市场营销 / 品牌运营</option>
-          <option value="金融">金融 / 投行 / 量化</option>
-          <option value="设计">UI/UX设计 / 视觉设计</option>
-          <option value="人力资源">人力资源 / 行政管理</option>
-          <option value="教育培训">教育培训 / 学术研究</option>
-          <option value="公务员">公务员 / 事业单位</option>
-          <option value="创业">自主创业</option>
+          <option value="软件与数据开发">软件与数据开发</option>
+          <option value="网络与信息安全">网络与信息安全</option>
+          <option value="物联网与智能硬件">物联网与智能硬件</option>
+          <option value="集成电路与芯片设计">集成电路与芯片设计</option>
+          <option value="机械工程（设计/制造/模具）">机械工程（设计/制造/模具）</option>
+          <option value="电气与自动化控制">电气与自动化控制</option>
+          <option value="智能制造与机器人">智能制造与机器人</option>
+          <option value="汽车与新能源汽车技术">汽车与新能源汽车技术</option>
+          <option value="建筑工程与智能建造">建筑工程与智能建造</option>
+          <option value="工程造价与项目管理">工程造价与项目管理</option>
+          <option value="室内与环境艺术设计">室内与环境艺术设计</option>
+          <option value="服装与时尚设计">服装与时尚设计</option>
+          <option value="视觉传达与数字媒体">视觉传达与数字媒体</option>
+          <option value="珠宝首饰设计与鉴定">珠宝首饰设计与鉴定</option>
+          <option value="物流与供应链管理">物流与供应链管理</option>
+          <option value="市场营销与品牌策划">市场营销与品牌策划</option>
+          <option value="国际贸易与跨境电商">国际贸易与跨境电商</option>
+          <option value="旅游与酒店运营管理">旅游与酒店运营管理</option>
+          <option value="财务会计与金融管理">财务会计与金融管理</option>
+          <option value="材料与新能源技术">材料与新能源技术</option>
         </select>
       </div>
       <div class="input-row">
@@ -797,6 +807,50 @@ var CAREER_DB = {
   }
 };
 
+// ============ Default Plan Generator ============
+function getDefaultCareerPlan(career, major) {
+  // 基于职业方向名称和专业的通用规划模板
+  var firstStage = '初级' + career.replace(/[（(].*[）)]/g, '').replace(/技术|工程|管理|设计|运营|开发/g, '').replace(/与.*$/g, '') + '师/专员';
+  if (firstStage.length < 4) firstStage = '初级' + career.replace(/[（(].*[）)]/g, '').substring(0, 3) + '岗';
+  return {
+    icon: '🎯', color: 'indigo',
+    roadmap: [
+      {title: firstStage, desc: '掌握岗位基础技能，熟悉行业工作流程与业务规范'},
+      {title: '中级专业人员', desc: '能够独立承担项目任务，解决常见专业问题'},
+      {title: '高级/资深专家', desc: '主导重点项目，具备系统思维和跨领域协作能力'},
+      {title: '管理/专家路线', desc: '成为团队负责人或领域专家，制定技术标准与业务策略'}
+    ],
+    timeline: function(grade) {
+      var base = [];
+      if (grade === '大一' || grade === '大二') {
+        base.push({title: '专业基础', desc: '认真学习' + major + '核心课程，打牢专业理论基础'});
+        base.push({title: '技能拓展', desc: '了解' + career + '所需工具/证书/技能，参加相关社团或竞赛'});
+        base.push({title: '实践入门', desc: '利用假期参加认知实习或企业参观，建立行业认知'});
+      } else if (grade === '大三') {
+        base.push({title: '技能强化', desc: '针对' + career + '方向，系统学习岗位核心技能并做项目练习'});
+        base.push({title: '实习积累', desc: '积极投递相关企业实习，积累真实工作经验'});
+        base.push({title: '秋招冲刺', desc: '9-11月关注目标企业校园招聘，准备简历与面试'});
+      } else {
+        base.push({title: '求职冲刺', desc: '春招补录阶段持续投递，扩大目标企业范围'});
+        base.push({title: '入职准备', desc: '提前了解目标岗位职责，复习专业知识，做好角色转换'});
+      }
+      return base;
+    },
+    skills: [
+      {title: '专业知识', desc: '扎实的' + major + '专业知识，能够将理论应用于实际问题'},
+      {title: '岗位技能', desc: '掌握' + career + '岗位所需的核心工具、方法与流程'},
+      {title: '项目经验', desc: '通过课程设计、实习或竞赛积累相关项目经历'},
+      {title: '综合素质', desc: '良好的沟通表达、团队协作、学习能力和职业素养'}
+    ],
+    strategy: [
+      {title: '目标企业', desc: '关注与' + major + '和' + career + '相关的优质企业，分层投递'},
+      {title: '简历重点', desc: '突出专业课程、项目经历、实习经验和相关证书'},
+      {title: '面试准备', desc: '准备专业知识问答、项目介绍、职业规划等常见面试题'},
+      {title: '加分项', desc: '考取行业相关证书、参加专业竞赛、积累对口实习经历'}
+    ]
+  };
+}
+
 // ============ State ============
 var currentPlan = null;
 
@@ -814,8 +868,7 @@ function generatePlan() {
   if (!grade) { showToast('请选择年级'); document.getElementById('inpGrade').focus(); return; }
   if (!career) { showToast('请选择目标职业方向'); document.getElementById('inpCareer').focus(); return; }
 
-  var db = CAREER_DB[career];
-  if (!db) { showToast('未找到该方向的规划模板'); return; }
+  var db = CAREER_DB[career] || getDefaultCareerPlan(career, major);
 
   var timeline = db.timeline(grade);
 
