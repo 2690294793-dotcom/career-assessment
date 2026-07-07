@@ -157,12 +157,7 @@ body {
 .q-opt.sel.l4 .q-bubble { box-shadow: 0 0 0 4px #fff, 0 0 0 7px rgba(134,239,172,0.4); }
 .q-opt.sel.l5 .q-bubble { box-shadow: 0 0 0 4px #fff, 0 0 0 7px rgba(74,222,128,0.4); }
 .q-opt.sel.l6 .q-bubble { box-shadow: 0 0 0 4px #fff, 0 0 0 7px rgba(34,197,94,0.4); }
-.q-opt-label {
-  font-size: 10px; color: var(--text-secondary); margin-top: 8px;
-  text-align: center; white-space: nowrap; transition: color 0.2s;
-  font-weight: 500;
-}
-.q-opt.sel .q-opt-label { color: var(--text-primary); font-weight: 700; }
+.q-opt-label { display: none; }
 /* bubble colors — 7 levels: red(disagree) → gray(neutral) → green(agree) */
 .q-opt.l0 .q-bubble { background: #EF4444; width:38px; height:38px; }  /* 非常不同意 - largest red */
 .q-opt.l1 .q-bubble { background: #F87171; width:34px; height:34px; }  /* 不同意 */
@@ -826,7 +821,7 @@ var TESTS = {
 //  ANSWER OPTIONS
 // ============================================================
 var ANSWER_OPTS = ['非常不同意','不同意','有点不同意','中立','有点同意','同意','非常同意'];
-var ANSWER_SHORT = ['非常不同意','','','中立','','','非常同意'];
+
 
 // ============================================================
 //  RENDER: STUDENT INFO FORM
@@ -965,8 +960,7 @@ function renderQuestion(animate) {
 
   var optsHtml = ANSWER_OPTS.map(function(t, i) {
     return '<div class="q-opt l'+i+(selected===i?' sel':'')+'" onclick="selectAnswer('+i+')">'+
-      '<div class="q-bubble"></div>'+
-      '<span class="q-opt-label">'+(ANSWER_SHORT[i] || t)+'</span></div>';
+      '<div class="q-bubble"></div></div>';
   }).join('');
 
   // Dot indicators
