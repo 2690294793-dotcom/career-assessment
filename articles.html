@@ -175,6 +175,16 @@ body {
 .modal-content p { font-size: 15px; line-height: 1.85; color: var(--text-primary); margin-bottom: 14px; text-indent: 2em; }
 .modal-content p:first-of-type { text-indent: 0; }
 
+/* Jump Original Button on Card */
+.jump-original-btn { 
+  display: inline-flex; align-items: center; gap: 2px;
+  font-size: 11px; color: var(--primary); cursor: pointer;
+  text-decoration: none; white-space: nowrap; padding: 2px 0;
+  transition: opacity 0.2s;
+}
+.jump-original-btn:hover { opacity: 0.7; }
+.jump-original-btn svg { width: 13px; height: 13px; fill: var(--primary); }
+
 /* View Original Link */
 .view-original-btn { 
   display: block; margin: 16px 0; padding: 10px 0; text-align: center;
@@ -381,6 +391,7 @@ function renderArticles() {
     var title = currentSearch ? highlightText(a.title, currentSearch) : escapeHtml(a.title);
     var excerpt = currentSearch ? highlightText(a.excerpt, currentSearch) : escapeHtml(a.excerpt);
     var sourceBadge = (a.source === 'wechat') ? '<span class="source-badge wechat">原文</span>' : '<span class="source-badge summary">摘要</span>';
+    var jumpBtn = a.wxUrl ? '<a href="' + a.wxUrl + '" target="_blank" class="jump-original-btn" onclick="event.stopPropagation();">跳转原文<svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg></a>' : '';
     return '<div class="article-card" data-id="' + a.id + '">' +
       (a.cover && a.cover.startsWith('img/') ? '<div class="article-cover"><img src="' + a.cover + '" alt="" loading="lazy"></div>' : '<div class="article-cover" style="background: ' + (a.cover || 'linear-gradient(135deg, #6366f1, #4338ca)') + ';"><span class="cover-label">' + escapeHtml(a.categoryName) + '</span></div>') +
       '<div class="article-info">' +
@@ -390,6 +401,7 @@ function renderArticles() {
           '<span class="article-meta-item">' + a.date + '</span>' +
           '<span class="article-meta-item">' + a.views + '</span>' +
           '<span class="article-meta-item">' + a.categoryName + '</span>' +
+          jumpBtn +
         '</div>' +
       '</div>' +
     '</div>';
