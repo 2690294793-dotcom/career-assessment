@@ -1229,23 +1229,18 @@ function renderTimeSlotsForDate(dateStr) {
   var availableSlots = getAvailableSlotsForDay(dayOfWeek);
   var availableTimes = expandSlotsToTimeSlots(availableSlots);
 
-  // 所有可能的整点时间（08:00 到 21:00）
-  var allTimes = [];
-  for (var h = 8; h <= 21; h++) {
-    allTimes.push(String(h).padStart(2, '0') + ':00');
+  var html = '';
+  if (availableTimes.length === 0) {
+    container.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:24px 0;color:var(--text-light);font-size:13px;">该日暂无可预约时段</div>';
+    selectedTime = null;
+    checkStep1Ready();
+    return;
   }
 
-  var html = '';
-  var firstAvailableTime = null;
-  allTimes.forEach(function(t) {
-    var isAvailable = availableTimes.indexOf(t) >= 0;
-    if (isAvailable && !firstAvailableTime) firstAvailableTime = t;
-    if (isAvailable) {
-      var isSelected = t === (selectedTime || firstAvailableTime);
-      html += '<div class="time-slot' + (isSelected ? ' selected' : '') + '" onclick="selectTime(\'' + t + '\', this)">' + t + '</div>';
-    } else {
-      html += '<div class="time-slot unavailable">' + t + '</div>';
-    }
+  var firstAvailableTime = availableTimes[0];
+  availableTimes.forEach(function(t) {
+    var isSelected = t === (selectedTime || firstAvailableTime);
+    html += '<div class="time-slot' + (isSelected ? ' selected' : '') + '" onclick="selectTime(\'' + t + '\', this)">' + t + '</div>';
   });
 
   container.innerHTML = html;
@@ -1254,6 +1249,7 @@ function renderTimeSlotsForDate(dateStr) {
   if (firstAvailableTime && !selectedTime) {
     selectedTime = firstAvailableTime;
   }
+  checkStep1Ready();
 }
 
 // 加载导师的时间表和预约开关
