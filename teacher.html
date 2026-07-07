@@ -332,6 +332,29 @@ tr:last-child td { border-bottom: none; }
 .score-bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--primary), var(--accent)); }
 .score-bar-val { font-size: 13px; font-weight: 700; color: var(--primary); width: 40px; text-align: right; }
 
+/* Holland result code clickable */
+.result-code.clickable {
+  cursor: pointer; padding: 3px 9px; border-radius: 10px;
+  background: var(--primary-light); color: var(--primary);
+  transition: all 0.2s; display: inline-block;
+}
+.result-code.clickable:hover { background: var(--primary); color: #fff; }
+
+/* Holland analysis modal content */
+.ha-hero { text-align: center; padding: 12px 0 20px; }
+.ha-hero-code { font-size: 40px; font-weight: 900; letter-spacing: 6px; color: var(--primary); }
+.ha-hero-type { font-size: 16px; font-weight: 700; color: var(--text-primary); margin-top: 4px; }
+.ha-hero-pills { display: flex; justify-content: center; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+.ha-hero-pill { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px 5px 5px; border-radius: 16px; font-size: 12px; font-weight: 600; }
+.ha-hero-pill-letter { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #fff; }
+.ha-analysis { font-size: 14px; line-height: 1.8; color: var(--text-secondary); }
+.ha-analysis h4 { font-size: 15px; color: var(--text-primary); margin-bottom: 10px; margin-top: 16px; }
+.ha-analysis p { margin-bottom: 10px; }
+.ha-dim-list { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
+.ha-dim-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px; border-radius: 10px; background: var(--bg); }
+.ha-dim-tag { flex-shrink: 0; padding: 4px 10px; border-radius: 10px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+.ha-dim-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+
 /* Time slots: only show available slots from mentor schedule */
 .time-grid .time-slot.unavailable { display: none; }
 .time-grid:empty::before { content: "该日暂无可预约时段"; display: block; grid-column: 1/-1; text-align: center; padding: 24px 0; color: var(--text-light); font-size: 13px; }
@@ -616,6 +639,17 @@ tr:last-child td { border-bottom: none; }
   </div>
 </div>
 
+<!-- Holland Analysis Modal -->
+<div class="modal-bg" id="hollandModal" onclick="if(event.target===this)closeHollandModal()">
+  <div class="modal" style="max-width:520px;">
+    <div class="modal-head">
+      <h3>🔍 三码分析解读</h3>
+      <button class="modal-close" onclick="closeHollandModal()">&times;</button>
+    </div>
+    <div class="modal-body" id="hollandModalBody"></div>
+  </div>
+</div>
+
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
@@ -760,13 +794,20 @@ function renderTable(data) {
     var testName = TEST_INFO[item.test_type] ? TEST_INFO[item.test_type].name : (item.test_name || item.test_type);
     var time = item.created_at ? new Date(item.created_at).toLocaleString("zh-CN", {month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit"}) : "-";
 
+    var codeCell = esc(item.result_code||'-');
+    if (item.test_type === 'holland' && item.result_code && item.result_code.length === 3) {
+      codeCell = '<span class="result-code clickable" onclick="event.stopPropagation(); showHollandAnalysis(\''+esc(item.result_code)+'\', '+idx+')" title="点击查看三码分析">'+esc(item.result_code)+'</span>';
+    } else {
+      codeCell = '<span class="result-code">'+codeCell+'</span>';
+    }
+
     html += '<tr>'+
       '<td style="font-weight:600;">'+esc(item.name)+'</td>'+
       '<td>'+esc(item.school||'-')+'</td>'+
       '<td>'+esc(item.student_id)+'</td>'+
       '<td>'+esc(item.class_name)+'</td>'+
       '<td><span class="badge badge-'+(item.test_type||'')+'">'+esc(testName)+'</span></td>'+
-      '<td><span class="result-code">'+esc(item.result_code||'-')+'</span></td>'+
+      '<td>'+codeCell+'</td>'+
       '<td class="hide-mobile" style="color:var(--text-secondary);font-size:12px;">'+esc(item.result_summary||'-')+'</td>'+
       '<td class="hide-mobile" style="color:var(--text-light);font-size:12px;">'+time+'</td>'+
       '<td><button class="btn" style="padding:5px 10px;font-size:11px;" onclick="showDetail('+idx+')">查看</button>'+
@@ -1369,13 +1410,21 @@ function showDetail(idx) {
     }).join("");
   }
 
+  // Build result code cell - clickable for Holland
+  var codeCell = esc(item.result_code||'-');
+  if (item.test_type === 'holland' && item.result_code && item.result_code.length === 3) {
+    codeCell = '<span class="result-code clickable" onclick="showHollandAnalysis(\''+esc(item.result_code)+'\', '+idx+')" title="点击查看分析解读">'+esc(item.result_code)+' 🔍</span>';
+  } else {
+    codeCell = '<span class="result-code">'+codeCell+'</span>';
+  }
+
   document.getElementById("modalBody").innerHTML =
     '<div class="detail-row"><div class="detail-label">姓名</div><div class="detail-val" style="font-weight:600;">'+esc(item.name)+'</div></div>'+
     '<div class="detail-row"><div class="detail-label">学校</div><div class="detail-val">'+esc(item.school||'-')+'</div></div>'+
     '<div class="detail-row"><div class="detail-label">学号</div><div class="detail-val">'+esc(item.student_id)+'</div></div>'+
     '<div class="detail-row"><div class="detail-label">班级</div><div class="detail-val">'+esc(item.class_name)+'</div></div>'+
     '<div class="detail-row"><div class="detail-label">测评类型</div><div class="detail-val"><span class="badge badge-'+(item.test_type||'')+'">'+esc(testName)+'</span></div></div>'+
-    '<div class="detail-row"><div class="detail-label">结果代码</div><div class="detail-val" style="font-size:20px;font-weight:800;color:var(--primary);letter-spacing:2px;">'+esc(item.result_code||'-')+'</div></div>'+
+    '<div class="detail-row"><div class="detail-label">结果代码</div><div class="detail-val">'+codeCell+'</div></div>'+
     '<div class="detail-row"><div class="detail-label">概述</div><div class="detail-val">'+esc(item.result_summary||'-')+'</div></div>'+
     '<div class="detail-row"><div class="detail-label">提交时间</div><div class="detail-val" style="color:var(--text-secondary);">'+time+'</div></div>'+
     (scoresHtml ? '<div style="margin-top:20px;"><div style="font-size:14px;font-weight:700;margin-bottom:12px;">📊 各维度得分</div>'+scoresHtml+'</div>' : '')+
@@ -1388,6 +1437,138 @@ function showDetail(idx) {
 
 function closeModal() {
   document.getElementById("detailModal").classList.remove("show");
+}
+
+// ============================================
+// HOLLAND THREE-CODE POPUP ANALYSIS
+// ============================================
+function getHollandTypeNames() {
+  return {
+    RIA:'技术研发型',RIS:'数据分析师型',RIE:'工程管理型',RIC:'质量控制型',RAS:'环境工程型',RSE:'户外管理型',
+    RSC:'实务操作型',RCI:'数据核算型',RCE:'技术支持型',RES:'现场执行型',REI:'产品研发型',REC:'工程技术型',
+    RAE:'工程创意型',RAI:'工程创新型',REA:'项目执行型',RSI:'服务技术型',RSA:'工程技术型',RAC:'数据工艺型',
+    IAR:'科技创新型',IAS:'学术研究型',ISE:'咨询分析型',ISC:'生物信息型',IRA:'研发工程师型',IRS:'数据科学家型',
+    ISR:'系统分析型',ICR:'信息处理型',IAE:'科技创意型',IEA:'科研管理型',IES:'数据分析型',IEC:'技术管理型',
+    AIR:'创意设计型',AIS:'文化传媒型',ASE:'艺术管理型',ASC:'视觉传达型',AIE:'创意策划型',ASI:'人文教育型',
+    ARS:'艺术创作型',AES:'娱乐传媒型',AER:'创意实践型',AEI:'创新策划型',ARI:'工艺设计型',ARE:'艺术运营型',
+    AEC:'创意管理型',ARC:'设计工艺型',ACR:'艺术技术型',
+    SAI:'教育辅导型',SEA:'人力资源型',SEC:'社会服务型',SIA:'心理咨询型',SCE:'行政管理型',SRI:'康复治疗型',
+    SIC:'教育服务型',SER:'客户服务型',SAE:'公共关系型',SAR:'人文创意型',SIR:'科研教育型',
+    EAS:'市场营销型',ESC:'商务管理型',ECR:'项目运营型',EIS:'投资银行型',ERA:'创业管理型',EIA:'企业培训型',
+    ESI:'销售管理型',ESR:'业务拓展型',ERC:'运营总监型',EAR:'品牌创意型',EAI:'市场创新型',ECA:'商务分析型',EAC:'营销管理型',
+    CSE:'行政管理型',CIR:'数据管理型',CRE:'财务审计型',CSI:'合规风控型',CAE:'运营管理型',CIE:'供应链管理型',
+    CSR:'事务管理型',CES:'行政助理型',CAR:'数据创意型',CEI:'财务策划型',CRI:'信息管理型'
+  };
+}
+
+function getHollandDimDescs() {
+  return {
+    R: '动手能力强，偏好使用工具和机械',
+    I: '善于思考分析，偏好研究和探索',
+    A: '富有创意想象，偏好艺术和表达',
+    S: '乐于帮助他人，偏好服务和沟通',
+    E: '具有领导才能，偏好管理和说服',
+    C: '注重规范细节，偏好数据和事务'
+  };
+}
+
+function getHollandAnalysisText(code, sorted) {
+  var typeNames = getHollandTypeNames();
+  var typeName = typeNames[code] || '综合型';
+  var dimDescs = getHollandDimDescs();
+  var top3 = sorted.slice(0,3);
+  var top = top3[0], second = top3[1], third = top3[2];
+
+  var dimNames = {R:'现实型',I:'研究型',A:'艺术型',S:'社会型',E:'企业型',C:'常规型'};
+  var d1 = dimNames[top.dim] || top.dim;
+  var d2 = dimNames[second.dim] || second.dim;
+  var d3 = dimNames[third.dim] || third.dim;
+
+  var analysis =
+    '该学生最突出的维度是 <b>' + d1 + '（' + top.dim + '）</b>，得分 ' + top.score + '%，说明' + dimDescs[top.dim] + '。' +
+    '其次是 <b>' + d2 + '（' + second.dim + '）</b>，得分 ' + second.score + '%，反映其' + dimDescs[second.dim].replace('偏好','同时具备').replace('善于','同时具备') + '。';
+
+  if (third && third.score >= 40) {
+    analysis += '第三维度 <b>' + d3 + '（' + third.dim + '）</b>也有一定倾向，说明' + dimDescs[third.dim].replace('偏好','在某些场景下也') + '。';
+  }
+
+  analysis += '<br><br><b>适合方向：</b>三码组合 <b>' + code + '</b>（' + typeName + '）暗示该学生适合从事与 "' + d1 + '、' + d2 + '、' + d3 + '" 相关的职业领域，可重点考虑融合这些特质的工作。';
+
+  return analysis;
+}
+
+function showHollandAnalysis(code, idx) {
+  if (!code || code.length !== 3) return;
+
+  // Find the item from filtered data
+  var kw = (document.getElementById("searchInput").value || "").toLowerCase();
+  var cf = document.getElementById("classFilter").value;
+  var tf = document.getElementById("testFilter").value;
+  var filtered = allData.filter(function(item) {
+    var mk = !kw || (item.name||"").toLowerCase().indexOf(kw)>=0 ||
+      (item.school||"").toLowerCase().indexOf(kw)>=0 ||
+      (item.student_id||"").toLowerCase().indexOf(kw)>=0 ||
+      (item.class_name||"").toLowerCase().indexOf(kw)>=0;
+    var mc = !cf || item.class_name === cf;
+    var mt = !tf || item.test_type === tf;
+    return mk && mc && mt;
+  });
+  var item = filtered[idx];
+  if (!item) return;
+
+  var typeNames = getHollandTypeNames();
+  var typeName = typeNames[code] || '综合型';
+  var dimDescs = getHollandDimDescs();
+  var dimNames = {R:'现实型',I:'研究型',A:'艺术型',S:'社会型',E:'企业型',C:'常规型'};
+  var dimColors = {R:'#10B981',I:'#3B82F6',A:'#8B5CF6',S:'#F59E0B',E:'#EF4444',C:'#14B8A6'};
+
+  // Build sorted scores from item data
+  var sorted = [];
+  if (item.scores && typeof item.scores === 'object') {
+    var info = TEST_INFO.holland || { dims: ['R','I','A','S','E','C'], dimNames: {R:'现实型',I:'研究型',A:'艺术型',S:'社会型',E:'企业型',C:'常规型'} };
+    sorted = info.dims.map(function(d) { return {dim:d, score:item.scores[d]||0}; }).sort(function(a,b){ return b.score - a.score; });
+  }
+
+  var top3 = sorted.slice(0,3);
+
+  var analysisText = getHollandAnalysisText(code, sorted);
+
+  // Build top 3 pills
+  var pillsHtml = top3.map(function(e) {
+    return '<div class="ha-hero-pill" style="background:'+dimColors[e.dim]+'15;color:'+dimColors[e.dim]+';border:1.5px solid '+dimColors[e.dim]+'40">'+
+      '<span class="ha-hero-pill-letter" style="background:'+dimColors[e.dim]+'">'+e.dim+'</span>'+
+      '<span>'+dimNames[e.dim]+' '+e.score+'%</span>'+
+    '</div>';
+  }).join('');
+
+  // Build dim analysis list
+  var dimListHtml = '<div class="ha-dim-list">'+
+    sorted.map(function(e) {
+      return '<div class="ha-dim-item">'+
+        '<span class="ha-dim-tag" style="background:'+dimColors[e.dim]+'20;color:'+dimColors[e.dim]+'">'+dimNames[e.dim]+' '+e.dim+'</span>'+
+        '<span class="ha-dim-desc">'+dimDescs[e.dim]+'。得分 '+e.score+'%，'+(e.score>=50?'属于优势领域':'相对较弱')+'。</span>'+
+      '</div>';
+    }).join('')+
+  '</div>';
+
+  document.getElementById("hollandModalBody").innerHTML =
+    '<div class="ha-hero">'+
+      '<div class="ha-hero-code">'+code+'</div>'+
+      '<div class="ha-hero-type">'+typeName+'</div>'+
+      '<div class="ha-hero-pills">'+pillsHtml+'</div>'+
+    '</div>'+
+    '<div style="padding:16px 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border);">'+
+      '<div class="ha-analysis">'+analysisText+'</div>'+
+    '</div>'+
+    '<div style="margin-top:16px;">'+
+      '<div style="font-size:14px;font-weight:700;margin-bottom:12px;">📊 六维分析</div>'+dimListHtml+
+    '</div>';
+
+  document.getElementById("hollandModal").classList.add("show");
+}
+
+function closeHollandModal() {
+  document.getElementById("hollandModal").classList.remove("show");
 }
 
 async function confirmDelete(id) {
