@@ -42,9 +42,19 @@ CREATE TABLE IF NOT EXISTS appointments (
   teacher_response TEXT DEFAULT '',
   consultation_notes TEXT DEFAULT '',
   student_rating INTEGER DEFAULT 0,
+  feedback_tags JSONB DEFAULT '[]',
+  feedback_text TEXT DEFAULT '',
+  feedback_at TIMESTAMPTZ,
+  has_feedback BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- 预约表反馈字段扩展（兼容已创建的旧表）
+ALTER TABLE appointments ADD COLUMN IF NOT EXISTS feedback_tags JSONB DEFAULT '[]';
+ALTER TABLE appointments ADD COLUMN IF NOT EXISTS feedback_text TEXT DEFAULT '';
+ALTER TABLE appointments ADD COLUMN IF NOT EXISTS feedback_at TIMESTAMPTZ;
+ALTER TABLE appointments ADD COLUMN IF NOT EXISTS has_feedback BOOLEAN DEFAULT FALSE;
 
 -- 3. 测评报告导出记录
 CREATE TABLE IF NOT EXISTS report_exports (
