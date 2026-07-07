@@ -653,22 +653,15 @@
 
       <!-- Date -->
       <div class="section-label">选择时间</div>
-      <div class="flow-card" style="padding:14px 16px;">
+      <div id="scheduleNotice" style="display:none; padding:12px 16px; background:#FEF3C7; border-radius:12px; margin-bottom:12px; font-size:13px; color:#92400e; text-align:center;"></div>
+      <div id="timeSection" class="flow-card" style="padding:14px 16px;">
         <div id="dateChipsContainer" style="display:flex; gap:8px; overflow-x:auto; padding-bottom:2px; margin-bottom:12px;">
           <!-- JS 动态生成从今天起10天 -->
         </div>
-        <div class="time-grid">
-          <div class="time-slot selected" onclick="selectTime('09:00', this)">09:00</div>
-          <div class="time-slot" onclick="selectTime('10:00', this)">10:00</div>
-          <div class="time-slot unavailable">11:00</div>
-          <div class="time-slot" onclick="selectTime('14:00', this)">14:00</div>
-          <div class="time-slot" onclick="selectTime('15:00', this)">15:00</div>
-          <div class="time-slot unavailable">16:00</div>
-          <div class="time-slot" onclick="selectTime('19:00', this)">19:00</div>
-          <div class="time-slot" onclick="selectTime('20:00', this)">20:00</div>
-          <div class="time-slot" onclick="selectTime('21:00', this)">21:00</div>
+        <div id="timeGridContainer" class="time-grid">
+          <!-- JS 动态生成可用时间段 -->
         </div>
-        <div style="margin-top:8px; font-size:11px; color:var(--text-light); text-align:center;">灰色时段已约满 · 每次咨询约60分钟</div>
+        <div style="margin-top:8px; font-size:11px; color:var(--text-light); text-align:center;">灰色时段不在导师可预约范围 · 每次咨询约60分钟</div>
       </div>
     </div>
     <div class="bottom-cta">
@@ -1076,6 +1069,9 @@ var selectedTime = '09:00'; // 默认选中第一个时间槽
 var currentRating = 0;
 var currentAppointmentNo = null;
 var currentAppointmentData = null;
+var mentorScheduleSlots = [];  // 当前导师的时间表
+var mentorAccepting = true;    // 当前导师是否接受预约
+var mentorClosedMsg = '';      // 关闭预约时的提示
 
 var MENTOR_DATA = {
   hexia:       { name:'何霞', title:'企业管理教授 · 广东省就业特色示范课负责人', bio:'擅长领域：职业定位 / 优势萃取' },
@@ -1109,6 +1105,8 @@ function selectMentor(id, el) {
   document.querySelectorAll('.mentor-pick-card').forEach(function(c) { c.classList.remove('selected'); });
   el.classList.add('selected');
   selectedMentor = id;
+  // 加载该导师的时间表和预约开关
+  loadMentorSchedule(id);
   checkStep1Ready();
 }
 
@@ -1127,6 +1125,8 @@ function selectDate(d, el) {
   el.style.background = 'var(--primary)';
   el.style.color = '#fff';
   selectedDate = d;
+  selectedTime = null; // 重置时间选择
+  renderTimeSlotsForDate(d); // 重新渲染该日期的时间槽
   checkStep1Ready();
 }
 
@@ -1144,6 +1144,18 @@ function initDateChips() {
   var days = ['周日','周一','周二','周三','周四','周五','周六'];
   var today = new Date();
   var html = '';
+  var firstAvailableIdx = -1;
+
+  // 先检查哪些日期有可用时间段
+  for (var i = 0; i < 10; i++) {
+    var d = new Date(today);
+    d.setDate(today.getDate() + i);
+    var dayOfWeek = d.getDay();
+    var hasSlots = getAvailableSlotsForDay(dayOfWeek).length > 0;
+    if (hasSlots && firstAvailableIdx < 0) firstAvailableIdx = i;
+  }
+  if (firstAvailableIdx < 0) firstAvailableIdx = 0; // fallback
+
   for (var i = 0; i < 10; i++) {
     var d = new Date(today);
     d.setDate(today.getDate() + i);
@@ -1151,8 +1163,9 @@ function initDateChips() {
     var dd = String(d.getDate()).padStart(2, '0');
     var val = mm + '-' + dd;
     var display = mm + '/' + dd;
-    var dayName = days[d.getDay()];
-    var isActive = i === 0;
+    var dayOfWeek = d.getDay();
+    var dayName = days[dayOfWeek];
+    var isActive = i === firstAvailableIdx;
     var bg = isActive ? 'var(--primary)' : '#F3F4F6';
     var color = isActive ? '#fff' : 'var(--text-secondary)';
     var opacity = isActive ? 'opacity:0.8;' : '';
@@ -1160,7 +1173,127 @@ function initDateChips() {
             '<div style="font-weight:600;">' + display + '</div><div style="font-size:10px;' + opacity + '">' + dayName + '</div></div>';
   }
   container.innerHTML = html;
-  selectedDate = String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+
+  // 设置默认日期为第一个有可用时段的日期
+  var d = new Date(today);
+  d.setDate(today.getDate() + firstAvailableIdx);
+  selectedDate = String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+
+  // 渲染对应日期的时间槽
+  renderTimeSlotsForDate(selectedDate);
+}
+
+// 获取某个星期几的可用时间段
+function getAvailableSlotsForDay(dayOfWeek) {
+  if (!mentorScheduleSlots || mentorScheduleSlots.length === 0) {
+    // 如果导师没有设定时间表，使用默认时段
+    var defaultSlots = [
+      { day_of_week: 1, start_time: '09:00', end_time: '21:00' },
+      { day_of_week: 2, start_time: '09:00', end_time: '21:00' },
+      { day_of_week: 3, start_time: '09:00', end_time: '21:00' },
+      { day_of_week: 4, start_time: '09:00', end_time: '21:00' },
+      { day_of_week: 5, start_time: '09:00', end_time: '21:00' }
+    ];
+    return defaultSlots.filter(function(s) { return s.day_of_week === dayOfWeek; });
+  }
+  return mentorScheduleSlots.filter(function(s) { return s.day_of_week === dayOfWeek; });
+}
+
+// 将时间范围拆成每小时一个时间段
+function expandSlotsToTimeSlots(slots) {
+  var result = [];
+  slots.forEach(function(slot) {
+    var startH = parseInt(slot.start_time.split(':')[0]);
+    var endH = parseInt(slot.end_time.split(':')[0]);
+    for (var h = startH; h < endH; h++) {
+      result.push(String(h).padStart(2, '0') + ':00');
+    }
+  });
+  return result;
+}
+
+// 为选中的日期渲染时间槽
+function renderTimeSlotsForDate(dateStr) {
+  var container = document.getElementById('timeGridContainer');
+  if (!container) return;
+
+  // 从日期字符串算出星期几
+  var now = new Date();
+  var year = now.getFullYear();
+  var parts = dateStr.split('-');
+  var month = parseInt(parts[0]) - 1;
+  var day = parseInt(parts[1]);
+  var dateObj = new Date(year, month, day);
+  var dayOfWeek = dateObj.getDay();
+
+  var availableSlots = getAvailableSlotsForDay(dayOfWeek);
+  var availableTimes = expandSlotsToTimeSlots(availableSlots);
+
+  // 所有可能的整点时间（08:00 到 21:00）
+  var allTimes = [];
+  for (var h = 8; h <= 21; h++) {
+    allTimes.push(String(h).padStart(2, '0') + ':00');
+  }
+
+  var html = '';
+  var firstAvailableTime = null;
+  allTimes.forEach(function(t) {
+    var isAvailable = availableTimes.indexOf(t) >= 0;
+    if (isAvailable && !firstAvailableTime) firstAvailableTime = t;
+    if (isAvailable) {
+      var isSelected = t === (selectedTime || firstAvailableTime);
+      html += '<div class="time-slot' + (isSelected ? ' selected' : '') + '" onclick="selectTime(\'' + t + '\', this)">' + t + '</div>';
+    } else {
+      html += '<div class="time-slot unavailable">' + t + '</div>';
+    }
+  });
+
+  container.innerHTML = html;
+
+  // 自动选中第一个可用时间
+  if (firstAvailableTime && !selectedTime) {
+    selectedTime = firstAvailableTime;
+  }
+}
+
+// 加载导师的时间表和预约开关
+async function loadMentorSchedule(mentorId) {
+  var noticeEl = document.getElementById('scheduleNotice');
+  var timeSection = document.getElementById('timeSection');
+
+  try {
+    // 加载预约开关
+    var settings = await getMentorSettings(mentorId);
+    mentorAccepting = settings.accepting_appointments;
+    mentorClosedMsg = settings.closed_message || '';
+
+    if (!mentorAccepting) {
+      // 导师暂停预约
+      noticeEl.style.display = 'block';
+      noticeEl.textContent = '🔒 ' + mentorClosedMsg;
+      timeSection.style.display = 'none';
+      selectedTime = null;
+      checkStep1Ready();
+      return;
+    }
+
+    noticeEl.style.display = 'none';
+    timeSection.style.display = 'block';
+
+    // 加载时间表
+    mentorScheduleSlots = await getMentorSchedule(mentorId);
+  } catch(err) {
+    console.error('加载导师时间表失败:', err);
+    // 降级：使用默认时间表，保持预约开放
+    mentorAccepting = true;
+    mentorScheduleSlots = [];
+    noticeEl.style.display = 'none';
+    timeSection.style.display = 'block';
+  }
+
+  // 重新初始化日期和时间
+  initDateChips();
+  checkStep1Ready();
 }
 
 function checkStep1Ready() {
