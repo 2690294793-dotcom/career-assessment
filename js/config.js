@@ -454,7 +454,7 @@ async function getMentorSettings(mentorId) {
   var local = JSON.parse(localStorage.getItem("zt_mentor_settings") || "[]");
   var found = local.find(function(s) { return s.mentor_id === mentorId; });
   if (!found) {
-    found = { mentor_id: mentorId, accepting_appointments: true, closed_message: '导师暂时不接受预约，请稍后再试' };
+    found = { mentor_id: mentorId, booking_open: true };
     local.push(found);
     localStorage.setItem("zt_mentor_settings", JSON.stringify(local));
   }
@@ -477,8 +477,7 @@ async function getAllMentorSettings() {
 async function createMentorSettings(mentorId) {
   var setting = {
     mentor_id: mentorId,
-    accepting_appointments: true,
-    closed_message: '导师暂时不接受预约，请稍后再试'
+    booking_open: true
   };
   if (db) {
     const { data, error } = await db
@@ -533,7 +532,7 @@ async function updateMentorSettings(mentorId, updates) {
   if (idx >= 0) {
     local[idx] = { ...local[idx], ...updates, updated_at: new Date().toISOString() };
   } else {
-    local.push({ mentor_id: mentorId, accepting_appointments: true, closed_message: '导师暂时不接受预约，请稍后再试', ...updates, updated_at: new Date().toISOString() });
+    local.push({ mentor_id: mentorId, booking_open: true, ...updates, updated_at: new Date().toISOString() });
   }
   localStorage.setItem("zt_mentor_settings", JSON.stringify(local));
   return local[idx >= 0 ? idx : local.length - 1];
