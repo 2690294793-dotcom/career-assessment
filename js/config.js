@@ -274,6 +274,48 @@ async function getAppointmentByNo(appointmentNo) {
   return local.find(function(a) { return a.appointment_no === appointmentNo; }) || null;
 }
 
+// 保存学生反馈（在 consult-flow.html 或我的预约中调用）
+async function saveFeedback(appointmentNo, feedback) {
+  feedback = feedback || {};
+  if (!appointmentNo) {
+    throw new Error('缺少预约编号');
+  }
+  const payload = {
+    student_rating: feedback.rating || 0,
+    feedback_tags: Array.isArray(feedback.tags) ? feedback.tags : [],
+    feedback_text: feedback.text || '',
+    feedback_at: new Date().toISOString(),
+    has_feedback: true,
+    updated_at: new Date().toISOString()
+  };
+
+  if (db) {
+    try {
+      const { data, error } = await db
+        .from("appointments")
+        .update(payload)
+        .eq("appointment_no", appointmentNo)
+        .select();
+      if (error) throw error;
+      console.log("[Supabase] 反馈已保存:", appointmentNo);
+      return data[0];
+    } catch(e) {
+      console.error("[Supabase] 反馈保存失败，降级到本地:", e.message);
+    }
+  }
+
+  // 本地降级
+  var local = JSON.parse(localStorage.getItem("zt_appointments") || "[]");
+  var idx = local.findIndex(function(a) { return a.appointment_no === appointmentNo; });
+  if (idx < 0) {
+    throw new Error('未找到本地预约记录：' + appointmentNo);
+  }
+  local[idx] = { ...local[idx], ...payload };
+  localStorage.setItem("zt_appointments", JSON.stringify(local));
+  console.log("[本地] 反馈已保存:", appointmentNo);
+  return local[idx];
+}
+
 // 删除预约
 async function deleteAppointment(id) {
   if (db) {
