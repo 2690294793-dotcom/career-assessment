@@ -379,7 +379,7 @@ async function getMentorSchedule(mentorId) {
       .from("mentor_schedule")
       .select("*")
       .eq("mentor_id", mentorId)
-      .order("day_of_week", { ascending: true });
+      .order("specific_date", { ascending: true });
     if (error) throw error;
     return data;
   }
@@ -497,35 +497,28 @@ async function createMentorSettings(mentorId) {
 // 更新导师预约开关（不存在则自动创建）
 async function updateMentorSettings(mentorId, updates) {
   if (db) {
-    // 先查询记录是否存在
-    const { data: existing, error: selectErr } = await db
-      .from("mentor_settings")
-      .select("id")
-      .eq("mentor_id", mentorId)
-      .single();
-
-    if (selectErr && selectErr.code !== 'PGRST116') throw selectErr;
-
     const payload = { ...updates, updated_at: new Date().toISOString() };
 
-    if (!existing) {
-      // 不存在则创建
-      const { data, error } = await db
-        .from("mentor_settings")
-        .insert({ ...payload, mentor_id: mentorId })
-        .select();
-      if (error) throw error;
-      return data[0];
-    }
-
-    // 存在则更新
-    const { data, error } = await db
+    // 先尝试更新，如果记录不存在则插入
+    const { data: updated, error: updateErr } = await db
       .from("mentor_settings")
       .update(payload)
       .eq("mentor_id", mentorId)
       .select();
-    if (error) throw error;
-    return data[0];
+
+    if (updateErr) throw updateErr;
+
+    // 如果没有任何行被更新，说明记录不存在，需要创建
+    if (!updated || updated.length === 0) {
+      const { data: inserted, error: insertErr } = await db
+        .from("mentor_settings")
+        .insert({ ...payload, mentor_id: mentorId })
+        .select();
+      if (insertErr) throw insertErr;
+      return inserted[0];
+    }
+
+    return updated[0];
   }
   var local = JSON.parse(localStorage.getItem("zt_mentor_settings") || "[]");
   var idx = local.findIndex(function(s) { return s.mentor_id === mentorId; });
