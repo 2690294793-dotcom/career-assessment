@@ -49,15 +49,15 @@ body {
 .page-body::-webkit-scrollbar { width: 0; }
 
 /* Header */
-.page-header { text-align: center; padding: 6px 0 4px; }
+.page-header { text-align: center; padding: 8px 0 10px; }
 .page-title { font-size: 18px; font-weight: 800; color: var(--text-primary); }
-.page-subtitle { font-size: 11px; color: var(--text-secondary); margin-top: 1px; }
+.page-subtitle { font-size: 12px; color: var(--text-secondary); margin-top: 2px; font-weight: 500; }
 
 /* Progress */
-.prog-wrap { margin-bottom: 2px; }
-.prog-info { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; }
-.prog-bar { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
-.prog-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--accent)); border-radius: 3px; transition: width 0.4s; }
+.prog-wrap { margin-bottom: 10px; }
+.prog-info { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-secondary); margin-bottom: 4px; font-weight: 500; }
+.prog-bar { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+.prog-fill { height: 100%; background: var(--primary); border-radius: 2px; transition: width 0.4s ease; }
 
 /* ====== SELECTION SCREEN ====== */
 .select-wrap {
@@ -115,9 +115,10 @@ body {
   background: var(--primary-light); margin-bottom: 8px;
 }
 .q-card {
-  background: var(--card); border-radius: var(--radius-md); padding: 22px 18px;
+  background: var(--card); border-radius: var(--radius-md); padding: 28px 20px 20px;
   box-shadow: 0 2px 12px rgba(0,0,0,0.05);
   transition: opacity 0.25s ease, transform 0.25s ease;
+  text-align: center;
 }
 .q-card.enter { animation: slideEnter 0.3s ease forwards; }
 .q-card.exit  { animation: slideExit 0.2s ease forwards; }
@@ -129,44 +130,79 @@ body {
   from { opacity: 1; transform: translateX(0); }
   to   { opacity: 0; transform: translateX(-24px); }
 }
-.q-num { font-size: 12px; color: var(--accent); font-weight: 700; margin-bottom: 10px; }
-.q-text { font-size: 16px; color: var(--text-primary); font-weight: 600; line-height: 1.7; margin-bottom: 20px; }
-.q-options { display: flex; flex-direction: column; gap: 10px; }
+.q-num { display: none; }
+.q-text { font-size: 18px; color: var(--text-primary); font-weight: 700; line-height: 1.6; margin-bottom: 32px; padding: 0 4px; }
+/* 7-point horizontal circle scale — 16personalities style */
+.q-options {
+  display: flex; flex-direction: row; justify-content: space-between; align-items: center;
+  gap: 4px; padding: 0 8px; margin-bottom: 4px;
+}
 .q-opt {
-  display: flex; align-items: center; gap: 12px;
-  padding: 14px 16px;
-  border: 2px solid var(--border);
-  border-radius: var(--radius-sm);
-  cursor: pointer; transition: all 0.2s;
-  font-size: 14px; color: var(--text-secondary);
-  background: var(--card);
+  display: flex; flex-direction: column; align-items: center; gap: 0;
+  cursor: pointer; transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent; user-select: none;
+  flex: 1; min-width: 0;
 }
-.q-opt:active { transform: scale(0.98); }
-.q-opt.sel {
-  border-color: var(--primary); background: var(--primary-light);
-  color: var(--primary); font-weight: 600;
+.q-opt:active .q-bubble { transform: scale(1.15); }
+.q-bubble {
+  width: 28px; height: 28px; border-radius: 50%;
+  transition: all 0.25s ease;
+  cursor: pointer;
 }
-.q-radio {
-  width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--border);
-  flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+.q-opt.sel .q-bubble { box-shadow: 0 0 0 4px #fff, 0 0 0 7px rgba(0,0,0,0.15); }
+.q-opt.sel.l0 .q-bubble { box-shadow: 0 0 0 4px #fff, 0 0 0 7px rgba(239,68,68,0.4); }
+.q-opt.sel.l1 .q-bubble { box-shadow: 0 0 0 4px #fff, 0 0 0 7px rgba(248,113,113,0.4); }
+.q-opt.sel.l2 .q-bubble { box-shadow: 0 0 0 4px #fff, 0 0 0 7px rgba(252,165,165,0.4); }
+.q-opt.sel.l3 .q-bubble { box-shadow: 0 0 0 4px #fff, 0 0 0 7px rgba(209,213,219,0.5); }
+.q-opt.sel.l4 .q-bubble { box-shadow: 0 0 0 4px #fff, 0 0 0 7px rgba(134,239,172,0.4); }
+.q-opt.sel.l5 .q-bubble { box-shadow: 0 0 0 4px #fff, 0 0 0 7px rgba(74,222,128,0.4); }
+.q-opt.sel.l6 .q-bubble { box-shadow: 0 0 0 4px #fff, 0 0 0 7px rgba(34,197,94,0.4); }
+.q-opt-label {
+  font-size: 10px; color: var(--text-secondary); margin-top: 8px;
+  text-align: center; white-space: nowrap; transition: color 0.2s;
+  font-weight: 500;
+}
+.q-opt.sel .q-opt-label { color: var(--text-primary); font-weight: 700; }
+/* bubble colors — 7 levels: red(disagree) → gray(neutral) → green(agree) */
+.q-opt.l0 .q-bubble { background: #EF4444; width:38px; height:38px; }  /* 非常不同意 - largest red */
+.q-opt.l1 .q-bubble { background: #F87171; width:34px; height:34px; }  /* 不同意 */
+.q-opt.l2 .q-bubble { background: #FCA5A5; width:30px; height:30px; }  /* 有点不同意 */
+.q-opt.l3 .q-bubble { background: #D1D5DB; width:26px; height:26px; }  /* 中立 - smallest gray */
+.q-opt.l4 .q-bubble { background: #86EFAC; width:30px; height:30px; }  /* 有点同意 */
+.q-opt.l5 .q-bubble { background: #4ADE80; width:34px; height:34px; }  /* 同意 */
+.q-opt.l6 .q-bubble { background: #22C55E; width:38px; height:38px; }  /* 非常同意 - largest green */
+/* Unselected = slightly muted */
+.q-opt:not(.sel).l0 .q-bubble { opacity:0.55; }
+.q-opt:not(.sel).l1 .q-bubble { opacity:0.50; }
+.q-opt:not(.sel).l2 .q-bubble { opacity:0.45; }
+.q-opt:not(.sel).l3 .q-bubble { opacity:0.40; }
+.q-opt:not(.sel).l4 .q-bubble { opacity:0.45; }
+.q-opt:not(.sel).l5 .q-bubble { opacity:0.50; }
+.q-opt:not(.sel).l6 .q-bubble { opacity:0.55; }
+/* Scale ends labels */
+.q-scale-labels {
+  display: flex; justify-content: space-between; padding: 0 8px;
+  font-size: 11px; color: var(--text-light);
+}
+.q-scale-labels span:first-child { color: #EF4444; }
+.q-scale-labels span:last-child { color: #22C55E; }
+.q-radio { display: none; }
+
+.q-nav-row { display: flex; gap: 10px; align-items: center; margin-top: 20px; }
+.btn-back {
+  flex: 0 0 auto; padding: 10px 18px; border-radius: 20px;
+  font-size: 13px; font-weight: 600; border: none;
+  background: var(--bg); color: var(--text-secondary); cursor: pointer;
   transition: all 0.2s;
 }
-.q-opt.sel .q-radio { border-color: var(--primary); background: var(--primary); }
-.q-opt.sel .q-radio::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #fff; }
-
-.q-nav-row { display: flex; gap: 10px; align-items: center; }
-.btn-back {
-  flex: 0 0 auto; padding: 12px 20px; border-radius: 24px;
-  font-size: 14px; font-weight: 600; border: 1.5px solid var(--border);
-  background: var(--card); color: var(--text-secondary); cursor: pointer;
-}
+.btn-back:hover { background: var(--border); }
 .q-indicator {
   flex: 1; text-align: center; font-size: 12px; color: var(--text-light);
-  display: flex; align-items: center; justify-content: center; gap: 4px;
+  display: flex; align-items: center; justify-content: center; gap: 4px; flex-wrap: wrap;
 }
-.q-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--border); }
+.q-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--border); transition: all 0.25s; }
 .q-dot.done { background: var(--primary); }
-.q-dot.current { width: 8px; height: 8px; background: var(--primary); box-shadow: 0 0 0 3px rgba(99,102,241,0.2); }
+.q-dot.current { width: 8px; height: 8px; background: var(--primary); box-shadow: 0 0 0 3px rgba(99,102,241,0.25); }
 
 /* ====== RESULTS ====== */
 .result-hero {
@@ -713,7 +749,8 @@ var TESTS = {
 // ============================================================
 //  ANSWER OPTIONS
 // ============================================================
-var ANSWER_OPTS = ['完全不符合','不太符合','一般','比较符合','完全符合'];
+var ANSWER_OPTS = ['非常不同意','不同意','有点不同意','中立','有点同意','同意','非常同意'];
+var ANSWER_SHORT = ['非常不同意','','','中立','','','非常同意'];
 
 // ============================================================
 //  RENDER: STUDENT INFO FORM
@@ -851,8 +888,9 @@ function renderQuestion(animate) {
   var body = document.getElementById('pageBody');
 
   var optsHtml = ANSWER_OPTS.map(function(t, i) {
-    return '<div class="q-opt'+(selected===i?' sel':'')+'" onclick="selectAnswer('+i+')">'+
-      '<div class="q-radio"></div><span>'+t+'</span></div>';
+    return '<div class="q-opt l'+i+(selected===i?' sel':'')+'" onclick="selectAnswer('+i+')">'+
+      '<div class="q-bubble"></div>'+
+      '<span class="q-opt-label">'+(ANSWER_SHORT[i] || t)+'</span></div>';
   }).join('');
 
   // Dot indicators
@@ -880,6 +918,7 @@ function renderQuestion(animate) {
       '<div class="q-num">Q'+(state.currentQ+1)+'</div>'+
       '<div class="q-text">'+q.q+'</div>'+
       '<div class="q-options" id="optsWrap">'+optsHtml+'</div>'+
+      '<div class="q-scale-labels"><span>非常不同意</span><span style="color:#9CA3AF;">中立</span><span>非常同意</span></div>'+
     '</div>'+
     '<div class="q-nav-row">'+
       (state.currentQ>0 ? '<button class="btn-back" onclick="prevQ()">← 上一题</button>' : '<div></div>')+
@@ -1011,10 +1050,10 @@ function calcResults() {
   test.dimensions.forEach(function(d) { scores[d]=0; counts[d]=0; });
 
   test.questions.forEach(function(q, i) {
-    var rawScore = state.answers[i] !== undefined ? state.answers[i] : 2;
+    var rawScore = state.answers[i] !== undefined ? state.answers[i] : 3;
     // Handle reverse items
     if (test.reverseItems.indexOf(i) !== -1) {
-      rawScore = 4 - rawScore;
+      rawScore = 6 - rawScore;
     }
     scores[q.dim] += rawScore;
     counts[q.dim] += 1;
@@ -1023,7 +1062,7 @@ function calcResults() {
   // Normalize to 0-100%
   var maxScore = {};
   test.dimensions.forEach(function(d) {
-    maxScore[d] = Math.round((scores[d] / (counts[d] * 4)) * 100);
+    maxScore[d] = Math.round((scores[d] / (counts[d] * 6)) * 100);
   });
 
   state.scores = maxScore;
