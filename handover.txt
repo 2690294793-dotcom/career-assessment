@@ -1,197 +1,175 @@
-自在生涯工作室 前端项目交接文档
+自在生涯工作室 前端项目交接文档（2026-07-07 19:48 版）
 
 
 一、项目完整本地根目录路径
 
-C:\Users\Lenovo\WorkBuddy\2026-07-03-22-40-27\
+C:\Users\Lenovo\WorkBuddy\2026-07-06-19-13-36\
 
 
-二、前端整体项目架构
+二、GitHub 仓库与线上地址
 
-本项目为纯前端多页面应用，无构建工具，无框架依赖，所有页面均为独立的HTML文件，内联CSS和JavaScript，通过浏览器直接打开即可运行。数据层采用Supabase云数据库与localStorage本地存储双轨制，Supabase不可用时自动降级到本地存储。
-
-整体架构分为三层：
-页面层：根目录下所有HTML文件，每个文件包含完整的页面结构、内联样式和内联脚本，页面间通过window.location.href跳转，通过URL参数传递数据。
-逻辑层：js目录下的JavaScript文件，提供数据库配置、预设数据和端侧逻辑。
-资源层：css目录提供全局共享样式，img目录提供图片资源。
-
-css文件夹作用：
-存放全局共享样式文件style.css，定义了CSS变量体系（颜色、圆角、阴影）、基础重置样式和通用组件类。但实际开发中，各HTML页面主要使用内联style标签，该文件作为样式参考和共享基础，未被所有页面广泛引用。
-
-js文件夹作用：
-config.js：Supabase数据库统一配置文件，包含SUPABASE_URL、SUPABASE_KEY常量，initSupabase()初始化函数，以及saveSubmission()、getAllSubmissions()、createAppointment()、getAppointments()、updateAppointmentStatus()、saveConsultationNotes()、getMyAppointments()、subscribeAppointments()等数据库操作函数。学校名固定为广州职业技术大学（SCHOOL_NAMES常量）。支持本地降级，当db对象为null时使用localStorage。
-articles-data.js：资讯文章预设数据，PRESET_ARTICLES数组存储26篇爬取的公众号文章，作为Supabase文章表的数据兜底。
-student.js：学生端逻辑脚本，定义霍兰德职业兴趣类型常量CAREER_TYPES，包含R/I/A/S/E/C六种类型的描述和推荐职业。
-teacher.js：教师端逻辑脚本，定义教师密码TEACHER_PASSWORD和测评信息TEST_INFO，包含登录、数据加载、表格渲染、CSV导出等功能。
-
-img文件夹作用：
-存放项目所有图片资源，分为两类：
-文章分类封面图5张：cover-books.png（读书）、cover-campus.png（校园）、cover-career-ai.png（AI职场）、cover-tech-jobs.png（科技就业）、cover-workshop.png（工作坊）。
-咨询师头像5张：mentor-gongjingxian.jpg（龚静娴）、mentor-hexia.jpg（何夏）、mentor-huangjieqi.jpg（黄杰淇）、mentor-panwenhao.jpg（潘文豪）、mentor-wanglina.png（王丽娜）。
+仓库：2690294793-dotcom/career-assessment
+线上：https://2690294793-dotcom.github.io/career-assessment/
+推送方式：GitHub Contents API（国内 git push 不稳定），需用户提供 Personal Access Token（fine-grained，勾选 Contents Read and Write），用完即删。
 
 
-三、所有页面文件功能说明
+三、Supabase 配置
 
-index.html（29.4KB）
-项目首页，页面标题为自在生涯工作室。采用SVG六边形星图作为主导航，点击各六边形进入对应功能页。包含requireLogin()登录拦截机制，未登录用户点击功能按钮时跳转login.html。包含checkLoginState()检测登录状态并更新顶部用户信息，logoutApp()退出登录。页面顶部有学生端和教师端切换toggle。底部导航栏包含五个入口：首页、测评、咨询、目标、我的。页面采用手机框架设计（390x844px），居中显示。
+URL：https://nipkszvyehgjnufvqjnf.supabase.co
+Anon Key：eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5pcGtzenZ5ZWhnam51ZnZxam5mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxNTU5NjQsImV4cCI6MjA5ODczMTk2NH0.qvRsX3gaxxznF8dXOgfJyKYSCEsdyb12WQXpGWjR8Vc
 
-login.html（7.8KB）
-登录页，采用微信快捷登录风格。doQuickLogin()检查localStorage中是否已有登录信息（app_user_info），已有则直接跳转回上一页，首次登录显示simpleForm弹窗要求填写姓名和学号，学校固定为广州职业技术大学且只读。doSimpleLogin()将用户信息保存到localStorage并跳转。goBack()返回上一页。
+表结构：
+- submissions：测评提交记录
+- appointments：预约信息（含 feedback_tags/feedback_text/feedback_at/has_feedback）
+- mentor_schedule：导师可预约时间段（specific_date DATE + start_time/end_time）
+- mentor_settings：预约开关（仅 booking_open BOOLEAN）
+- articles：文章信息
 
-profile.html（19.8KB）
-完善个人资料页，包含基本信息（姓名、学号必填，学校固定只读）、教育经历（可添加多条，含学校、专业、学历、起止年份）、工作经历（可添加多条，含公司、职位、起止日期、描述）、项目经历（可添加多条，含名称、角色、链接、描述）。数据存储在localStorage的resumeData键。loadData()加载已有数据，saveData()实时保存，saveAll()保存并返回。各模块支持折叠展开（toggleCard），支持动态增删条目。esc()函数做XSS防护。
-
-resume.html（34.9KB）
-我的页面，顶部显示头像和姓名，提供完善个人资料入口。下方菜单列表包含三个子页面：我的预约、我的测评、我的规划方案。init()初始化页面，applyLoginState()应用登录状态，doLogout()退出登录。loadAppointmentHistory()从Supabase加载预约历史记录并渲染，loadMyAssessments()从localStorage加载测评记录，loadMyPlans()从localStorage加载规划方案。预约列表支持展开详情（toggleAptDetail），有自动刷新机制（startAptAutoRefresh/stopAptAutoRefresh）。
-
-about.html（7.3KB）
-关于我们页，包含平台简介、核心功能网格展示（测评、咨询、资讯、目标四大功能）、特色介绍、导师团队展示。
-
-assessment.html（85.2KB）
-职业兴趣测评页，包含四种测评：霍兰德职业兴趣测评、MBTI性格测评、大五人格测评、DISC行为风格测评。引入Chart.js绘制雷达图，引入html2canvas支持报告导出。renderSelect()渲染测评选择界面，startTest()开始测评，renderQuestion()渲染题目，selectAnswer()选择答案，calcResults()计算结果。结果渲染函数：renderBigFive()、renderHolland()、renderDisc()、renderMbti()。支持学校验证码解锁完整报告（renderSchoolGate/verifySchoolCode），未验证时显示部分报告（renderPartialReport）。exportReport()导出报告为图片，submitToSupabase()将结果提交到数据库。测评结果同时保存到localStorage。
-
-consult-flow.html（62.2KB）
-预约咨询流程页，采用多步骤分页设计。步骤一选择咨询师（selectMentor），步骤二选择咨询类型（selectType），步骤三选择日期和时间（initDateChips动态生成未来7天日期，selectDate/selectTime），步骤四填写确认信息（populateConfirm，prefillStudentInfo自动填充已登录学生信息），submitConsultForm()异步提交到Supabase。提交成功后进入反馈评价页（setRating评分、toggleTag选择标签、submitFeedback提交反馈），支持下载报告（downloadReport）和分享报告（shareReport）。表单验证包含showError/clearFormErrors。
-
-articles.html（21KB）
-资讯中心页，loadArticles()加载文章，优先从Supabase加载（loadFromSupabaseAsync），失败则使用预设数据兜底（loadFromPreset）。parseSupabaseArticle()解析数据库记录。支持搜索（highlightText关键词高亮）、分类过滤、文章详情弹窗（openDetail/closeDetail）。renderArticles()渲染文章列表。页面顶部有阅读进度条。引入js/config.js和js/articles-data.js。
-
-goals.html（23.3KB）
-目标进度页，数据存储在localStorage的career_goals_v2键。loadGoals()加载目标，saveGoals()保存。支持添加目标（toggleAdd/addGoal，含目标名称、描述、截止日期）、添加子步骤（addStep）、勾选完成子步骤（toggleStep，自动计算进度calcProgress）、标记目标完成（markDone）、删除目标/步骤（deleteGoal/deleteStep）。render()渲染所有目标卡片，renderGoalCard()渲染单个卡片含进度条。支持折叠展开步骤（toggleSteps）。
-
-teacher.html（51.8KB）
-教师端管理页面，采用桌面布局（非手机框架），max-width 1200px。doLogin()使用密码登录（teacher123），showDashboard()显示管理面板。包含三个标签页：测评管理（loadAssessments加载、renderStats统计、renderClassFilter班级过滤、renderTable表格渲染、filterTable筛选、showDetail详情弹窗、exportCSV导出）、预约管理（loadAppointments加载、renderAptStats统计、filterAppointments按状态筛选、renderAppointments渲染、handleAppointment审批、saveNotes咨询记录、handleDeleteApt删除）、咨询记录（loadRecords）。startRealtimeSubscription()订阅Supabase实时更新，playNotification()新预约提示音。
-
-resume-templates.html（49.4KB）
-规划方案生成页，generatePlan()根据用户输入生成个性化职业规划方案，renderPlan()渲染方案内容（renderSection渲染各模块）。regenerate()重新生成，savePlan()保存到localStorage，getSavedPlans()获取已保存方案，renderSavedPlans()渲染列表，viewSavedPlan()查看详情，deletePlan()删除。采用手机框架设计，紫色系配色。
-
-setup-guide.html（10.3KB）
-Supabase部署图文教程，指导用户完成Supabase项目创建、数据库表创建、RLS策略配置、密钥填写等步骤。
-
-database.sql（4.6KB）
-Supabase建表脚本，包含三张表：submissions（提交记录表，存储测评结果和表单数据）、appointments（预约表，存储咨询预约信息）、report_exports（报告导出记录表）。包含RLS行级安全策略、索引、updated_at自动更新触发器。
+RLS 策略：appointments 有 SELECT/INSERT/DELETE；mentor_schedule/mentor_settings 有 SELECT/INSERT/DELETE。
 
 
-四、禁止修改的文件、模块清单
+四、前端整体项目架构
 
-以下文件为核心基础设施，禁止修改其结构和逻辑，仅允许在明确需要时追加新函数或新常量，不得删除或重写已有内容：
+纯前端多页面应用，无构建工具，无框架依赖，所有页面为独立 HTML 文件，内联 CSS 和 JavaScript。数据层采用 Supabase 云数据库 + localStorage 本地存储双轨制，Supabase 不可用时自动降级到 localStorage。
 
-js/config.js
-Supabase数据库统一配置文件，所有数据库连接和操作函数的入口。修改将影响全站数据层。
+三层架构：
+- 页面层：根目录下所有 HTML 文件，页面间通过 window.location.href 跳转，URL 参数传递数据。
+- 逻辑层：js 目录下的 JavaScript 文件。
+- 资源层：css 目录提供全局样式，img 目录提供图片资源。
 
-js/articles-data.js
-预设文章数据，26篇文章内容为爬取的公众号原文，修改将导致资讯中心兜底数据异常。
+关键文件：
+- js/config.js：Supabase 配置与全部数据库操作函数（saveSubmission、getAppointments、createAppointment、saveConsultationNotes、getMentorSchedule、addScheduleSlot、deleteScheduleSlot、getMentorSettings、updateMentorSettings、saveFeedback 等）
+- js/articles-data.js：26 篇预设公众号文章，Supabase 兜底数据
+- js/student.js：霍兰德职业兴趣类型常量 CAREER_TYPES
+- js/teacher.js：教师端常量（TEACHER_PASSWORD、TEST_INFO）
+- database.sql：建表脚本与 RLS 策略
+- push-files.js：GitHub Contents API 批量推送脚本
 
-database.sql
-数据库建表脚本和RLS策略，直接对应Supabase线上数据库结构，修改需同步线上。
+img 目录：
+- 文章分类封面图 5 张：cover-books.png、cover-campus.png、cover-career-ai.png、cover-tech-jobs.png、cover-workshop.png
+- 咨询师头像 5 张：mentor-gongjingxian.jpg、mentor-hexia.jpg、mentor-huangjieqi.jpg、mentor-panwenhao.jpg、mentor-wanglina.png
+- logo.png：资讯中心 logo
+
+
+五、所有页面文件功能说明
+
+index.html
+首页，SVG 六边形导航，登录拦截 requireLogin()，学生/教师端切换 toggle，手机框架设计 390x844px。
+
+login.html
+微信快捷登录风格，首次登录填写姓名和学号，学校固定为广州职业技术大学且只读。doQuickLogin()/doSimpleLogin()。
+
+profile.html
+完善个人资料（基本信息、教育经历、工作经历、项目经历），数据存 localStorage 的 resumeData 键。
+
+resume.html
+我的页面，顶部头像和姓名，下方菜单：我的预约、我的测评、我的规划方案。预约状态为 completed 时显示「提交反馈」或「查看报告」按钮。
+
+about.html
+关于我们，平台简介与导师团队展示。
+
+assessment.html
+四种测评：霍兰德职业兴趣测评（60题，RIASEC每维度10题）、MBTI性格测评（60题，EI/SN/TF/JP每维度15题，24道反转题）、大五人格测评（OCEAN）、DISC行为风格测评。引入 Chart.js 绘制雷达图，html2canvas 支持报告导出。支持学校验证码解锁完整报告。
+注意：霍兰德和MBTI题目已于2026-07-07更新为60题版本，来源O*NET和OEJTS开源量表，但assessment.html本地修改完成尚未推送GitHub。
+
+consult-flow.html
+预约咨询流程：选导师→选类型→选日期时间→填写确认信息→提交→反馈评价→报告。支持URL参数?apt=APTxxx直接进入反馈或报告步骤。日期时间与导师时间管理同步，只显示导师开放时段的日期。
+
+articles.html
+资讯中心，Supabase优先加载、预设数据兜底。支持搜索（关键词高亮）、分类过滤、文章详情弹窗。文章来源标识：微信原文(绿色badge)/内容摘要(橙色badge)。跳转原文按钮。
+
+goals.html
+目标进度管理，子步骤、进度条、折叠展开，数据存localStorage的career_goals_v2键。
+
+teacher.html
+教师端管理后台，桌面布局 max-width 1200px，密码登录。四个标签页：
+- 测评管理（查看/筛选/导出CSV）
+- 预约管理（审批/咨询记录/删除）
+- 咨询记录
+- 时间管理（预约开关booking_open + 日期选择器添加时间段 + 列表删除）
+注意：添加时间段函数名为handleAddScheduleSlot()，不要用addScheduleSlot()（会和config.js同名函数冲突导致无限递归）。
+
+resume-templates.html
+职业规划方案生成，目标职业方向下拉框已更新为广州职业技术大学20个专业对应方向。
 
 setup-guide.html
-部署教程，对应database.sql的操作指引，两者必须保持一致。
+Supabase部署图文教程。
 
-js/student.js
-学生端常量定义（CAREER_TYPES霍兰德类型），assessment.html中的霍兰德测评依赖此文件的数据结构。
+database.sql
+建表脚本：submissions、appointments、mentor_schedule、mentor_settings、articles。含RLS策略、索引、触发器。
 
-js/teacher.js
-教师端常量定义（TEACHER_PASSWORD密码、TEST_INFO测评维度信息），teacher.html依赖此文件。
 
-img/ 目录下所有图片
-已命名的封面图和咨询师头像，文件名被HTML硬编码引用，不得重命名或删除。
+六、禁止修改的文件、模块清单
 
-以下模块为各页面内联脚本中的核心函数，禁止修改其函数签名和返回值格式：
+js/config.js：数据库统一配置，修改影响全站数据层。仅允许追加新函数，不得删除或重写已有内容。
+js/articles-data.js：预设文章数据，修改导致兜底数据异常。
+database.sql：对应线上数据库结构，修改需同步线上。
+setup-guide.html：对应database.sql操作指引，两者必须一致。
+js/student.js：霍兰德类型常量。
+js/teacher.js：教师端常量。
+img/ 目录下所有图片：文件名被HTML硬编码引用，不得重命名或删除。
 
+核心函数签名禁止修改：
 index.html: requireLogin()、checkLoginState()、logoutApp()
 login.html: doQuickLogin()、doSimpleLogin()
 assessment.html: calcResults()、renderBigFive()、renderHolland()、renderDisc()、renderMbti()、submitToSupabase()
 consult-flow.html: submitConsultForm()
 articles.html: loadArticles()、loadFromSupabaseAsync()、loadFromPreset()
+teacher.html: handleAddScheduleSlot()（不要改名回addScheduleSlot）
 
 
-五、统一代码编写规范
+七、统一代码编写规范
 
-HTML规范：
-每个HTML文件为独立页面，结构为DOCTYPE html、html lang="zh-CN"、head（meta charset UTF-8、meta viewport、title、内联style、外部CDN引入）、body、内联script。
-页面标题统一格式：页面名 + 空格 + 中圆点（·）+ 空格 + 自在生涯工作室。
-移动端页面viewport添加maximum-scale=1.0, user-scalable=no禁止缩放。
+HTML：每个文件独立页面，DOCTYPE html，html lang="zh-CN"，内联style和script。页面标题格式：页面名 · 自在生涯工作室。移动端viewport加maximum-scale=1.0, user-scalable=no。
 
-CSS规范：
-每个页面在head内使用style标签内联样式，不使用外部CSS文件（css/style.css仅作参考）。
-在:root中定义CSS变量，变量名使用语义化命名：--primary（主色）、--primary-dark（深色）、--primary-light（浅色）、--accent（强调色）、--bg（背景色）、--card（卡片色）、--text-primary（主文字色）、--text-secondary（次要文字色）、--text-light（浅文字色）、--border（边框色）、--radius-sm/md/lg（圆角）。
-手机框架页面统一使用.phone类，固定尺寸390x844px，border-radius 42px，居中显示，box-shadow模拟手机外壳。
-字体统一为：-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif。
-所有元素box-sizing: border-box，body设置-webkit-font-smoothing: antialiased。
-按钮交互反馈使用:active { transform: scale(0.97); }和transition过渡。
+CSS：内联style标签，不使用外部CSS文件。:root定义CSS变量（--primary、--bg、--card等）。手机框架用.phone类390x844px。字体：-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif。按钮:active { transform: scale(0.97); }。
 
-JavaScript规范：
-所有脚本内联在页面body末尾的script标签中（除config.js和articles-data.js为外部引入）。
-函数声明使用function关键字，不使用箭头函数赋值。
-异步操作使用async/await。
-XSS防护统一使用esc()或escapeHtml()函数对动态内容转义。
-用户提示统一使用showToast(msg)函数，显示底部浮动提示后自动消失。
-localStorage键名规范：app_user_info（登录信息）、resumeData（个人资料）、career_goals_v2（目标数据）、assessment_results（测评结果，如有）。
-学校名称统一固定为广州职业技术大学，所有涉及学校的输入框均设置readonly属性。
-数据库操作统一通过js/config.js中的函数调用，不直接操作Supabase客户端。
-新增功能时，遵循就近原则，内联在对应页面的script标签内，不创建新的外部JS文件（除非逻辑确实需要跨页面共享）。
+JavaScript：内联在页面body末尾。函数声明用function关键字。异步用async/await。XSS防护用esc()。提示用showToast()。localStorage键名：app_user_info、resumeData、career_goals_v2、assessment_results。学校固定广州职业技术大学。数据库操作通过js/config.js函数调用。新增功能内联在对应页面，不创建新外部JS。
 
 
-六、当前已完成功能、待开发需求与后续开发目标
+八、当前未完成事项
 
-当前已完成功能：
+1. assessment.html 本地已修改（霍兰德60题+MBTI60题+16种人格描述更新），尚未推送到GitHub。需要GitHub token推送。
+2. 推送后需测试：https://2690294793-dotcom.github.io/career-assessment/assessment.html
+3. 教师端测评结果同步验证（确认新题目结果能在教师端正确显示）。
 
-1. 用户登录系统
-快捷登录（模拟微信登录），首次登录填写姓名和学号，学校固定为广州职业技术大学。登录状态持久化到localStorage，各页面通过requireLogin()拦截未登录用户。支持退出登录。
 
-2. 个人资料管理
-基本信息（姓名、学号、学校）、教育经历（多条）、工作经历（多条）、项目经历（多条）的增删改查。数据存储在localStorage，与登录信息同步。各模块支持折叠展开。
+九、已完成功能清单
 
-3. 职业兴趣测评
-四种测评全部完成：霍兰德职业兴趣测评（6维度RIASEC）、MBTI性格测评（4维度）、大五人格测评（5维度OCEAN）、DISC行为风格测评（4维度）。每种测评包含题目渲染、答题交互、进度显示、结果计算、雷达图可视化（Chart.js）。支持学校验证码解锁完整报告，未验证显示部分报告。支持报告导出为图片（html2canvas）。测评结果提交到Supabase并保存到localStorage。
+1. 用户登录系统（localStorage持久化，各页面requireLogin拦截）
+2. 个人资料管理（教育/工作/项目经历增删改查）
+3. 职业兴趣测评（霍兰德60题、MBTI60题、大五人格、DISC，Chart.js雷达图，html2canvas导出，学校验证码解锁）
+4. 预约咨询（多步骤流程、反馈评价、报告下载分享）
+5. 资讯中心（Supabase+预设兜底、搜索、分类、微信HTML渲染、跳转原文）
+6. 目标进度管理（子步骤、进度条、折叠展开）
+7. 教师端管理（测评管理、预约管理、咨询记录、时间管理）
+8. 规划方案生成（广州职大20个专业方向）
+9. 数据库与部署（Supabase五表+RLS+GitHub Pages）
 
-4. 预约咨询
-多步骤流程：选择咨询师（5位导师）- 选择咨询类型 - 选择日期时间（未来7天动态生成）- 填写确认信息 - 提交到Supabase。提交成功后进入反馈评价页，支持星级评分、标签选择、文字反馈。支持下载和分享咨询报告。表单含字段验证。
 
-5. 资讯中心
-文章列表展示，Supabase优先加载、预设数据兜底（26篇文章）。支持关键词搜索（高亮匹配）、分类过滤（5个分类）、文章详情弹窗。页面顶部阅读进度条。
+十、待开发需求
 
-6. 目标进度管理
-目标的增删改查，每个目标含名称、描述、截止日期。支持添加子步骤、勾选完成子步骤、自动计算进度百分比、标记目标完成。进度条可视化。数据存储在localStorage。
+1. 测评历史趋势分析（多次测评对比变化趋势图）
+2. 文章管理后台（教师端发布、富文本编辑、上下架）
+3. 简历PDF导出功能
+4. 消息通知系统（学生端预约状态变更提醒，Supabase Realtime）
+5. 教师端数据统计分析增强（测评参与率、预约转化率、学生活跃度）
+6. 移动端适配优化（teacher.html响应式）
+7. 用户权限体系（管理员/教师/学生三级）
+8. 资讯文章交互增强（收藏、点赞、评论）
+9. 目标到期提醒与推送
 
-7. 教师端管理
-桌面端管理界面，密码登录（teacher123）。三个功能模块：测评管理（查看学生测评结果、班级筛选、详情查看、CSV导出）、预约管理（查看预约列表、状态统计、审批通过/拒绝、填写咨询记录、删除预约）、咨询记录查看。支持Supabase Realtime实时订阅新预约，新预约提示音。
 
-8. 规划方案生成
-根据用户输入生成个性化职业规划方案，支持保存、查看、删除。方案按模块渲染展示。
+十一、重要Bug修复记录（供参考避免重蹈覆辙）
 
-9. 数据库与部署
-Supabase三表结构（submissions、appointments、report_exports）含RLS策略。提供setup-guide.html图文部署教程。
+1. appointments DELETE RLS策略缺失 → 添加CREATE POLICY "允许教师删除预约" ON appointments FOR DELETE USING (true)
+2. handleDeleteApt调用错误刷新函数 → 改为根据currentTab判断调用loadAppointments还是loadRecords
+3. "更新失败"根本原因：代码用accepting_appointments/closed_message但DB只有booking_open → 全部替换为booking_open
+4. DAY_NAMES语法错误：var后多了}; → 删除
+5. addScheduleSlot函数名冲突：teacher.html内联函数覆盖config.js同名函数 → 无限递归 → 内联改名为handleAddScheduleSlot()
+6. mentor_schedule表设计：day_of_week(周几)改为specific_date(具体日期)，用户明确要求按日期选择
 
-待开发需求与后续开发目标：
 
-1. 咨询师时间档期管理
-当前预约日期为未来7天全部可选，需增加咨询师各时间段可预约数量限制，避免重复预约。教师端需增加档期设置功能。
+十二、完整历史记录
 
-2. 测评历史趋势分析
-当前测评结果仅单次保存，需增加历史记录对比功能，展示多次测评结果的变化趋势图。
-
-3. 文章管理后台
-当前文章数据为预设和Supabase手动录入，需开发教师端文章发布管理功能，支持富文本编辑、分类管理、上下架控制。
-
-4. 简历导出功能
-profile.html中个人资料数据已完整，需增加简历PDF导出功能，支持多种模板选择。resume-templates.html可扩展为简历模板选择和生成入口。
-
-5. 消息通知系统
-当前教师端有实时订阅提示音，学生端缺少通知机制。需开发学生端预约状态变更通知（预约通过/拒绝提醒），可结合Supabase Realtime实现。
-
-6. 数据统计分析增强
-教师端需增加更丰富的数据看板：测评参与率统计、预约转化率分析、学生活跃度趋势等可视化图表。
-
-7. 移动端适配优化
-teacher.html目前为桌面布局，需增加响应式适配，支持平板和手机端访问。各手机框架页面需增加横屏适配。
-
-8. 用户权限体系
-当前教师端仅靠固定密码登录，需建立完整的账号体系：管理员、教师、学生三级权限，支持账号管理和权限分配。
-
-9. 资讯文章交互增强
-增加文章收藏、点赞、评论功能，文章详情页优化排版，支持文章内图片和多媒体内容展示。
-
-10. 目标提醒与推送
-goals.html中目标有截止日期，需增加到期提醒功能，可在首页和我的页面展示即将到期的目标。
+项目完整历史记录见同目录下 完整历史记录.md 文件，包含三账号（账号1项目构建、账号2迭代修复、当前新账号测评更新）的完整时间线台账。
