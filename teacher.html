@@ -901,10 +901,16 @@ async function handleDeleteApt(id) {
   if (!confirm("确定删除这条预约记录？")) return;
   try {
     await deleteAppointment(id);
-    showToast("已删除", "success");
-    loadAppointments();
+    showToast("已删除 ✅", "success");
+    // 根据当前Tab刷新对应的列表
+    if (currentTab === "records") {
+      loadRecords();
+    } else {
+      loadAppointments();
+    }
   } catch(err) {
-    showToast("删除失败", "error");
+    console.error("删除预约失败:", err);
+    showToast("删除失败 ❌", "error");
   }
 }
 
@@ -1079,11 +1085,12 @@ async function confirmDelete(id) {
   if (!confirm("确定删除这条记录？此操作不可撤销。")) return;
   try {
     await deleteSubmission(id);
-    showToast("删除成功", "success");
+    showToast("删除成功 ✅", "success");
     closeModal();
     loadAssessments();
   } catch(err) {
-    showToast("删除失败", "error");
+    console.error("删除测评失败:", err);
+    showToast("删除失败 ❌ — 请检查 Supabase RLS 策略是否允许删除", "error");
   }
 }
 
