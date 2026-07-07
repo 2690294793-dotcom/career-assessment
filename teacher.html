@@ -577,10 +577,10 @@ tr:last-child td { border-bottom: none; }
       </label>
     </div>
 
-    <!-- 关闭预约时的提示消息 -->
+    <!-- 关闭预约提示 -->
     <div class="schedule-closed-msg" id="closedMsgRow" style="display:none;">
-      <span>💬</span>
-      <textarea id="closedMessage" placeholder="关闭预约时向学生显示的提示信息" rows="1" oninput="saveClosedMessage()"></textarea>
+      <span>🔒</span>
+      <span>当前导师预约已暂停，学生端将无法预约</span>
     </div>
 
     <!-- 添加时间段 -->
@@ -1141,9 +1141,8 @@ async function loadSchedule() {
   try {
     var settings = await getMentorSettings(scheduleMentorId);
     var toggle = document.getElementById("acceptingToggle");
-    toggle.checked = settings.accepting_appointments;
-    document.getElementById("closedMsgRow").style.display = settings.accepting_appointments ? 'none' : 'block';
-    document.getElementById("closedMessage").value = settings.closed_message || '';
+    toggle.checked = settings.booking_open;
+    document.getElementById("closedMsgRow").style.display = settings.booking_open ? 'none' : 'block';
   } catch(err) {
     console.error("加载导师设置失败:", err);
   }
@@ -1211,7 +1210,7 @@ function selectScheduleMentor(mid) {
 async function toggleAccepting() {
   var isChecked = document.getElementById("acceptingToggle").checked;
   try {
-    await updateMentorSettings(scheduleMentorId, { accepting_appointments: isChecked });
+    await updateMentorSettings(scheduleMentorId, { booking_open: isChecked });
     document.getElementById("closedMsgRow").style.display = isChecked ? 'none' : 'block';
     showToast(isChecked ? "已开放预约 ✅" : "已暂停预约 🔒", "success");
   } catch(err) {
@@ -1219,15 +1218,6 @@ async function toggleAccepting() {
     showToast("更新失败", "error");
     // 回滚开关状态
     document.getElementById("acceptingToggle").checked = !isChecked;
-  }
-}
-
-async function saveClosedMessage() {
-  var msg = document.getElementById("closedMessage").value;
-  try {
-    await updateMentorSettings(scheduleMentorId, { closed_message: msg });
-  } catch(err) {
-    console.error("保存提示消息失败:", err);
   }
 }
 
