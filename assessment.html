@@ -151,23 +151,29 @@ body {
 }
 .q-opt.sel .q-bubble { box-shadow: 0 0 0 4px #fff, 0 0 0 7px rgba(0,0,0,0.15); }
 .q-opt.sel.l0 .q-bubble { box-shadow: 0 0 0 4px #fff, 0 0 0 7px rgba(239,68,68,0.4); }
-.q-opt.sel.l1 .q-bubble { box-shadow: 0 0 0 4px #fff, 0 0 0 7px rgba(248,113,113,0.4); }
-.q-opt.sel.l2 .q-bubble { box-shadow: 0 0 0 4px #fff, 0 0 0 7px rgba(209,213,219,0.5); }
-.q-opt.sel.l3 .q-bubble { box-shadow: 0 0 0 4px #fff, 0 0 0 7px rgba(134,239,172,0.4); }
-.q-opt.sel.l4 .q-bubble { box-shadow: 0 0 0 4px #fff, 0 0 0 7px rgba(34,197,94,0.4); }
+.q-opt.sel.l1 .q-bubble { box-shadow: 0 0 0 4px #fff, 0 0 0 7px rgba(239,68,68,0.4); }
+.q-opt.sel.l2 .q-bubble { box-shadow: 0 0 0 4px #fff, 0 0 0 7px rgba(248,113,113,0.35); }
+.q-opt.sel.l3 .q-bubble { box-shadow: 0 0 0 4px #fff, 0 0 0 7px rgba(209,213,219,0.5); }
+.q-opt.sel.l4 .q-bubble { box-shadow: 0 0 0 4px #fff, 0 0 0 7px rgba(134,239,172,0.35); }
+.q-opt.sel.l5 .q-bubble { box-shadow: 0 0 0 4px #fff, 0 0 0 7px rgba(34,197,94,0.4); }
+.q-opt.sel.l6 .q-bubble { box-shadow: 0 0 0 4px #fff, 0 0 0 7px rgba(34,197,94,0.4); }
 .q-opt-label { display: none; }
-/* bubble colors — 5 levels: red(disagree) → gray(neutral) → green(agree) */
-.q-opt.l0 .q-bubble { background: #EF4444; width:38px; height:38px; }  /* 完全不符合 - largest red */
-.q-opt.l1 .q-bubble { background: #FCA5A5; width:30px; height:30px; }  /* 不太符合 */
-.q-opt.l2 .q-bubble { background: #D1D5DB; width:24px; height:24px; }  /* 一般 - smallest gray */
-.q-opt.l3 .q-bubble { background: #86EFAC; width:30px; height:30px; }  /* 比较符合 */
-.q-opt.l4 .q-bubble { background: #22C55E; width:38px; height:38px; }  /* 非常符合 - largest green */
+/* bubble colors — 7 levels: red(disagree) → gray(neutral) → green(agree) */
+.q-opt.l0 .q-bubble { background: #EF4444; width:38px; height:38px; }  /* 非常不同意 - largest red */
+.q-opt.l1 .q-bubble { background: #F87171; width:32px; height:32px; }  /* 不同意 */
+.q-opt.l2 .q-bubble { background: #FCA5A5; width:28px; height:28px; }  /* 不太同意 */
+.q-opt.l3 .q-bubble { background: #D1D5DB; width:24px; height:24px; }  /* 一般 - smallest gray */
+.q-opt.l4 .q-bubble { background: #86EFAC; width:28px; height:28px; }  /* 比较同意 */
+.q-opt.l5 .q-bubble { background: #4ADE80; width:32px; height:32px; }  /* 同意 */
+.q-opt.l6 .q-bubble { background: #22C55E; width:38px; height:38px; }  /* 非常同意 - largest green */
 /* Unselected = slightly muted */
-.q-opt:not(.sel).l0 .q-bubble { opacity:0.55; }
-.q-opt:not(.sel).l1 .q-bubble { opacity:0.45; }
-.q-opt:not(.sel).l2 .q-bubble { opacity:0.40; }
-.q-opt:not(.sel).l3 .q-bubble { opacity:0.45; }
-.q-opt:not(.sel).l4 .q-bubble { opacity:0.55; }
+.q-opt:not(.sel).l0 .q-bubble { opacity:0.6; }
+.q-opt:not(.sel).l1 .q-bubble { opacity:0.5; }
+.q-opt:not(.sel).l2 .q-bubble { opacity:0.45; }
+.q-opt:not(.sel).l3 .q-bubble { opacity:0.40; }
+.q-opt:not(.sel).l4 .q-bubble { opacity:0.45; }
+.q-opt:not(.sel).l5 .q-bubble { opacity:0.5; }
+.q-opt:not(.sel).l6 .q-bubble { opacity:0.6; }
 /* Scale ends labels */
 .q-scale-labels {
   display: flex; justify-content: space-between; padding: 0 8px;
@@ -814,7 +820,7 @@ var TESTS = {
 // ============================================================
 //  ANSWER OPTIONS
 // ============================================================
-var ANSWER_OPTS = ['完全不符合','不太符合','一般','比较符合','非常符合'];
+var ANSWER_OPTS = ['非常不同意','不同意','不太同意','一般','比较同意','同意','非常同意'];
 
 
 // ============================================================
@@ -1114,11 +1120,11 @@ function calcResults() {
   test.dimensions.forEach(function(d) { scores[d]=0; counts[d]=0; });
 
   test.questions.forEach(function(q, i) {
-    var rawScore = state.answers[i] !== undefined ? state.answers[i] : 2;
-    // Handle reverse items: 1↔5, 2↔4, 3↔3
-    var pointValue = rawScore + 1;  // idx 0-4 → 1-5 points
+    var rawScore = state.answers[i] !== undefined ? state.answers[i] : 3;
+    // Handle reverse items: 0↔6, 1↔5, 2↔4, 3↔3
+    var pointValue = rawScore;  // idx 0-6 → 0-6 points
     if (test.reverseItems.indexOf(i) !== -1) {
-      pointValue = 6 - pointValue;
+      pointValue = 6 - rawScore;
     }
     scores[q.dim] += pointValue;
     counts[q.dim] += 1;
@@ -1127,7 +1133,7 @@ function calcResults() {
   // Normalize to 0-100%
   var maxScore = {};
   test.dimensions.forEach(function(d) {
-    maxScore[d] = Math.round((scores[d] / (counts[d] * 5)) * 100);
+    maxScore[d] = Math.round((scores[d] / (counts[d] * 6)) * 100);
   });
 
   state.scores = maxScore;
