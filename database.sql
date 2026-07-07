@@ -165,13 +165,13 @@ CREATE INDEX IF NOT EXISTS idx_articles_date ON articles(date DESC);
 CREATE INDEX IF NOT EXISTS idx_articles_category ON articles(category);
 CREATE INDEX IF NOT EXISTS idx_articles_source ON articles(source);
 
--- 5. 导师时间表（教师端设定可预约时段）
+-- 5. 导师时间表（教师端设定可预约时段，按具体日期）
 CREATE TABLE IF NOT EXISTS mentor_schedule (
   id BIGSERIAL PRIMARY KEY,
   mentor_id TEXT NOT NULL,
-  day_of_week INTEGER NOT NULL,  -- 0=周日, 1=周一, 2=周二, ..., 6=周六
-  start_time TEXT NOT NULL,      -- HH:MM 格式, 如 '09:00'
-  end_time TEXT NOT NULL,        -- HH:MM 格式, 如 '12:00'
+  specific_date DATE NOT NULL,   -- 具体日期，如 '2026-07-08'
+  start_time TEXT NOT NULL,      -- HH:MM 格式，如 '09:00'
+  end_time TEXT NOT NULL,        -- HH:MM 格式，如 '12:00'
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -179,8 +179,7 @@ CREATE TABLE IF NOT EXISTS mentor_schedule (
 CREATE TABLE IF NOT EXISTS mentor_settings (
   id BIGSERIAL PRIMARY KEY,
   mentor_id TEXT NOT NULL UNIQUE,
-  accepting_appointments BOOLEAN DEFAULT true,  -- 是否接受预约（全局开关）
-  closed_message TEXT DEFAULT '导师暂时不接受预约，请稍后再试',
+  booking_open BOOLEAN DEFAULT true,  -- 是否接受预约（全局开关）
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -206,10 +205,10 @@ CREATE TRIGGER update_articles_updated_at
 
 -- mentor_schedule 索引
 CREATE INDEX IF NOT EXISTS idx_mentor_schedule_mentor ON mentor_schedule(mentor_id);
-CREATE INDEX IF NOT EXISTS idx_mentor_schedule_day ON mentor_schedule(day_of_week);
+CREATE INDEX IF NOT EXISTS idx_mentor_schedule_date ON mentor_schedule(specific_date);
 
 -- 为每个导师初始化默认设置
-INSERT INTO mentor_settings (mentor_id, accepting_appointments) VALUES
+INSERT INTO mentor_settings (mentor_id, booking_open) VALUES
   ('hexia', true),
   ('wanglina', true),
   ('gongjingxian', true),
