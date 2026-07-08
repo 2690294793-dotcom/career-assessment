@@ -666,7 +666,7 @@ body {
 }
 .mbti-card-title {
   font-size: 16px; font-weight: 800; color: var(--text-primary);
-  margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
+  margin-bottom: 10px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
 }
 .mbti-card-body { font-size: 13px; line-height: 1.75; color: var(--text-secondary); }
 .mbti-card-body p { margin-bottom: 8px; }
@@ -708,8 +708,8 @@ body {
 .mbti-dim-bar-val { width: 32px; text-align: right; font-weight: 700; color: var(--text-primary); }
 
 /* 人际关系 & 个人成长 并排 */
-.mbti-card-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
-.mbti-card-grid .mbti-card { margin-bottom: 0; }
+.mbti-card-grid { display: grid; grid-template-columns: 1fr; gap: 14px; width: 100%; grid-auto-rows: 1fr; }
+.mbti-card-grid .mbti-card { margin-bottom: 0; min-width: 0; word-break: break-word; overflow-wrap: break-word; }
 
 @media (min-width: 640px) {
   .mbti-layout { flex-direction: row; }
@@ -2955,7 +2955,7 @@ function submitToSupabase(scores) {
 // ============================================================
 //  INIT
 // ============================================================
-console.log('[DEBUG] assessment.html v20260708-14 loaded');
+console.log('[DEBUG] assessment.html v20260708-15 loaded');
 console.log('[DEBUG] TESTS available:', typeof TESTS !== 'undefined' ? Object.keys(TESTS).join(', ') : 'UNDEFINED');
 state._locking = false;
 // 调用 config.js 的 initSupabase()，设置全局 db 变量
