@@ -465,6 +465,40 @@ tr:last-child td { border-bottom: none; }
   font-size: 13px; outline: none; background: #FEF3C7; color: #92400e;
 }
 
+/* ===== Batch Delete (测评管理) ===== */
+.row-checkbox {
+  width: 18px; height: 18px; accent-color: var(--primary);
+  cursor: pointer; flex-shrink: 0;
+}
+.th-checkbox {
+  display: flex; align-items: center; justify-content: center;
+}
+.th-checkbox input { width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer; }
+tr.selected td:not(:first-child) { background: rgba(99,102,241,0.06); }
+
+.batch-bar {
+  display: none; position: sticky; bottom: 0; z-index: 50;
+  background: #fff; border-top: 2px solid var(--primary);
+  padding: 12px 18px; margin-top: 0; border-radius: 0 0 var(--radius-md) var(--radius-md);
+  align-items: center; justify-content: space-between; gap: 12px;
+  box-shadow: 0 -4px 20px rgba(99,102,241,0.12);
+  animation: slideUpBar 0.25s ease-out;
+}
+.batch-bar.show { display: flex; }
+@keyframes slideUpBar { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.batch-info { font-size: 14px; font-weight: 600; color: var(--primary); }
+.batch-actions { display: flex; gap: 8px; align-items: center; }
+.batch-actions .btn-batch-del {
+  padding: 8px 18px; border-radius: 10px; border: none; background: var(--red);
+  color: #fff; font-size: 13px; font-weight: 700; cursor: pointer;
+  transition: all 0.15s; white-space: nowrap;
+}
+.batch-actions .btn-batch-del:hover { background: #DC2626; transform: scale(1.02); }
+.batch-actions .btn-batch-cancel {
+  padding: 8px 14px; border-radius: 10px; border: none; background: none;
+  color: var(--text-secondary); font-size: 13px; font-weight: 500; cursor: pointer;
+}
+
 @media (max-width: 768px) {
   .container { padding: 14px; }
   .top-bar { padding: 0 16px; }
@@ -508,7 +542,7 @@ tr:last-child td { border-bottom: none; }
     <input type="password" id="pwdInput" placeholder="请输入密码"
       onkeydown="if(event.key==='Enter') doLogin()">
     <button onclick="doLogin()">登 录</button>
-    <div style="margin-top:16px;color:#ccc;font-size:11px;">v20260708-4 · 默认密码: 123</div>
+    <div style="margin-top:16px;color:#ccc;font-size:11px;">v20260708-5</div>
   </div>
 </div>
 
@@ -688,6 +722,7 @@ var allData = [];
 var allAppointments = [];
 var aptFilter = "all";
 var realtimeUnsub = null;
+var selectedIds = [];
 
 // ============================================
 // LOGIN
@@ -784,12 +819,16 @@ function renderClassFilter() {
 
 function renderTable(data) {
   var tc = document.getElementById("tableContent");
+  // 重置批量选择（每次重新渲染）
+  selectedIds = [];
   if (data.length === 0) {
     tc.innerHTML = '<div class="empty"><div class="icon">📭</div><div>暂无测评数据</div><div style="font-size:13px;margin-top:8px;">学生提交测评后将在此显示</div></div>';
+    renderBatchBar();
     return;
   }
 
   var html = '<table><thead><tr>'+
+    '<th class="th-checkbox"><input type="checkbox" id="selectAllCheck" onchange="toggleSelectAll(this.checked)" title="全选/取消全选"></th>'+
     '<th>姓名</th><th>学校</th><th>学号</th><th>班级</th><th>测评类型</th>'+
     '<th>结果</th><th class="hide-mobile">概述</th><th class="hide-mobile">提交时间</th><th>操作</th>'+
     '</tr></thead><tbody>';
@@ -805,7 +844,8 @@ function renderTable(data) {
       codeCell = '<span class="result-code">'+codeCell+'</span>';
     }
 
-    html += '<tr>'+
+    html += '<tr data-id="'+item.id+'">'+
+      '<td><input type="checkbox" class="row-checkbox" data-id="'+item.id+'" onchange="onRowCheckChange(this)"></td>'+
       '<td style="font-weight:600;">'+esc(item.name)+'</td>'+
       '<td>'+esc(item.school||'-')+'</td>'+
       '<td>'+esc(item.student_id)+'</td>'+
@@ -820,7 +860,97 @@ function renderTable(data) {
   });
 
   html += '</tbody></table>';
+  html += '<div class="batch-bar" id="batchBar">'+
+    '<div class="batch-info" id="batchInfo">已选 0 条</div>'+
+    '<div class="batch-actions">'+
+      '<button class="btn-batch-cancel" onclick="clearSelection()">取消</button>'+
+      '<button class="btn-batch-del" onclick="batchDelete()">🗑 批量删除</button>'+
+    '</div>'+
+    '</div>';
   tc.innerHTML = html;
+  renderBatchBar();
+}
+
+// ============================================
+// 批量删除
+// ============================================
+var selectedIds = [];
+
+function onRowCheckChange(cb) {
+  var id = cb.getAttribute('data-id');
+  if (cb.checked) {
+    if (selectedIds.indexOf(id) < 0) selectedIds.push(id);
+    cb.closest('tr').classList.add('selected');
+  } else {
+    selectedIds = selectedIds.filter(function(x){ return x !== id; });
+    cb.closest('tr').classList.remove('selected');
+    var sa = document.getElementById('selectAllCheck');
+    if (sa) sa.checked = false;
+  }
+  renderBatchBar();
+}
+
+function toggleSelectAll(checked) {
+  selectedIds = [];
+  var checks = document.querySelectorAll('.row-checkbox');
+  checks.forEach(function(cb) {
+    cb.checked = checked;
+    if (checked) {
+      var id = cb.getAttribute('data-id');
+      if (selectedIds.indexOf(id) < 0) selectedIds.push(id);
+      cb.closest('tr').classList.add('selected');
+    } else {
+      cb.closest('tr').classList.remove('selected');
+    }
+  });
+  renderBatchBar();
+}
+
+function clearSelection() {
+  selectedIds = [];
+  var checks = document.querySelectorAll('.row-checkbox');
+  checks.forEach(function(cb) { cb.checked = false; cb.closest('tr').classList.remove('selected'); });
+  var sa = document.getElementById('selectAllCheck');
+  if (sa) sa.checked = false;
+  renderBatchBar();
+}
+
+function renderBatchBar() {
+  var bar = document.getElementById('batchBar');
+  if (!bar) return;
+  var info = document.getElementById('batchInfo');
+  if (selectedIds.length > 0) {
+    info.textContent = '已选 ' + selectedIds.length + ' 条';
+    bar.classList.add('show');
+  } else {
+    bar.classList.remove('show');
+  }
+}
+
+async function batchDelete() {
+  if (selectedIds.length === 0) return;
+  if (!confirm('确定删除选中的 ' + selectedIds.length + ' 条记录？此操作不可撤销。')) return;
+  var total = selectedIds.length;
+  var ok = 0, fail = 0;
+  showToast('开始批量删除 ' + total + ' 条...', 'success');
+  // 逐条删除（避免一次 in() 过大或 RLS 限制）
+  for (var i = 0; i < selectedIds.length; i++) {
+    try {
+      await deleteSubmission(selectedIds[i]);
+      ok++;
+    } catch(err) {
+      console.error('删除失败 id='+selectedIds[i], err);
+      fail++;
+    }
+  }
+  // 清空选择
+  selectedIds = [];
+  if (fail === 0) {
+    showToast('已删除 ' + ok + ' 条记录 ✅', 'success');
+  } else {
+    showToast('删除完成：成功 ' + ok + ' 条，失败 ' + fail + ' 条', fail === total ? 'error' : 'success');
+  }
+  loadAssessments();
 }
 
 function filterTable() {
