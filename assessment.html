@@ -9,6 +9,12 @@
 <title>职业兴趣测评 · 自在生涯工作室</title>
 <script src="https://cdn.bootcdn.net/ajax/libs/Chart.js/4.4.0/chart.umd.min.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// Supabase CDN 回退：如果 jsdelivr 加载失败（国内常见），尝试 unpkg
+if (typeof window.supabase === 'undefined') {
+  document.write('<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.min.js"><\/script>');
+}
+</script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <style>
 :root {
@@ -531,6 +537,94 @@ body {
   text-align: center; font-size: 11px; color: #6B7280;
   margin-top: 10px; opacity: 0.85;
 }
+
+/* ====== STRENGTH 4-DOMAIN DISTRIBUTION (Clifton-style) ====== */
+.st-clifton-hero {
+  background: var(--card); border-radius: var(--radius-lg);
+  padding: 30px 22px; margin-bottom: 14px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+  text-align: center;
+}
+.st-clifton-hero-label { font-size: 14px; color: var(--text-secondary); margin-bottom: 8px; }
+.st-clifton-hero-domain {
+  font-size: 30px; font-weight: 900; color: var(--text-primary);
+  letter-spacing: 2px; margin-bottom: 6px;
+}
+.st-clifton-hero-sub { font-size: 14px; color: var(--text-secondary); margin-bottom: 16px; }
+.st-clifton-hero-top { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+.st-clifton-hero-pills { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+
+.st-domain-bar {
+  display: flex; height: 32px; border-radius: 8px; overflow: hidden;
+  margin-bottom: 6px;
+}
+.st-domain-seg {
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; color: #fff;
+  white-space: nowrap; overflow: hidden; transition: flex 0.6s ease;
+  min-width: 0;
+}
+.st-domain-seg.zero { background: #f0f0f5; color: transparent; }
+.st-domain-labels {
+  display: grid; gap: 4px; margin-bottom: 12px;
+}
+.st-domain-label {
+  font-size: 12px; color: var(--text-secondary);
+  display: flex; align-items: center; gap: 6px;
+}
+.st-domain-label-dot {
+  width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0;
+}
+
+/* ====== STRENGTH 34-theme grid (4 domains × N themes) ====== */
+.st-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.st-grid-col { display: flex; flex-direction: column; gap: 8px; }
+.st-grid-col-head {
+  font-size: 12px; font-weight: 700; color: #fff;
+  padding: 8px 10px; border-radius: 8px 8px 0 0;
+  text-align: center; letter-spacing: 1px;
+}
+.st-grid-cell {
+  background: #f5f5f7; border-radius: 6px;
+  padding: 10px 8px; text-align: center;
+  display: flex; flex-direction: column; gap: 2px;
+  transition: all 0.2s;
+}
+.st-grid-cell-num { font-size: 13px; font-weight: 800; }
+.st-grid-cell-name { font-size: 11px; color: var(--text-secondary); }
+.st-grid-cell.score-low { background: #f5f5f7; color: var(--text-secondary); }
+.st-grid-cell.score-low .st-grid-cell-num { color: var(--text-secondary); }
+.st-grid-cell.score-mid { background: #fef3c7; color: #92400E; }
+.st-grid-cell.score-mid .st-grid-cell-num { color: #92400E; }
+.st-grid-cell.score-high {
+  color: #fff;
+  background: var(--primary);
+}
+.st-grid-cell.score-high .st-grid-cell-num { color: #fff; }
+.st-grid-cell.score-high .st-grid-cell-name { color: rgba(255,255,255,0.85); }
+
+@media (max-width: 480px) {
+  .st-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* Top 5 themes richer card */
+.st-top-card {
+  border-radius: 10px; padding: 12px 14px; margin-bottom: 8px;
+  display: flex; align-items: center; gap: 12px;
+  border-left: 4px solid;
+}
+.st-top-rank {
+  width: 28px; height: 28px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 800; color: #fff; flex-shrink: 0;
+}
+.st-top-info { flex: 1; min-width: 0; }
+.st-top-name { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+.st-top-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.5; }
+.st-top-score { font-size: 13px; font-weight: 800; flex-shrink: 0; }
 </style>
 <script src="https://beacon.cdn.qq.com/sdk/4.5.9/beacon_web.min.js"></script>
 <script>
@@ -610,6 +704,7 @@ var TESTS = {
     name: '霍兰德职业兴趣测试',
     icon: '🧭',
     iconBg: '#DCFCE7',
+    borderColor: '#EF4444',
     shortDesc: 'RIASEC六维模型',
     desc: '基于O*NET职业兴趣测评（霍兰德RIASEC模型），从现实型、研究型、艺术型、社会型、企业型、常规型六个维度评估你的职业兴趣偏好、能力优势和价值回馈。题目源自美国劳工部O*NET数据库，共66题，分兴趣/能力/回馈三个模块。',
     meta: '66 题 · 约 12 分钟 · 兴趣+能力+回馈三模块',
@@ -718,6 +813,7 @@ var TESTS = {
     name: 'MBTI性格测试',
     icon: '🧩',
     iconBg: '#FCE7F3',
+    borderColor: '#F97316',
     shortDesc: '16种人格类型',
     desc: '基于OEJTS开放扩展荣格类型量表（开源MBTI替代），从精力来源(E/I)、认知方式(S/N)、决策方式(T/F)、生活态度(J/P)四个维度评估你的性格类型。共60题，每维度15题。',
     meta: '60 题 · 约 10 分钟',
@@ -801,6 +897,7 @@ var TESTS = {
     name: '大五人格测试',
     icon: '🧬',
     iconBg: '#EEF0FF',
+    borderColor: '#EAB308',
     shortDesc: 'OCEAN五维模型',
     desc: '基于经典BFI-2大五人格量表，从外向性、宜人性、尽责性、神经质、开放性五个维度全面评估你的人格特质。',
     meta: '60 题 · 约 8 分钟',
@@ -880,6 +977,7 @@ var TESTS = {
     name: '优势潜能测评',
     icon: '🌟',
     iconBg: '#EEF2FF',
+    borderColor: '#22C55E',
     shortDesc: '34主题·探索天赋优势',
     desc: '基于CSSPI-34中国大学生优势潜能模型，从行动执行、表达影响、关系协同、认知探索四大领域共34个主题，全面探索你的优势潜能和天赋线索。',
     meta: '136 题 · 约 18–25 分钟',
@@ -1139,8 +1237,7 @@ function submitStudentInfo() {
 function renderSelect() {
   state.view = 'select';
   var cards = Object.values(TESTS).map(function(t) {
-    var dimKey = t.dimensions && t.dimensions[0];
-    var borderColor = (t.dimColors && dimKey && t.dimColors[dimKey]) ? t.dimColors[dimKey] : '#6366f1';
+    var borderColor = t.borderColor || '#6366f1';
     return '<div class="test-card" onclick="startTest(\''+t.id+'\')" style="border-left:4px solid '+borderColor+';">'+
       '<div class="test-icon" style="background:'+t.iconBg+'">'+t.icon+'</div>'+
       '<div class="test-info">'+
@@ -1801,53 +1898,120 @@ function renderStrength(scores) {
   // scores: each dim = sum of 4 questions (range 4-24)
   var sorted = test.dimensions.map(function(d){return {dim:d,score:scores[d]||0};}).sort(function(a,b){return b.score-a.score;});
   var top5 = sorted.slice(0, 5);
-  var heroHtml = buildHero(scores, test);
 
-  // Top 5 bar chart
-  var top5Html = top5.map(function(e, i){
-    var color = test.dimColors[e.dim];
-    var pct = Math.round((e.score / 24) * 100);
-    return '<div class="disc-item"><div class="disc-item-header">'+
-      '<span class="disc-item-name"><span class="disc-dot-sm" style="background:'+color+'"></span><b>'+(i+1)+'. '+test.dimNames[e.dim]+'</b></span>'+
-      '<span class="disc-item-pct">'+e.score+'/24</span></div>'+
-      '<div class="disc-bar-wrap"><div class="disc-bar-fill" style="width:'+pct+'%;background:'+color+'"></div></div></div>';
-  }).join('');
-
-  // Domain averages
+  // Find dominant domain
   var domains = ['行动执行','表达影响','关系协同','认知探索'];
   var dColors = {'行动执行':'#F59E0B','表达影响':'#3B82F6','关系协同':'#10B981','认知探索':'#8B5CF6'};
+  var dIcon = {'行动执行':'⚡','表达影响':'🎤','关系协同':'🤝','认知探索':'💡'};
+  var domainAvgs = domains.map(function(dom){
+    var themes = test.domains[dom].themes;
+    var total = themes.reduce(function(s,d){return s+(scores[d]||0);}, 0);
+    return {name:dom, avg: total / themes.length, themes: themes};
+  });
+  domainAvgs.sort(function(a,b){return b.avg - a.avg;});
+  var dominantDomain = domainAvgs[0];
+
+  // Custom Hero (Clifton-style: "您的 XX 才干主题最为突出")
+  var strengthHeroHtml =
+    '<div class="st-clifton-hero">'+
+      '<div class="st-clifton-hero-label">您的</div>'+
+      '<div class="st-clifton-hero-domain">'+dominantDomain.name+' 才干</div>'+
+      '<div class="st-clifton-hero-sub">领域最突出</div>'+
+      '<div class="st-clifton-hero-pills">'+
+        domains.map(function(dom){
+          var active = dom === dominantDomain.name;
+          var c = dColors[dom];
+          return '<span class="hl-hero-pill" style="background:'+(active?c:c+'20')+';color:'+(active?'#fff':c)+';border:1px solid '+c+'">'+
+            '<span class="hl-hero-pill-letter" style="background:'+(active?'#fff':c)+';color:'+(active?c:'#fff')+'">'+dIcon[dom]+'</span>'+dom+
+          '</span>';
+        }).join('')+
+      '</div>'+
+      '<div class="st-clifton-hero-top">您最常使用的前5个优势主题：'+top5.map(function(e){return test.dimNames[e.dim];}).join(' · ')+'</div>'+
+    '</div>';
+
+  // Description block
+  var descHtml = '<div class="score-card" style="margin-bottom:14px">'+
+    '<div style="font-size:13px;color:var(--text-secondary);line-height:1.8">此图表显示了您特有的优势潜能 34 个主题才干在四大领域中的相对分布。这些类别是一个非常好的起点，您可以查看自己最有可能在哪些方面表现出色，以及如何为团队做出最佳贡献。<br>请参阅下面的图表，了解有关您的优势在各领域分布情况的更多详细信息。</div>'+
+  '</div>';
+
+  // 4-domain stacked bar (Clifton-style)
+  var maxScore = 24;
+  var totalAll = domainAvgs.reduce(function(s,d){return s+d.avg;}, 0);
+  var stBarHtml = '<div class="st-domain-bar">'+
+    domainAvgs.map(function(d){
+      var pct = (d.avg / maxScore) * 100;
+      return '<div class="st-domain-seg" style="flex:'+pct+';background:'+dColors[d.name]+'">'+d.avg.toFixed(1)+'</div>';
+    }).join('')+
+  '</div>'+
+  '<div class="st-domain-labels" style="grid-template-columns: repeat(4, 1fr)">'+
+    domainAvgs.map(function(d){
+      return '<div class="st-domain-label"><span class="st-domain-label-dot" style="background:'+dColors[d.name]+'"></span>'+d.name+'</div>';
+    }).join('')+
+  '</div>';
+
+  // Top 5 with description (richer card)
+  var top5Html = top5.map(function(e, i){
+    var color = test.dimColors[e.dim];
+    var dom = domains.find(function(d){return test.domains[d].themes.indexOf(e.dim)!==-1;})||'';
+    var oneLiner = getStrengthOneLiner(e.dim);
+    return '<div class="st-top-card" style="background:'+color+'10;border-left-color:'+color+'">'+
+      '<div class="st-top-rank" style="background:'+color+'">'+(i+1)+'</div>'+
+      '<div class="st-top-info">'+
+        '<div class="st-top-name" style="color:'+color+'">'+test.dimNames[e.dim]+' <span style="font-size:11px;color:var(--text-secondary);font-weight:400;margin-left:6px">· '+dom+'</span></div>'+
+        '<div class="st-top-desc">'+oneLiner+'</div>'+
+      '</div>'+
+      '<div class="st-top-score" style="color:'+color+'">'+e.score+'/24</div>'+
+    '</div>';
+  }).join('');
+
+  // Domain averages as compact
   var domainHtml = domains.map(function(dom){
     var themes = test.domains[dom].themes;
     var total = themes.reduce(function(s,d){return s+(scores[d]||0);}, 0);
     var avg = Math.round(total / themes.length);
     var pct = Math.round((avg / 24) * 100);
     return '<div class="disc-item"><div class="disc-item-header">'+
-      '<span class="disc-item-name"><span class="disc-dot-sm" style="background:'+dColors[dom]+'"></span>'+dom+'</span>'+
+      '<span class="disc-item-name"><span class="disc-dot-sm" style="background:'+dColors[dom]+'"></span><b>'+dom+'</b></span>'+
       '<span class="disc-item-pct">均分 '+avg+'/24</span></div>'+
       '<div class="disc-bar-wrap"><div class="disc-bar-fill" style="width:'+pct+'%;background:'+dColors[dom]+'"></div></div></div>';
   }).join('');
 
-  // All 34 themes table
-  var allHtml = '<table class="hl-table" style="font-size:13px;margin-top:8px"><thead><tr><th>#</th><th>主题</th><th>领域</th><th>得分</th><th>一句话解释</th></tr></thead><tbody>'+
-    sorted.map(function(e,i){
-      var color = test.dimColors[e.dim];
-      var dom = domains.find(function(d){return test.domains[d].themes.indexOf(e.dim)!==-1;})||'';
-      var oneLiner = getStrengthOneLiner(e.dim);
-      var rowStyle = i<5 ? ' style="font-weight:bold;background:'+color+'10"' : '';
-      return '<tr'+rowStyle+'><td>'+(i+1)+'</td><td>'+test.dimNames[e.dim]+'</td>'+
-        '<td><span class="pill" style="background:'+dColors[dom]+'20;color:'+dColors[dom]+'">'+dom+'</span></td>'+
-        '<td><b>'+e.score+'</b>/24</td><td style="color:#555">'+oneLiner+'</td></tr>';
+  // 34-theme grid (4 columns × 1 per domain, sorted within domain)
+  var rankMap = {};
+  sorted.forEach(function(e, i){ rankMap[e.dim] = i + 1; });
+  var stGridHtml = '<div class="st-grid">'+
+    domains.map(function(dom){
+      var themes = test.domains[dom].themes
+        .map(function(d){return {dim:d, score:scores[d]||0};})
+        .sort(function(a,b){return b.score - a.score;});
+      var cells = themes.map(function(e){
+        var color = dColors[dom];
+        var name = test.dimNames[e.dim];
+        var rank = rankMap[e.dim];
+        var isTop5 = rank <= 5;
+        var lvl = isTop5 ? 'score-high' : (e.score >= 10 ? 'score-mid' : 'score-low');
+        return '<div class="st-grid-cell '+lvl+'" style="'+(isTop5?'background:'+color:'')+'">'+
+          '<div class="st-grid-cell-num">'+rank+'</div>'+
+          '<div class="st-grid-cell-name">'+name+'</div>'+
+        '</div>';
+      }).join('');
+      return '<div class="st-grid-col">'+
+        '<div class="st-grid-col-head" style="background:'+dColors[dom]+'">'+dIcon[dom]+' '+dom+'</div>'+
+        cells+
+      '</div>';
     }).join('')+
-    '</tbody></table>';
+  '</div>';
 
   document.getElementById('pageBody').innerHTML =
     '<div class="page-header"><div class="page-title">优势潜能报告</div><div class="page-subtitle">CSSPI-34 · 34主题优势探索</div></div>'+
     '<div class="report-export-wrap" id="reportExportWrap">'+
     buildReportInfoBar()+
-    heroHtml+
-    '<div class="score-card"><div class="score-title">✨ 当前最常使用的优势线索（Top 5）</div>'+top5Html+'</div>'+
-    '<div class="score-card"><div class="score-title">📊 四大领域平均得分</div>'+domainHtml+'</div>'+
-    '<div class="score-card"><div class="score-title">📋 全部34主题排序</div>'+allHtml+'</div>'+
+    strengthHeroHtml+
+    descHtml+
+    '<div class="score-card" style="margin-bottom:14px"><div class="score-title">📊 您的优势在各领域的分布情况</div>'+stBarHtml+'</div>'+
+    '<div class="score-card" style="margin-bottom:14px"><div class="score-title">✨ 当前最常使用的优势线索（Top 5）</div>'+top5Html+'</div>'+
+    '<div class="score-card" style="margin-bottom:14px"><div class="score-title">📈 四大领域平均得分</div>'+domainHtml+'</div>'+
+    '<div class="score-card" style="margin-bottom:14px"><div class="score-title">🔍 全部34主题才干矩阵</div>'+stGridHtml+'</div>'+
     '</div>'+
     buildExportBtnRow();
 }
@@ -2536,15 +2700,22 @@ function submitToSupabase(scores) {
     result_summary: resultSummary
   };
 
-  // 霍兰德：附带三模块分数
+  // 霍兰德：三模块分数合并到 scores 中（DB 无独立列）
   if (state.testKey === 'holland' && state.moduleScores) {
-    payload.module_scores = state.moduleScores;
-    payload.module_raws = state.moduleRaws;
+    payload.scores = Object.assign({}, scores, {
+      _module_scores: state.moduleScores,
+      _module_raws: state.moduleRaws
+    });
   }
 
-  // 如果 db 未初始化，尝试重新初始化
+  // 如果 db 未初始化，尝试重新初始化（最多尝试 3 次，每次间隔 500ms）
   if (typeof isDbReady === 'function' && !isDbReady() && typeof initSupabase === 'function') {
-    initSupabase();
+    for (var retry = 0; retry < 3; retry++) {
+      if (initSupabase()) break;
+    }
+    if (!isDbReady()) {
+      console.warn('[submitToSupabase] Supabase 仍未就绪，将降级到本地存储');
+    }
   }
 
   saveSubmission(payload).then(function(result) {
@@ -2556,7 +2727,11 @@ function submitToSupabase(scores) {
       showToast('⚠️ 结果已保存本地，但未同步到云端，请检查网络');
     }
   }).catch(function(err) {
-    console.warn('提交失败(不影响查看结果):', err);
+    console.error('提交失败(不影响查看结果):', err);
+    // 打印更多诊断信息
+    console.error('[诊断] error.code:', err.code, 'error.message:', err.message);
+    console.error('[诊断] db状态:', typeof isDbReady === 'function' ? (isDbReady() ? '已连接' : '未连接') : '未知');
+    console.error('[诊断] 测试类型:', state.testKey);
     showToast('❌ 同步失败：' + (err.message || '请检查网络'));
   });
 }
@@ -2564,7 +2739,7 @@ function submitToSupabase(scores) {
 // ============================================================
 //  INIT
 // ============================================================
-console.log('[DEBUG] assessment.html v20260708-10 loaded');
+console.log('[DEBUG] assessment.html v20260708-12 loaded');
 console.log('[DEBUG] TESTS available:', typeof TESTS !== 'undefined' ? Object.keys(TESTS).join(', ') : 'UNDEFINED');
 state._locking = false;
 // 调用 config.js 的 initSupabase()，设置全局 db 变量
