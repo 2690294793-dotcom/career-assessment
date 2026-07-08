@@ -10,8 +10,6 @@
 // 4. 复制 "Project URL" 填到下面的 SUPABASE_URL
 // 5. 复制 "anon public" key 填到下面的 SUPABASE_KEY
 // 6. 在 Supabase 的 SQL Editor 中执行 database.sql 建表
-//
-// 详细图文教程见 setup-guide.html
 // ============================================
 
 // ============================================
@@ -56,24 +54,48 @@ function isDbReady() { return db !== null; }
 // ============================================
 
 async function saveSubmission(data) {
-  // 如果 db 为 null，尝试重新初始化（可能 CDN 延迟导致首次 init 失败）
-  if (!db && typeof initSupabase === "function") {
-    initSupabase();
+  // 优先用 fetch 直连 Supabase REST API，不依赖 SDK CDN（国内加载不稳定）
+  try {
+    const resp = await fetch(SUPABASE_URL + '/rest/v1/submissions', {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=representation'
+      },
+      body: JSON.stringify(data)
+    });
+    if (resp.ok) {
+      const result = await resp.json();
+      console.log('[Supabase] fetch 提交成功');
+      return { record: result[0], savedToCloud: true };
+    }
+    const errText = await resp.text();
+    console.warn('[Supabase] fetch 返回错误', resp.status, errText);
+    throw new Error('HTTP ' + resp.status + ': ' + errText);
+  } catch(fetchErr) {
+    console.warn('[Supabase] fetch 提交失败，尝试 SDK 降级:', fetchErr.message);
+    // 降级 1：尝试用 SDK（如果 CDN 碰巧加载成功）
+    if (!db && typeof initSupabase === 'function') { initSupabase(); }
+    if (db) {
+      try {
+        const { data: result, error } = await db.from('submissions').insert(data).select();
+        if (error) throw error;
+        console.log('[Supabase] SDK 降级提交成功');
+        return { record: result[0], savedToCloud: true };
+      } catch(sdkErr) {
+        console.warn('[Supabase] SDK 降级也失败:', sdkErr.message);
+      }
+    }
+    // 降级 2：本地存储
+    console.log('[本地] 数据保存到浏览器本地存储');
+    const local = JSON.parse(localStorage.getItem('local_submissions') || '[]');
+    const record = { ...data, id: Date.now(), created_at: new Date().toISOString() };
+    local.push(record);
+    localStorage.setItem('local_submissions', JSON.stringify(local));
+    return { record: record, savedToCloud: false };
   }
-  if (db) {
-    const { data: result, error } = await db
-      .from("submissions")
-      .insert(data)
-      .select();
-    if (error) throw error;
-    return { record: result[0], savedToCloud: true };
-  }
-  // 本地降级
-  const local = JSON.parse(localStorage.getItem("local_submissions") || "[]");
-  const record = { ...data, id: Date.now(), created_at: new Date().toISOString() };
-  local.push(record);
-  localStorage.setItem("local_submissions", JSON.stringify(local));
-  return { record: record, savedToCloud: false };
 }
 
 async function getAllSubmissions() {
