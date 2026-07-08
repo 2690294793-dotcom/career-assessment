@@ -824,7 +824,7 @@ body {
 
 <div class="toast-el" id="toastEl"></div>
 
-<script src="js/config.js?v=20260708-21"></script>
+<script src="js/config.js?v=20260708-22"></script>
 <script>
 // ============================================================
 //  GLOBAL STATE
@@ -2300,33 +2300,15 @@ function renderMbti(scores) {
       '<p>'+info.growth+'</p>'+
     '</div>';
 
-  // 6. 职业道路
-  var careersTagHtml = '<div class="mbti-career-tags">'+
-    info.careers.map(function(c){return '<span class="mbti-career-tag">'+c+'</span>';}).join('')+
-  '</div>';
+  // 6. 个人成长
   var section3Html =
-    '<div class="mbti-section-title"><div class="mbti-section-num">3</div><div>职业道路</div></div>'+
-    '<div class="mbti-desc-card">'+
-      '<p>适合你的职业方向通常需要你发挥 '+info.traits.join('、')+' 的特质。以下领域与角色，更容易让你感到如鱼得水：</p>'+
-      careersTagHtml+
-    '</div>';
-
-  // 7. 个人成长
-  var section4Html =
-    '<div class="mbti-section-title"><div class="mbti-section-num">4</div><div>个人成长</div></div>'+
+    '<div class="mbti-section-title"><div class="mbti-section-num">3</div><div>个人成长</div></div>'+
     '<div class="mbti-desc-card">'+
       '<p>'+info.growth+'</p>'+
       '<p>尽管你在 '+info.traits.join('、')+' 上展现出独特优势，也要注意在关系与目标之间找到平衡。持续探索自我，会让你在成长之路上走得更稳、更远。</p>'+
     '</div>';
 
-  // 8. 底部操作按钮（装饰性，与截图一致）
-  var actionHtml =
-    '<div class="mbti-action-row">'+
-      '<button class="mbti-action-btn mbti-action-btn-primary" onclick="showToast(\'报告发送功能开发中\')">&#9993; 发送报告</button>'+
-      '<button class="mbti-action-btn mbti-action-btn-secondary" onclick="showToast(\'对比功能开发中\')">&#9829; 比较</button>'+
-    '</div>';
-
-  var allHtml = heroHtml + introHtml + sceneHtml + section1Html + section2Html + section3Html + section4Html + actionHtml;
+  var allHtml = heroHtml + introHtml + sceneHtml + section1Html + section2Html + section3Html;
 
   document.getElementById('pageBody').innerHTML =
     '<div class="page-header"><div class="page-title">MBTI报告</div><div class="page-subtitle">16种人格 · '+info.name+'</div></div>'+
@@ -3002,7 +2984,7 @@ function submitToSupabase(scores) {
 // ============================================================
 //  INIT
 // ============================================================
-console.log('[DEBUG] assessment.html v20260708-21 loaded');
+console.log('[DEBUG] assessment.html v20260708-22 loaded');
 console.log('[DEBUG] TESTS available:', typeof TESTS !== 'undefined' ? Object.keys(TESTS).join(', ') : 'UNDEFINED');
 state._locking = false;
 // 调用 config.js 的 initSupabase()，设置全局 db 变量
