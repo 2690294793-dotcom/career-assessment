@@ -200,12 +200,34 @@ body {
   background: linear-gradient(135deg, var(--primary-dark), var(--primary));
   border-radius: var(--radius-lg); padding: 28px 20px;
   text-align: center; color: #fff;
+  position: relative; overflow: hidden;
 }
-.result-hero-icon { font-size: 44px; margin-bottom: 8px; }
-.result-hero-type { font-size: 14px; opacity: 0.85; margin-bottom: 4px; }
-.result-hero-code { font-size: 34px; font-weight: 900; letter-spacing: 8px; margin-bottom: 4px; }
-.result-hero-name { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
-.result-hero-desc { font-size: 13px; opacity: 0.9; line-height: 1.7; }
+/* Big Five dimension-specific hero gradients */
+.result-hero.bf-E { background: linear-gradient(145deg, #f97316 0%, #ea580c 40%, #c2410c 100%); }
+.result-hero.bf-A { background: linear-gradient(145deg, #10b981 0%, #059669 40%, #047857 100%); }
+.result-hero.bf-C { background: linear-gradient(145deg, #3b82f6 0%, #2563eb 40%, #1d4ed8 100%); }
+.result-hero.bf-N { background: linear-gradient(145deg, #ec4899 0%, #db2777 40%, #be185d 100%); }
+.result-hero.bf-O { background: linear-gradient(145deg, #6366f1 0%, #4f46e5 40%, #4338ca 100%); }
+.result-hero .bf-glow {
+  position: absolute; width: 180px; height: 180px; border-radius: 50%;
+  filter: blur(50px); opacity: 0.25; pointer-events: none;
+}
+.result-hero .bf-glow-1 { top: -40px; right: -30px; background: #fff; }
+.result-hero .bf-glow-2 { bottom: -30px; left: -20px; background: rgba(255,255,255,.5); }
+.result-hero-icon-wrap {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 72px; height: 72px; border-radius: 22px;
+  background: rgba(255,255,255,.18);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(255,255,255,.25);
+  box-shadow: 0 8px 24px rgba(0,0,0,.12);
+  margin-bottom: 16px; position: relative; z-index: 2;
+}
+.result-hero-icon { font-size: 38px; line-height: 1; }
+.result-hero-type { font-size: 13px; opacity: .82; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; position: relative; z-index: 2; }
+.result-hero-code { font-size: 34px; font-weight: 900; letter-spacing: 8px; margin-bottom: 4px; position: relative; z-index: 2; }
+.result-hero-name { font-size: 19px; font-weight: 800; margin-bottom: 10px; letter-spacing: .3px; position: relative; z-index: 2; }
+.result-hero-desc { font-size: 13px; opacity: .92; line-height: 1.75; position: relative; z-index: 2; }
 
 .score-card {
   background: var(--card); border-radius: var(--radius-md); padding: 20px;
@@ -317,17 +339,31 @@ body {
 .mbti-section-footer { display: flex; justify-content: space-between; margin-top: 4px; font-size: 12px; color: var(--text-light); }
 
 /* Big Five classic bar */
-.bf-score-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.bf-score-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
 .bf-score-row:last-child { margin-bottom: 0; }
-.bf-score-name { font-size: 13px; font-weight: 600; color: var(--text-primary); width: 80px; flex-shrink: 0; }
-.bf-bar-wrap { flex: 1; height: 18px; background: #f0f0f5; border-radius: 9px; overflow: hidden; position: relative; }
-.bf-bar-fill { height: 100%; border-radius: 9px; transition: width 1s ease; }
+.bf-score-name {
+  width: 92px; flex-shrink: 0; display: flex; align-items: center; gap: 8px;
+  font-size: 13px; font-weight: 600; color: var(--text-primary);
+}
+.bf-score-name-icon {
+  width: 26px; height: 26px; border-radius: 8px; display: inline-flex;
+  align-items: center; justify-content: center; font-size: 14px;
+  color: #fff; flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0,0,0,.08);
+}
+.bf-score-name-icon.bf-E { background: linear-gradient(135deg, #fb923c, #ea580c); }
+.bf-score-name-icon.bf-A { background: linear-gradient(135deg, #34d399, #059669); }
+.bf-score-name-icon.bf-C { background: linear-gradient(135deg, #60a5fa, #2563eb); }
+.bf-score-name-icon.bf-N { background: linear-gradient(135deg, #f472b6, #db2777); }
+.bf-score-name-icon.bf-O { background: linear-gradient(135deg, #818cf8, #4f46e5); }
+.bf-bar-wrap { flex: 1; height: 12px; background: #f0f0f5; border-radius: 6px; overflow: hidden; position: relative; }
+.bf-bar-fill { height: 100%; border-radius: 6px; transition: width 1s ease; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
 .bf-bar-zone { position: absolute; top: 0; height: 100%; border-right: 1px dashed rgba(0,0,0,0.1); }
-.bf-score-val { font-size: 13px; font-weight: 700; color: var(--text-primary); width: 36px; flex-shrink: 0; text-align: right; }
-.bf-score-tag { font-size: 11px; font-weight: 500; flex-shrink: 0; padding: 2px 8px; border-radius: 8px; text-align: center; white-space: nowrap; }
-.bf-score-tag.high { background: #DCFCE7; color: #166534; }
-.bf-score-tag.mid { background: #FEF3C7; color: #92400E; }
-.bf-score-tag.low { background: #FEE2E2; color: #991B1B; }
+.bf-score-val { font-size: 14px; font-weight: 800; color: var(--text-primary); width: 42px; flex-shrink: 0; text-align: right; }
+.bf-score-tag { font-size: 11px; font-weight: 600; flex-shrink: 0; padding: 4px 10px; border-radius: 10px; text-align: center; white-space: nowrap; }
+.bf-score-tag.high { background: linear-gradient(135deg, #dcfce7, #bbf7d0); color: #166534; }
+.bf-score-tag.mid { background: linear-gradient(135deg, #fef3c7, #fde68a); color: #92400E; }
+.bf-score-tag.low { background: linear-gradient(135deg, #fee2e2, #fecaca); color: #991B1B; }
 
 /* DISC colored bar — clean 2-line layout */
 .disc-item { margin-bottom: 16px; }
@@ -1049,7 +1085,7 @@ var TESTS = {
     dimensions: ['E','A','C','N','O'],
     dimNames: {E:'外向性 Extraversion', A:'宜人性 Agreeableness', C:'尽责性 Conscientiousness', N:'神经质 Neuroticism', O:'开放性 Open-Mindedness'},
     dimIcons: {E:'🎤', A:'🤝', C:'📋', N:'🌊', O:'🌌'},
-    dimColors: {E:'#F59E0B', A:'#10B981', C:'#3B82F6', N:'#EF4444', O:'#6366f1'},
+    dimColors: {E:'#F97316', A:'#10B981', C:'#3B82F6', N:'#EC4899', O:'#6366F1'},
     questions: [
       {dim:'E',q:'性格外向，喜欢交际'},
       {dim:'A',q:'心肠柔软，有同情心'},
@@ -1748,15 +1784,16 @@ function renderBigFive(scores) {
   // Big Five: classic percentile bar chart
   var bfNames = {E:'外向性', A:'宜人性', C:'尽责性', N:'神经质', O:'开放性'};
   var bfZones = {E:{lo:'内向沉静',hi:'外向活跃'}, A:{lo:'理性为先',hi:'情感细腻'}, C:{lo:'灵活随性',hi:'运筹帷幄'}, N:{lo:'从容淡定',hi:'情绪敏感'}, O:{lo:'保守务实',hi:'天马行空'}};
-  var bfColors = test.dimColors || {E:'#F59E0B', A:'#10B981', C:'#3B82F6', N:'#EF4444', O:'#6366f1'};
+  var bfColors = test.dimColors || {E:'#F97316', A:'#10B981', C:'#3B82F6', N:'#EC4899', O:'#6366F1'};
 
+  var dimIcons = test.dimIcons || {E:'🎤', A:'🤝', C:'📋', N:'🧠', O:'💡'};
   var scoresHtml = test.dimensions.map(function(d){
     var s = scores[d];
     var z = bfZones[d];
     var tagCls = s >= 61 ? 'high' : (s >= 41 ? 'mid' : 'low');
     var tagText = s >= 61 ? z.hi : (s >= 41 ? '中等' : z.lo);
     return '<div class="bf-score-row">'+
-      '<span class="bf-score-name">'+bfNames[d]+'</span>'+
+      '<span class="bf-score-name"><span class="bf-score-name-icon bf-'+d+'">'+dimIcons[d]+'</span>'+bfNames[d]+'</span>'+
       '<div class="bf-bar-wrap">'+
         '<div class="bf-bar-fill" style="width:'+s+'%;background:'+bfColors[d]+'"></div>'+
       '</div>'+
@@ -1771,8 +1808,8 @@ function renderBigFive(scores) {
     buildReportInfoBar()+
     heroHtml+
     '<div class="score-card"><div class="score-title">人格特质特征</div>'+scoresHtml+'</div>'+
-    '<div class="trait-card"><div class="score-title">突出特质 — '+test.dimNames[heroDim].split(' ')[0]+'</div><div class="trait-row">'+tagsHtml+'</div></div>'+
-    '<div class="trait-card"><div class="score-title">次要特质 — '+test.dimNames[secondDim].split(' ')[0]+'</div><div class="trait-row">'+secondHtml+'</div></div>'+
+    '<div class="trait-card" style="border-left:4px solid '+bfColors[heroDim]+'"><div class="score-title">✨ 突出特质 — '+test.dimNames[heroDim].split(' ')[0]+'</div><div class="trait-row">'+tagsHtml+'</div></div>'+
+    '<div class="trait-card" style="border-left:4px solid '+bfColors[secondDim]+'"><div class="score-title">🌱 次要特质 — '+test.dimNames[secondDim].split(' ')[0]+'</div><div class="trait-row">'+secondHtml+'</div></div>'+
     '</div>'+
     buildExportBtnRow();
 }
@@ -2567,8 +2604,10 @@ function buildHero(scores, test) {
     case 'bigfive': {
       var traitInfo = getBigFiveTraits();
       var descHigh = sorted[0].score >= 50;
-      return '<div class="result-hero">'+
-        '<div class="result-hero-icon">'+test.dimIcons[heroDim]+'</div>'+
+      return '<div class="result-hero bf-'+heroDim+'">'+
+        '<div class="bf-glow bf-glow-1"></div>'+
+        '<div class="bf-glow bf-glow-2"></div>'+
+        '<div class="result-hero-icon-wrap"><div class="result-hero-icon">'+test.dimIcons[heroDim]+'</div></div>'+
         '<div class="result-hero-type">你最突出的人格维度</div>'+
         '<div class="result-hero-name">'+test.dimNames[heroDim]+'</div>'+
         '<div class="result-hero-desc">'+(descHigh ? traitInfo[heroDim].high : traitInfo[heroDim].low)+'</div>'+
