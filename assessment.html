@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>职业兴趣测评 · 自在生涯工作室</title>
 <script src="https://cdn.bootcdn.net/ajax/libs/Chart.js/4.4.0/chart.umd.min.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1074,14 +1077,23 @@ function renderSelect() {
 //  START TEST
 // ============================================================
 function startTest(testKey) {
-  state.testKey = testKey;
-  state.currentQ = 0;
-  state.answers = {};
-  state.view = 'quiz';
-  state._locking = false;
-  state._submitted = false;  // 重置提交标记，允许新测试提交
-  clearTimeout(state.autoTimer);
-  renderQuestion(false);
+  try {
+    console.log('[DEBUG] startTest called with:', testKey);
+    console.log('[DEBUG] TESTS keys:', Object.keys(TESTS));
+    state.testKey = testKey;
+    state.currentQ = 0;
+    state.answers = {};
+    state.view = 'quiz';
+    state._locking = false;
+    state._submitted = false;
+    clearTimeout(state.autoTimer);
+    console.log('[DEBUG] state.testKey =', state.testKey);
+    console.log('[DEBUG] TESTS[state.testKey] =', TESTS[state.testKey] ? 'found' : 'NOT FOUND!');
+    renderQuestion(false);
+  } catch(e) {
+    console.error('[DEBUG] startTest ERROR:', e.message, e.stack);
+    showToast('❌ 加载失败：' + e.message);
+  }
 }
 
 // ============================================================
@@ -1089,8 +1101,11 @@ function startTest(testKey) {
 //  animate=true: card slides in; false: appears instantly (first render)
 // ============================================================
 function renderQuestion(animate) {
+  try {
   clearTimeout(state.autoTimer);
   var test = TESTS[state.testKey];
+  console.log('[DEBUG] renderQuestion: testKey=' + state.testKey + ', test=' + (test ? test.name : 'NULL') + ', questions=' + (test ? test.questions.length : 'N/A'));
+  if (!test) { showToast('❌ 未找到测评: ' + state.testKey); return; }
   var total = test.questions.length;
   var q = test.questions[state.currentQ];
   var selected = state.answers[state.currentQ];
@@ -1142,6 +1157,10 @@ function renderQuestion(animate) {
       var card = document.getElementById('quizCard');
       if (card) card.classList.remove('enter');
     }, 320);
+  }
+  } catch(e) {
+    console.error('[DEBUG] renderQuestion ERROR:', e.message, e.stack);
+    showToast('❌ 题目加载失败：' + e.message);
   }
 }
 
@@ -2197,6 +2216,8 @@ function submitToSupabase(scores) {
 // ============================================================
 //  INIT
 // ============================================================
+console.log('[DEBUG] assessment.html v20260708-3 loaded');
+console.log('[DEBUG] TESTS available:', typeof TESTS !== 'undefined' ? Object.keys(TESTS).join(', ') : 'UNDEFINED');
 state._locking = false;
 // 调用 config.js 的 initSupabase()，设置全局 db 变量
 if (typeof initSupabase === 'function') {
