@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>自在生涯工作室</title>
 <style>
 :root {
@@ -505,6 +508,7 @@ tr:last-child td { border-bottom: none; }
     <input type="password" id="pwdInput" placeholder="请输入密码"
       onkeydown="if(event.key==='Enter') doLogin()">
     <button onclick="doLogin()">登 录</button>
+    <div style="margin-top:16px;color:#ccc;font-size:11px;">v20260708-4 · 默认密码: 123</div>
   </div>
 </div>
 
@@ -1639,10 +1643,21 @@ function showToast(msg, type) {
 // ============================================
 // INIT
 // ============================================
-initSupabase();
-if (sessionStorage.getItem("teacher_login") === "1") {
-  showDashboard();
-}
+(function() {
+  try {
+    initSupabase();
+  } catch(e) {
+    console.warn('[Init] Supabase 初始化失败:', e.message);
+    console.warn('[Init] 可能是 js/config.js 加载失败，请检查网络');
+  }
+  try {
+    if (sessionStorage.getItem("teacher_login") === "1") {
+      showDashboard();
+    }
+  } catch(e) {
+    console.error('[Init] 自动登录失败:', e.message);
+  }
+})();
 </script>
 </body>
 </html>
