@@ -1630,7 +1630,9 @@ function renderHolland(scores) {
     '<div class="hl-dim-list">'+
     sorted.map(function(e, i) {
       var name = test.dimNames[e.dim].split(' ')[0];
-      return '<div class="hl-dim-item'+(i<3?' hl-dim-highlight':'')+'">'+
+      var rainbowColors = ['#EF4444','#F97316','#EAB308','#22C55E','#3B82F6','#8B5CF6'];
+      var borderColor = rainbowColors[i] || rainbowColors[0];
+      return '<div class="hl-dim-item'+(i<3?' hl-dim-highlight':'')+'" style="border-left:4px solid '+borderColor+';">'+
         '<span class="hl-dim-tag" style="background:'+test.dimColors[e.dim]+'20;color:'+test.dimColors[e.dim]+'">'+name+'</span>'+
         '<span class="hl-dim-desc">'+dimDescs[e.dim]+' 你的得分'+e.raw+'分，'+(i<3?'属于优势领域':'相对较弱')+'。</span>'+
       '</div>';
@@ -2562,7 +2564,7 @@ function submitToSupabase(scores) {
 // ============================================================
 //  INIT
 // ============================================================
-console.log('[DEBUG] assessment.html v20260708-9 loaded');
+console.log('[DEBUG] assessment.html v20260708-10 loaded');
 console.log('[DEBUG] TESTS available:', typeof TESTS !== 'undefined' ? Object.keys(TESTS).join(', ') : 'UNDEFINED');
 state._locking = false;
 // 调用 config.js 的 initSupabase()，设置全局 db 变量
