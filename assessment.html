@@ -682,14 +682,14 @@ body {
   font-size: 17px; font-weight: 800; flex-shrink: 0;
 }
 
-/* 维度条 - 截图风格 */
+/* 维度条 - 截图风格：单色底+填充+圆点 */
 .mbti-dim-card {
   background: var(--card); border-radius: 16px;
   padding: 20px; margin-bottom: 18px;
   box-shadow: 0 2px 10px rgba(0,0,0,.04);
 }
 .mbti-dim-row {
-  margin-bottom: 20px;
+  margin-bottom: 22px;
 }
 .mbti-dim-row:last-child { margin-bottom: 0; }
 
@@ -711,22 +711,25 @@ body {
   flex-shrink: 0;
 }
 
-/* 维度条主体 */
+/* 维度条主体：浅灰底 + 主色填充 + 白圆点 */
 .mbti-dim-track-wrap {
   position: relative;
 }
 .mbti-dim-track {
-  height: 14px; border-radius: 7px; overflow: visible !important;
-  display: flex; position: relative;
+  height: 14px; border-radius: 7px;
+  background: #e5e7eb;
+  position: relative;
+  overflow: visible;
 }
-.mbti-dim-seg {
-  height: 100%;
+.mbti-dim-fill {
+  height: 100%; border-radius: 7px;
+  position: absolute; left: 0; top: 0;
 }
 .mbti-dim-dot {
   position: absolute; top: 50%; transform: translate(-50%, -50%);
-  width: 26px; height: 26px; border-radius: 50%;
-  background: #fff; border: 3px solid #ccc;
-  box-shadow: 0 2px 8px rgba(0,0,0,.12);
+  width: 22px; height: 22px; border-radius: 50%;
+  background: #fff; border: 3px solid;
+  box-shadow: 0 2px 8px rgba(0,0,0,.15);
   z-index: 3;
 }
 
@@ -821,7 +824,7 @@ body {
 
 <div class="toast-el" id="toastEl"></div>
 
-<script src="js/config.js?v=20260708-20"></script>
+<script src="js/config.js?v=20260708-21"></script>
 <script>
 // ============================================================
 //  GLOBAL STATE
@@ -2242,33 +2245,40 @@ function renderMbti(scores) {
       '<img class="mbti-scene-img" src="'+photoUrl+'" alt="'+info.name+' 场景">'+
     '</div>';
 
-  // 4. 维度条：截图风格
+  // 4. 维度条：截图风格（单色填充+白圆点+5个维度）
+  // 身份特征(A-T)：基于已有维度推算（N/T/P高→Turbulent高）
+  var identityPct = Math.round(
+    ((scores.SN < 50 ? (100-scores.SN)*0.3 : scores.SN*0.1) +
+     (scores.TF >= 50 ? scores.TF*0.3 : (100-scores.TF)*0.1) +
+     (scores.JP < 50 ? (100-scores.JP)*0.3 : scores.JP*0.1)) * 1.1
+  );
+  identityPct = Math.max(35, Math.min(75, identityPct)); // 35-75范围
   var mbtiDims = [
-    {key:'EI', label:'能量', leftText:'外向', rightText:'内向', leftColor:'#3B82F6', rightColor:'#F59E0B'},
-    {key:'SN', label:'心智', leftText:'感觉', rightText:'直觉', leftColor:'#F59E0B', rightColor:'#3B82F6'},
-    {key:'TF', label:'天性', leftText:'思维', rightText:'情感', leftColor:'#10B981', rightColor:'#EF4444'},
-    {key:'JP', label:'应对', leftText:'判断', rightText:'感知', leftColor:'#8B5CF6', rightColor:'#EC4899'}
+    {key:'EI', label:'能量', leftText:'外向', rightText:'内向', color:'#3B82F6'},
+    {key:'SN', label:'心智', leftText:'感觉', rightText:'直觉', color:'#F59E0B'},
+    {key:'TF', label:'天性', leftText:'思维', rightText:'情感', color:'#10B981'},
+    {key:'JP', label:'应对方式', leftText:'判断', rightText:'感知', color:'#8B5CF6'},
+    {_pct:identityPct, label:'身份特征', leftText:'自信果断', rightText:'情绪易波动', color:'#EF4444'}
   ];
   var dimsHtml = mbtiDims.map(function(d){
-    var s = Math.round(scores[d.key]);
-    var sL = s, sR = 100 - s;
-    var isLeft = s >= 50;
+    var s, isLeft;
+    if (d._pct !== undefined) {
+      s = d._pct; isLeft = s < 50; // 身份特征：<50=Assertive(左), ≥50=Turbulent(右)
+    } else {
+      s = Math.round(scores[d.key]); isLeft = s >= 50;
+    }
     var activeText = isLeft ? d.leftText : d.rightText;
-    var activeColor = isLeft ? d.leftColor : d.rightColor;
-    var dotBorder = activeColor;
-    var dotLeft = s + '%';
     return '<div class="mbti-dim-row">'+
       '<div class="mbti-dim-header">'+
-        '<span class="mbti-dim-label" style="color:'+activeColor+'">'+d.label+'</span>'+
-        '<span class="mbti-dim-pct" style="color:'+activeColor+'">'+s+'% '+activeText+'</span>'+
-        '<span class="mbti-dim-help" title="该维度反映你在这组特质上的偏好强度">?</span>'+
+        '<span class="mbti-dim-label" style="color:'+d.color+'">'+d.label+'</span>'+
+        '<span class="mbti-dim-pct" style="color:'+d.color+'">'+s+'% '+activeText+'</span>'+
+        '<span class="mbti-dim-help">?</span>'+
       '</div>'+
       '<div class="mbti-dim-track-wrap">'+
         '<div class="mbti-dim-track">'+
-          '<div class="mbti-dim-seg" style="width:'+sL+'%;background:'+d.leftColor+'"></div>'+
-          '<div class="mbti-dim-seg" style="width:'+sR+'%;background:'+d.rightColor+'"></div>'+
+          '<div class="mbti-dim-fill" style="width:'+s+'%;background:'+d.color+'"></div>'+
         '</div>'+
-        '<div class="mbti-dim-dot" style="left:'+dotLeft+';border-color:'+dotBorder+'"></div>'+
+        '<div class="mbti-dim-dot" style="left:'+s+'%;border-color:'+d.color+'"></div>'+
       '</div>'+
       '<div class="mbti-dim-footer">'+
         '<span>'+d.leftText+'</span>'+
@@ -2992,7 +3002,7 @@ function submitToSupabase(scores) {
 // ============================================================
 //  INIT
 // ============================================================
-console.log('[DEBUG] assessment.html v20260708-20 loaded');
+console.log('[DEBUG] assessment.html v20260708-21 loaded');
 console.log('[DEBUG] TESTS available:', typeof TESTS !== 'undefined' ? Object.keys(TESTS).join(', ') : 'UNDEFINED');
 state._locking = false;
 // 调用 config.js 的 initSupabase()，设置全局 db 变量
