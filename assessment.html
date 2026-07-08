@@ -1107,29 +1107,37 @@ function renderStudentInfo() {
 }
 
 function submitStudentInfo() {
-  var name = (document.getElementById('si-name').value || '').trim();
-  var school = (document.getElementById('si-school').value || '').trim();
-  var sid = (document.getElementById('si-sid').value || '').trim();
-  var cls = (document.getElementById('si-class').value || '').trim();
-  if (!name) { showToast('请输入姓名'); return; }
-  if (!school) { showToast('请输入学校'); return; }
-  if (!sid) { showToast('请输入学号'); return; }
-  if (!cls) { showToast('请输入班级'); return; }
-  // 验证学校是否为本校
-  if (typeof verifySchool === 'function' && !verifySchool(school)) {
-    showToast('❌ 仅限本校学生使用，请确认学校名称');
-    var schoolInput = document.getElementById('si-school');
-    schoolInput.classList.add('error');
-    schoolInput.focus();
-    schoolInput.select();
-    setTimeout(function() { schoolInput.classList.remove('error'); }, 600);
-    return;
+  try {
+    console.log('[DEBUG] submitStudentInfo() clicked');
+    var name = (document.getElementById('si-name').value || '').trim();
+    var school = (document.getElementById('si-school').value || '').trim();
+    var sid = (document.getElementById('si-sid').value || '').trim();
+    var cls = (document.getElementById('si-class').value || '').trim();
+    if (!name) { showToast('请输入姓名'); return; }
+    if (!school) { showToast('请输入学校'); return; }
+    if (!sid) { showToast('请输入学号'); return; }
+    if (!cls) { showToast('请输入班级'); return; }
+    // 验证学校是否为本校
+    console.log('[DEBUG] verifying school:', school);
+    if (typeof verifySchool === 'function' && !verifySchool(school)) {
+      showToast('❌ 仅限本校学生使用，请确认学校名称');
+      var schoolInput = document.getElementById('si-school');
+      schoolInput.classList.add('error');
+      schoolInput.focus();
+      schoolInput.select();
+      setTimeout(function() { schoolInput.classList.remove('error'); }, 600);
+      return;
+    }
+    state.studentInfo = { name: name, school: school, studentId: sid, className: cls };
+    state._schoolVerified = true;  // 开始时已验证，后续不再验证
+    // 持久化，下次不用重复填写
+    try { localStorage.setItem('assessment_student_info', JSON.stringify(state.studentInfo)); } catch(e) {}
+    console.log('[DEBUG] calling renderSelect()');
+    renderSelect();
+  } catch(e) {
+    console.error('[DEBUG] submitStudentInfo ERROR:', e.message, e.stack);
+    alert('提交信息出错：' + e.message + '，请刷新页面重试。');
   }
-  state.studentInfo = { name: name, school: school, studentId: sid, className: cls };
-  state._schoolVerified = true;  // 开始时已验证，后续不再验证
-  // 持久化，下次不用重复填写
-  try { localStorage.setItem('assessment_student_info', JSON.stringify(state.studentInfo)); } catch(e) {}
-  renderSelect();
 }
 
 // ============================================================
@@ -2460,14 +2468,19 @@ function submitToSupabase(scores) {
 // ============================================================
 //  INIT
 // ============================================================
-console.log('[DEBUG] assessment.html v20260708-3 loaded');
+console.log('[DEBUG] assessment.html v20260708-5 loaded');
 console.log('[DEBUG] TESTS available:', typeof TESTS !== 'undefined' ? Object.keys(TESTS).join(', ') : 'UNDEFINED');
 state._locking = false;
 // 调用 config.js 的 initSupabase()，设置全局 db 变量
-if (typeof initSupabase === 'function') {
-  initSupabase();
-} else {
-  console.warn('config.js 未加载，Supabase 无法初始化');
+try {
+  if (typeof initSupabase === 'function') {
+    initSupabase();
+  } else {
+    console.warn('config.js 未加载，Supabase 无法初始化');
+  }
+} catch(e) {
+  console.warn('Supabase 初始化失败(不影响测评):', e.message);
+  window.db = null;
 }
 // 优先恢复已保存的学生信息，没有则先填写
 (function(){
