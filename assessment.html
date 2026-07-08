@@ -1649,7 +1649,7 @@ function renderHolland(scores) {
       '<div class="hl-hero-code-row">'+
         top3.map(function(e, i){
           var name = test.dimNames[e.dim].split(' ')[0];
-          return '<div class="hl-hero-pill" style="background:'+test.dimColors[e.dim]+'15;color:'+test.dimColors[e.dim]+';border:1.5px solid '+test.dimColors[e.dim]+'40">'+
+          return '<div class="hl-hero-pill" style="background:rgba(255,255,255,0.95);color:#1f2937;border:1px solid rgba(255,255,255,0.6);box-shadow:0 2px 6px rgba(0,0,0,0.12);">'+
             '<span class="hl-hero-pill-letter" style="background:'+test.dimColors[e.dim]+'">'+e.dim+'</span>'+
             '<span>'+name+'</span>'+
           '</div>';
@@ -2562,7 +2562,7 @@ function submitToSupabase(scores) {
 // ============================================================
 //  INIT
 // ============================================================
-console.log('[DEBUG] assessment.html v20260708-8 loaded');
+console.log('[DEBUG] assessment.html v20260708-9 loaded');
 console.log('[DEBUG] TESTS available:', typeof TESTS !== 'undefined' ? Object.keys(TESTS).join(', ') : 'UNDEFINED');
 state._locking = false;
 // 调用 config.js 的 initSupabase()，设置全局 db 变量
