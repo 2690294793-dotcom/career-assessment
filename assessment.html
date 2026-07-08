@@ -625,6 +625,92 @@ body {
 .st-top-name { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
 .st-top-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.5; }
 .st-top-score { font-size: 13px; font-weight: 800; flex-shrink: 0; }
+
+/* ====== MBTI 16PERSONALITIES-STYLE IMAGE REPORT ====== */
+.mbti-report { --c-accent: #4DAB6E; --c-accent-10: rgba(77,171,110,0.1); }
+.mbti-report-analysts { --c-accent: #5B5BC5; --c-accent-10: rgba(91,91,197,0.1); }
+.mbti-report-diplomats { --c-accent: #4DAB6E; --c-accent-10: rgba(77,171,110,0.1); }
+.mbti-report-sentinels { --c-accent: #4A90A4; --c-accent-10: rgba(74,144,164,0.1); }
+.mbti-report-explorers { --c-accent: #E0A94E; --c-accent-10: rgba(224,169,78,0.1); }
+
+.mbti-hero {
+  position: relative; border-radius: 0 0 24px 24px;
+  padding: 32px 22px; color: #fff; overflow: hidden;
+  margin-bottom: 16px; min-height: 160px; display: flex; align-items: center;
+}
+.mbti-hero-bg { position: absolute; inset: 0; z-index: 1; }
+.mbti-hero-content { position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: center; width: 100%; }
+.mbti-hero-left { flex: 1; }
+.mbti-hero-label { font-size: 13px; opacity: 0.9; margin-bottom: 6px; font-weight: 500; }
+.mbti-hero-type { font-size: 34px; font-weight: 900; line-height: 1.1; margin-bottom: 6px; }
+.mbti-hero-code { font-size: 18px; font-weight: 700; opacity: 0.95; letter-spacing: 3px; }
+.mbti-hero-svg { width: 130px; height: 130px; flex-shrink: 0; margin-left: 10px; }
+
+.mbti-desc-wrap {
+  font-size: 14px; line-height: 1.8; color: #333;
+  padding: 20px 22px; background: var(--card); border-radius: 16px;
+  margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.mbti-desc-wrap p { margin-bottom: 12px; }
+.mbti-desc-wrap p:last-child { margin-bottom: 0; }
+
+.mbti-layout { display: flex; gap: 14px; flex-direction: column; }
+.mbti-main { flex: 1; min-width: 0; }
+.mbti-sidebar { width: 100%; }
+
+.mbti-card {
+  background: var(--card); border-radius: 16px;
+  padding: 18px; margin-bottom: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  border-left: 4px solid var(--c-accent);
+}
+.mbti-card-title {
+  font-size: 16px; font-weight: 800; color: var(--text-primary);
+  margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
+}
+.mbti-card-body { font-size: 13px; line-height: 1.75; color: var(--text-secondary); }
+.mbti-card-body p { margin-bottom: 8px; }
+
+.mbti-sidebar-card {
+  background: var(--card); border-radius: 16px;
+  padding: 16px; margin-bottom: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04); text-align: center;
+}
+.mbti-sidebar-avatar {
+  width: 60px; height: 60px; border-radius: 50%;
+  background: var(--c-accent); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px; margin: 0 auto 8px;
+}
+.mbti-sidebar-type { font-size: 18px; font-weight: 800; color: var(--text-primary); }
+.mbti-sidebar-code { font-size: 13px; color: var(--text-light); margin-bottom: 4px; }
+.mbti-sidebar-group { font-size: 12px; color: var(--text-secondary); font-weight: 500; }
+.mbti-sidebar-toc {
+  background: var(--card); border-radius: 16px;
+  padding: 14px; margin-bottom: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.mbti-toc-item { font-size: 13px; color: var(--text-secondary); padding: 7px 0; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 6px; }
+.mbti-toc-item:last-child { border-bottom: 0; }
+.mbti-toc-num { color: var(--c-accent); font-weight: 800; width: 18px; }
+
+.mbti-career-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.mbti-career-tag {
+  background: var(--c-accent-10); color: var(--c-accent);
+  font-size: 12px; padding: 4px 10px; border-radius: 20px;
+  font-weight: 600;
+}
+
+.mbti-dim-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 12px; }
+.mbti-dim-bar-label { width: 36px; font-weight: 600; color: var(--text-primary); }
+.mbti-dim-bar-track { flex: 1; height: 12px; border-radius: 6px; background: var(--bg); display: flex; overflow: hidden; }
+.mbti-dim-bar-seg { height: 100%; transition: width 0.8s ease; }
+.mbti-dim-bar-val { width: 32px; text-align: right; font-weight: 700; color: var(--text-primary); }
+
+@media (min-width: 640px) {
+  .mbti-layout { flex-direction: row; }
+  .mbti-sidebar { width: 200px; flex-shrink: 0; }
+}
 </style>
 <script src="https://beacon.cdn.qq.com/sdk/4.5.9/beacon_web.min.js"></script>
 <script>
@@ -2062,57 +2148,140 @@ function getStrengthOneLiner(dim) {
 // ============================================================
 function renderMbti(scores) {
   var test = TESTS.mbti;
-
   var EorI = scores.EI >= 50 ? 'E' : 'I';
   var SorN = scores.SN >= 50 ? 'S' : 'N';
   var TorF = scores.TF >= 50 ? 'T' : 'F';
   var JorP = scores.JP >= 50 ? 'J' : 'P';
   var mbtiType = EorI + SorN + TorF + JorP;
   var info = getMbtiInfo(mbtiType);
+  var group = getMbtiGroup(mbtiType);
+  var groupName = getMbtiGroupName(group);
+  var accentColor = getMbtiGroupColor(group);
 
-  var heroHtml = buildHero(scores, test);
+  // 顶部大横幅（16P风格）
+  var heroHtml =
+    '<div class="mbti-hero" style="background:'+accentColor+'">'+
+      '<div class="mbti-hero-bg"></div>'+
+      '<div class="mbti-hero-content">'+
+        '<div class="mbti-hero-left">'+
+          '<div class="mbti-hero-label">你的人格类型是：</div>'+
+          '<div class="mbti-hero-type">'+info.name+'</div>'+
+          '<div class="mbti-hero-code">'+mbtiType+'-A</div>'+
+        '</div>'+
+        '<div class="mbti-hero-svg">'+getMbtiSvg(mbtiType)+'</div>'+
+      '</div>'+
+    '</div>';
 
-  // MBTI: classic dual-color split bars — 2-line layout
+  // 描述段落
+  var descHtml = '<div class="mbti-desc-wrap"><p>作为一位 <b>'+mbtiType+'（'+info.name+'）</b>，'+info.desc+'</p><p>你属于 <b>'+groupName+'</b> 阵营，这一人格群体通常以'+info.traits.join('、')+'著称。</p></div>';
+
+  // 特征标签
+  var traitsHtml = '<div class="mbti-career-tags">'+
+    info.traits.map(function(t){return '<span class="mbti-career-tag">'+t+'</span>';}).join('')+
+  '</div>';
+
+  // 维度倾向（新版双段条形）
   var mbtiDims = [
     {key:'EI', header:'能量', left:'外倾', right:'内倾', leftColor:'#3B82F6', rightColor:'#F59E0B'},
     {key:'SN', header:'心智', left:'感觉', right:'直觉', leftColor:'#F59E0B', rightColor:'#3B82F6'},
     {key:'TF', header:'天性', left:'思维', right:'情感', leftColor:'#10B981', rightColor:'#EF4444'},
     {key:'JP', header:'应对', left:'判断', right:'感知', leftColor:'#8B5CF6', rightColor:'#EC4899'}
   ];
-
-  var scoresHtml = mbtiDims.map(function(d){
+  var dimsHtml = mbtiDims.map(function(d){
     var s = Math.round(scores[d.key]);
     var sL = s;
     var sR = 100 - s;
     var isLeft = s >= 50;
     var activeLabel = isLeft ? d.left : d.right;
     var activeColor = isLeft ? d.leftColor : d.rightColor;
-    return '<div class="mbti-section">'+
-      '<div class="mbti-section-header">'+
-        '<span class="mbti-section-label">'+d.header+': <span style="color:'+activeColor+'">'+activeLabel+'</span></span>'+
-        '<span class="mbti-section-pct" style="color:'+activeColor+'">'+s+'%</span>'+
+    return '<div class="mbti-dim-bar-row">'+
+      '<div class="mbti-dim-bar-label" style="color:'+activeColor+'">'+activeLabel+'</div>'+
+      '<div class="mbti-dim-bar-track">'+
+        '<div class="mbti-dim-bar-seg" style="width:'+sL+'%;background:'+d.leftColor+'"></div>'+
+        '<div class="mbti-dim-bar-seg" style="width:'+sR+'%;background:'+d.rightColor+'"></div>'+
       '</div>'+
-      '<div class="mbti-bar-full">'+
-        '<div class="mbti-bar-left" style="flex:'+sL+';background:'+d.leftColor+'">'+
-          (sL>=25 ? '<span class="mbti-bar-text">'+sL+'%</span>' : '')+
-        '</div>'+
-        '<div class="mbti-bar-right" style="flex:'+sR+';background:'+d.rightColor+'">'+
-          (sR>=25 ? '<span class="mbti-bar-text">'+sR+'%</span>' : '')+
-        '</div>'+
-      '</div>'+
-      '<div class="mbti-section-footer">'+
-        '<span>'+d.left+'</span>'+
-        '<span>'+d.right+'</span>'+
-      '</div>'+
+      '<div class="mbti-dim-bar-val" style="color:'+activeColor+'">'+s+'%</div>'+
     '</div>';
   }).join('');
 
+  // 职业标签
+  var careersHtml = '<div class="mbti-career-tags">'+
+    info.careers.map(function(c){return '<span class="mbti-career-tag">'+c+'</span>';}).join('')+
+  '</div>';
+
+  // 内容卡片
+  var personalityCard =
+    '<div class="mbti-card">'+
+      '<div class="mbti-card-title">🧠 人格特征</div>'+
+      '<div class="mbti-card-body">'+
+        '<p>'+info.desc+'</p>'+
+        '<p>核心特质：</p>'+traitsHtml+
+      '</div>'+
+    '</div>';
+
+  var careersCard =
+    '<div class="mbti-card">'+
+      '<div class="mbti-card-title">💼 职业道路</div>'+
+      '<div class="mbti-card-body">'+
+        '<p>适合你的职业方向通常需要你发挥'+info.traits.join('、')+'的特质：</p>'+
+        careersHtml+
+      '</div>'+
+    '</div>';
+
+  var relationshipsCard =
+    '<div class="mbti-card">'+
+      '<div class="mbti-card-title">❤️ 人际关系</div>'+
+      '<div class="mbti-card-body"><p>'+info.relationships+'</p></div>'+
+    '</div>';
+
+  var growthCard =
+    '<div class="mbti-card">'+
+      '<div class="mbti-card-title">🌱 个人成长</div>'+
+      '<div class="mbti-card-body"><p>'+info.growth+'</p></div>'+
+    '</div>';
+
+  var dimsCard =
+    '<div class="mbti-card">'+
+      '<div class="mbti-card-title">📊 维度倾向</div>'+
+      '<div class="mbti-card-body">'+dimsHtml+'</div>'+
+    '</div>';
+
+  // 侧边栏
+  var sidebarCard =
+    '<div class="mbti-sidebar-card">'+
+      '<div class="mbti-sidebar-avatar">'+test.icon+'</div>'+
+      '<div class="mbti-sidebar-type">'+info.name+'</div>'+
+      '<div class="mbti-sidebar-code">'+mbtiType+'-A</div>'+
+      '<div class="mbti-sidebar-group">'+groupName+' · 16型人格</div>'+
+    '</div>';
+
+  var tocCard =
+    '<div class="mbti-sidebar-toc">'+
+      '<div class="mbti-toc-item"><span class="mbti-toc-num">1</span>人格特征</div>'+
+      '<div class="mbti-toc-item"><span class="mbti-toc-num">2</span>职业道路</div>'+
+      '<div class="mbti-toc-item"><span class="mbti-toc-num">3</span>人际关系</div>'+
+      '<div class="mbti-toc-item"><span class="mbti-toc-num">4</span>个人成长</div>'+
+    '</div>';
+
+  var mainHtml =
+    personalityCard +
+    careersCard +
+    relationshipsCard +
+    growthCard;
+
+  var layoutHtml =
+    '<div class="mbti-layout">'+
+      '<div class="mbti-main">'+mainHtml+'</div>'+
+      '<div class="mbti-sidebar">'+sidebarCard+tocCard+dimsCard+'</div>'+
+    '</div>';
+
   document.getElementById('pageBody').innerHTML =
     '<div class="page-header"><div class="page-title">MBTI报告</div><div class="page-subtitle">16种人格 · '+info.name+'</div></div>'+
-    '<div class="report-export-wrap" id="reportExportWrap">'+
+    '<div class="report-export-wrap mbti-report mbti-report-'+group+'" id="reportExportWrap">'+
     buildReportInfoBar()+
     heroHtml+
-    '<div class="score-card"><div class="score-title">维度倾向</div>'+scoresHtml+'</div>'+
+    descHtml+
+    layoutHtml+
     '</div>'+
     buildExportBtnRow();
 }
@@ -2586,24 +2755,64 @@ function getHollandTypeNames() {
 
 function getMbtiInfo(type) {
   var map = {
-    ISTJ:{name:'物流师',desc:'务实、严谨、可靠。你重视传统和秩序，做事有条不紊，是团队中最值得信赖的支柱。',careers:['审计师','法官','军警','会计','数据分析师']},
-    ISFJ:{name:'守护者',desc:'温暖、细心、奉献。你默默地关心他人，用行动而非言语表达爱，是可靠的守护者。',careers:['护士','教师','社工','行政专员','图书管理员']},
-    INFJ:{name:'提倡者',desc:'深邃、理想、富有洞察力。你拥有强大的直觉和共情能力，致力于让世界变得更美好。',careers:['心理咨询师','作家','教育顾问','HR总监','非营利组织负责人']},
-    INTJ:{name:'建筑师',desc:'战略、独立、远见。你善于系统思考，是天生的战略家，总能看见别人看不到的未来。',careers:['科学家','工程师','管理咨询','教授','CTO']},
-    ISTP:{name:'鉴赏家',desc:'冷静、务实、灵活。你动手能力极强，善于在危机中保持冷静并找到解决方案。',careers:['机械师','飞行员','外科医生','工程师','犯罪调查员']},
-    ISFP:{name:'探险家',desc:'温和、艺术、自由。你用独特的美学感知世界，享受当下的每一刻。',careers:['设计师','摄影师','美容师','花艺师','音乐家']},
-    INFP:{name:'调停者',desc:'理想、善良、创造。你内心充满热情，追求意义和价值，相信每个人都可以变得更好。',careers:['作家','心理咨询师','UX设计师','编辑','非营利工作者']},
-    INTP:{name:'逻辑���家',desc:'理性、创新、好奇。你对知识的渴望永无止境，享受解构复杂问题的乐趣。',careers:['程序员','数学家','哲学家','研究员','发明家']},
-    ESTP:{name:'企业家',desc:'大胆、务实、行动派。你活在当下，享受冒险和刺激，是解决实际问题的能手。',careers:['创业者','销售','急救员','运动员','经纪人']},
-    ESFP:{name:'表演者',desc:'热情、活泼、享乐。你是天生的表演者，用笑容感染身边每一个人。',careers:['演员','导游','活动策划','公关','主持人']},
-    ENFP:{name:'竞选者',desc:'热情、创意、社交。你充满奇思妙想，善于发现每个人的闪光点。',careers:['记者','市场营销','创业者','培训师','外交官']},
-    ENTP:{name:'辩论家',desc:'机智、好奇、善辩。你享受智力上的挑战，总能从不同角度看问题。',careers:['律师','企业家','产品经理','投资顾问','建筑师']},
-    ESTJ:{name:'总经理',desc:'高效、务实、领导。你是天生的组织者，善于带领团队达成目标。',careers:['CEO','军官','校长','法官','项目经理']},
-    ESFJ:{name:'执政官',desc:'热心、负责、合群。你注重人际关系和谐，是社区和团队的粘合剂。',careers:['销售经理','教师','医疗管理','活动策划','公关']},
-    ENFJ:{name:'主人公',desc:'魅力、利他、激励。你天生具有领导气质，能激发他人的潜能。',careers:['政治家','培训师','心理咨询师','人力资源总监','校长']},
-    ENTJ:{name:'指挥官',desc:'果断、远见、强势。你是天生的领袖，擅长制定战略并果断执行。',careers:['CEO','企业高管','法官','军事指挥官','管理咨询']}
+    ISTJ:{name:'物流师',desc:'务实、严谨、可靠。你重视传统和秩序，做事有条不紊，是团队中最值得信赖的支柱。',careers:['审计师','法官','军警','会计','数据分析师'],traits:['可靠','守序','务实'],relationships:'你重视承诺与忠诚，用行动表达关心。你不太擅长说甜言蜜语，但会在关键时刻出现。',growth:'允许自己偶尔灵活变通，不必事事追求完美计划。'},
+    ISFJ:{name:'守护者',desc:'温暖、细心、奉献。你默默地关心他人，用行动而非言语表达爱，是可靠的守护者。',careers:['护士','教师','社工','行政专员','图书管理员'],traits:['温暖','细心','奉献'],relationships:'你善于照顾他人，但要注意不要过度牺牲自己。与懂得感激的人相处会让你更舒适。',growth:'学会说出自己的需求，你的付出值得被看见。'},
+    INFJ:{name:'提倡者',desc:'深邃、理想、富有洞察力。你拥有强大的直觉和共情能力，致力于让世界变得更美好。',careers:['心理咨询师','作家','教育顾问','HR总监','非营利组织负责人'],traits:['深邃','理想','洞察'],relationships:'你渴望深层次的连接，重视真诚与理解。你善于倾听，但偶尔也需要被倾听。',growth:'设定清晰的情感边界，避免把世界的问题都扛在自己肩上。'},
+    INTJ:{name:'建筑师',desc:'战略、独立、远见。你善于系统思考，是天生的战略家，总能看见别人看不到的未来。',careers:['科学家','工程师','管理咨询','教授','CTO'],traits:['战略','独立','远见'],relationships:'你重视智慧与成长，喜欢有深度的对话。你不善于表达情感，但会用行动支持重要的人。',growth:'在追求效率的同时，别忘了关注和表达他人的情感需求。'},
+    ISTP:{name:'鉴赏家',desc:'冷静、务实、灵活。你动手能力极强，善于在危机中保持冷静并找到解决方案。',careers:['机械师','飞行员','外科医生','工程师','犯罪调查员'],traits:['冷静','务实','灵活'],relationships:'你独立而低调，喜欢给彼此留出空间。你通过解决问题来表达在乎。',growth:'在关系里，有时陪伴本身比解决问题更重要。'},
+    ISFP:{name:'探险家',desc:'温和、艺术、自由。你用独特的美学感知世界，享受当下的每一刻。',careers:['设计师','摄影师','美容师','花艺师','音乐家'],traits:['温和','艺术','自由'],relationships:'你温柔而敏感，喜欢轻松自然的相处。你用创造力和陪伴来表达爱意。',growth:'相信自己的价值，不必为了迎合他人而隐藏真实的自己。'},
+    INFP:{name:'调停者',desc:'理想、善良、创造。你内心充满热情，追求意义和价值，相信每个人都可以变得更好。',careers:['作家','心理咨询师','UX设计师','编辑','非营利工作者'],traits:['理想','善良','创造'],relationships:'你重视真诚和价值观的契合，渴望被理解和接纳。你富有同理心，也容易受伤。',growth:'把理想拆成可执行的小步，让现实世界也跟上你的内心节奏。'},
+    INTP:{name:'逻辑学家',desc:'理性、创新、好奇。你对知识的渴望永无止境，享受解构复杂问题的乐趣。',careers:['程序员','数学家','哲学家','研究员','发明家'],traits:['理性','创新','好奇'],relationships:'你珍视智力共鸣，喜欢和思想有趣的人交流。情感表达不是你的强项，但你的忠诚很深沉。',growth:'尝试在逻辑之外，也理解和回应他人的情绪。'},
+    ESTP:{name:'企业家',desc:'大胆、务实、行动派。你活在当下，享受冒险和刺激，是解决实际问题的能手。',careers:['创业者','销售','急救员','运动员','经纪人'],traits:['大胆','务实','行动'],relationships:'你热情直接，喜欢一起冒险和体验新鲜事物。你让关系充满活力，但需要新鲜感。',growth:'在追逐刺激的同时，也要经营关系的稳定和深度。'},
+    ESFP:{name:'表演者',desc:'热情、活泼、享乐。你是天生的表演者，用笑容感染身边每一个人。',careers:['演员','导游','活动策划','公关','主持人'],traits:['热情','活泼','享乐'],relationships:'你让身边人感到被关注和快乐，社交是你的能量来源。你享受热闹，也需要被欣赏。',growth:'学会独处，倾听内心真实的声音，不必时刻扮演快乐角色。'},
+    ENFP:{name:'竞选者',desc:'热情、创意、社交。你充满奇思妙想，善于发现每个人的闪光点。',careers:['记者','市场营销','创业者','培训师','外交官'],traits:['热情','创意','社交'],relationships:'你真诚而热情，善于激发他人的潜能。你害怕束缚，需要关系里有成长和新鲜感。',growth:'把注意力从可能性中收回一些，完成眼前的承诺会让你更有成就感。'},
+    ENTP:{name:'辩论家',desc:'机智、好奇、善辩。你享受智力上的挑战，总能从不同角度看问题。',careers:['律师','企业家','产品经理','投资顾问','建筑师'],traits:['机智','好奇','善辩'],relationships:'你风趣幽默，喜欢能接住你想法的人。但要注意，辩论和抬杠之间的界限很细。',growth:'在追求赢的同时，也照顾他人的感受，关系不是辩论赛。'},
+    ESTJ:{name:'总经理',desc:'高效、务实、领导。你是天生的组织者，善于带领团队达成目标。',careers:['CEO','军官','校长','法官','项目经理'],traits:['高效','务实','领导'],relationships:'你重视责任与效率，会为身边的人提供稳定和组织。你欣赏直接和可靠的人。',growth:'在指出问题前，先肯定他人的努力，会让你的领导更有温度。'},
+    ESFJ:{name:'执政官',desc:'热心、负责、合群。你注重人际关系和谐，是社区和团队的粘合剂。',careers:['销售经理','教师','医疗管理','活动策划','公关'],traits:['热心','负责','合群'],relationships:'你善于营造温馨的氛围，喜欢照顾和被需要。你在关系里付出很多，也期待被认可。',growth:'不必为了维持和谐而压抑自己的真实想法。'},
+    ENFJ:{name:'主人公',desc:'魅力、利他、激励。你天生具有领导气质，能激发他人的潜能。',careers:['政治家','培训师','心理咨询师','人力资源总监','校长'],traits:['魅力','利他','激励'],relationships:'你善于理解和支持他人，是关系中的温暖核心。你渴望有意义的人际连接。',growth:'在照亮他人的同时，记得给自己充电，避免过度消耗。'},
+    ENTJ:{name:'指挥官',desc:'果断、远见、强势。你是天生的领袖，擅长制定战略并果断执行。',careers:['CEO','企业高管','法官','军事指挥官','管理咨询'],traits:['果断','远见','强势'],relationships:'你欣赏能力和效率，喜欢和强者同行。你会为关系提供方向和资源，但需要学习柔软。',growth:'在达成目标的路上，留一点时间给情感交流和关系维护。'}
   };
-  return map[type] || {name:'未知',desc:'独特的人格',careers:['多领域探索']};
+  return map[type] || {name:'未知',desc:'独特的人格',careers:['多领域探索'],traits:['独特'],relationships:'独一无二的关系模式。',growth:'持续探索自我。'};
+}
+
+function getMbtiGroup(type) {
+  if (/^(INTJ|INTP|ENTJ|ENTP)$/.test(type)) return 'analysts';
+  if (/^(INFJ|INFP|ENFJ|ENFP)$/.test(type)) return 'diplomats';
+  if (/^(ISTJ|ISFJ|ESTJ|ESFJ)$/.test(type)) return 'sentinels';
+  if (/^(ISTP|ISFP|ESTP|ESFP)$/.test(type)) return 'explorers';
+  return 'diplomats';
+}
+function getMbtiGroupName(group) {
+  return {analysts:'分析家', diplomats:'外交家', sentinels:'守护者', explorers:'探险家'}[group] || '';
+}
+function getMbtiGroupColor(group) {
+  return {analysts:'#5B5BC5', diplomats:'#4DAB6E', sentinels:'#4A90A4', explorers:'#E0A94E'}[group] || '#4DAB6E';
+}
+function getMbtiSvg(type) {
+  var group = getMbtiGroup(type);
+  var c = getMbtiGroupColor(group);
+  var bg = {analysts:'#E8E7FF', diplomats:'#E8F5E9', sentinels:'#E3F2F5', explorers:'#FFF6E0'}[group] || '#E8F5E9';
+  var f = 'rgba(255,255,255,0.35)';
+  var f2 = 'rgba(255,255,255,0.18)';
+  var decor = '';
+  if (group === 'diplomats') {
+    decor = '<path d="M18 100 L28 60 L38 100" fill="'+f2+'"/><path d="M82 100 L92 50 L102 100" fill="'+f2+'"/><circle cx="102" cy="22" r="6" fill="'+f+'"/><circle cx="14" cy="35" r="4" fill="'+f+'"/>';
+  } else if (group === 'analysts') {
+    decor = '<circle cx="24" cy="26" r="8" fill="none" stroke="'+f+'" stroke-width="2"/><circle cx="100" cy="42" r="5" fill="none" stroke="'+f+'" stroke-width="1.5"/><circle cx="14" cy="62" r="4" fill="none" stroke="'+f+'" stroke-width="1.5"/><rect x="20" y="82" width="15" height="20" rx="2" fill="'+f2+'"/>';
+  } else if (group === 'sentinels') {
+    decor = '<path d="M20 100 L25 65 L30 100" fill="'+f2+'"/><path d="M85 100 L90 60 L95 100" fill="'+f2+'"/><rect x="22" y="75" width="6" height="10" fill="'+f+'"/><rect x="87" y="75" width="6" height="10" fill="'+f+'"/>';
+  } else {
+    decor = '<circle cx="25" cy="70" r="8" fill="none" stroke="'+f+'" stroke-width="2"/><circle cx="100" cy="30" r="5" fill="none" stroke="'+f+'" stroke-width="1.5"/><rect x="85" y="55" width="12" height="8" rx="2" fill="'+f2+'"/>';
+  }
+  return '<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">'+
+    '<rect width="120" height="120" fill="'+bg+'" rx="18"/>'+
+    '<path d="M0 85 Q30 75 60 80 Q90 85 120 75 L120 120 L0 120 Z" fill="'+f2+'"/>'+
+    '<ellipse cx="60" cy="40" rx="18" ry="20" fill="'+f+'"/>'+
+    '<path d="M45 58 Q60 50 75 58 L78 105 L42 105 Z" fill="'+f+'"/>'+
+    '<rect x="55" y="28" width="6" height="2" rx="1" fill="rgba(255,255,255,0.7)"/>'+
+    '<rect x="65" y="28" width="6" height="2" rx="1" fill="rgba(255,255,255,0.7)"/>'+
+    decor +
+  '</svg>';
 }
 
 // ============================================================
@@ -2739,7 +2948,7 @@ function submitToSupabase(scores) {
 // ============================================================
 //  INIT
 // ============================================================
-console.log('[DEBUG] assessment.html v20260708-12 loaded');
+console.log('[DEBUG] assessment.html v20260708-13 loaded');
 console.log('[DEBUG] TESTS available:', typeof TESTS !== 'undefined' ? Object.keys(TESTS).join(', ') : 'UNDEFINED');
 state._locking = false;
 // 调用 config.js 的 initSupabase()，设置全局 db 变量
