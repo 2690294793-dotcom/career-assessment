@@ -707,9 +707,14 @@ body {
 .mbti-dim-bar-seg { height: 100%; transition: width 0.8s ease; }
 .mbti-dim-bar-val { width: 32px; text-align: right; font-weight: 700; color: var(--text-primary); }
 
+/* 人际关系 & 个人成长 并排 */
+.mbti-card-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
+.mbti-card-grid .mbti-card { margin-bottom: 0; }
+
 @media (min-width: 640px) {
   .mbti-layout { flex-direction: row; }
   .mbti-sidebar { width: 200px; flex-shrink: 0; }
+  .mbti-card-grid { grid-template-columns: 1fr 1fr; }
 }
 </style>
 <script src="https://beacon.cdn.qq.com/sdk/4.5.9/beacon_web.min.js"></script>
@@ -2266,8 +2271,10 @@ function renderMbti(scores) {
   var mainHtml =
     personalityCard +
     careersCard +
-    relationshipsCard +
-    growthCard;
+    '<div class="mbti-card-grid">'+
+      relationshipsCard +
+      growthCard +
+    '</div>';
 
   var layoutHtml =
     '<div class="mbti-layout">'+
@@ -2948,7 +2955,7 @@ function submitToSupabase(scores) {
 // ============================================================
 //  INIT
 // ============================================================
-console.log('[DEBUG] assessment.html v20260708-13 loaded');
+console.log('[DEBUG] assessment.html v20260708-14 loaded');
 console.log('[DEBUG] TESTS available:', typeof TESTS !== 'undefined' ? Object.keys(TESTS).join(', ') : 'UNDEFINED');
 state._locking = false;
 // 调用 config.js 的 initSupabase()，设置全局 db 变量
