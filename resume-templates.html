@@ -218,6 +218,11 @@ body {
   background: transparent; color: var(--primary); font-size: 12px; font-weight: 600;
   cursor: pointer; font-family: inherit;
 }
+.saved-sync-btn {
+  flex: 1; padding: 8px; border: 1.5px solid #10b981; border-radius: 14px;
+  background: transparent; color: #10b981; font-size: 12px; font-weight: 600;
+  cursor: pointer; font-family: inherit;
+}
 .saved-del-btn {
   padding: 8px 14px; border: 1.5px solid #fecaca; border-radius: 14px;
   background: transparent; color: #ef4444; font-size: 12px; font-weight: 600;
@@ -1010,6 +1015,7 @@ function renderSavedPlans() {
       '</div>' +
       '<div class="saved-card-actions">' +
         '<button class="saved-view-btn" onclick="viewSavedPlan(' + i + ')">查看详情</button>' +
+        '<button class="saved-sync-btn" onclick="syncPlanToGoals(' + i + ')">🎯 同步到目标</button>' +
         '<button class="saved-del-btn" onclick="deletePlan(' + i + ')">删除</button>' +
       '</div>' +
     '</div>';
@@ -1059,6 +1065,93 @@ function deletePlan(index) {
   localStorage.setItem('saved_plans', JSON.stringify(saved));
   showToast('方案已删除');
   renderSavedPlans();
+}
+
+// ============ Sync Plan to Goals ============
+// 将已保存的规划方案同步为目标，保留 goals.html 原有的"创建目标"功能。
+// 目标数据使用与 goals.html 一致的 localStorage key: career_goals_v2
+function syncPlanToGoals(index) {
+  var saved = getSavedPlans();
+  var p = saved[index];
+  if (!p) { showToast('方案不存在'); return; }
+
+  var d = p.plan || {};
+  var inputs = p.inputs || {};
+  var catMap = {
+    '互联网产品': '技能提升',
+    '软件开发': '技能提升',
+    '数据分析': '技能提升',
+    '产品运营': '求职投递',
+    '市场营销': '求职投递',
+    '人力资源': '人脉拓展',
+    '财务管理': '技能提升',
+    '平面设计': '技能提升',
+    '新媒体': '求职投递',
+    '电商运营': '求职投递',
+    '其他': '技能提升'
+  };
+  var cat = catMap[inputs.career] || '技能提升';
+
+  // 截止日期：30 天后
+  var dt = new Date();
+  dt.setDate(dt.getDate() + 30);
+  var deadline = dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0') + '-' + String(dt.getDate()).padStart(2, '0');
+
+  // 子步骤：把路线图 / 时间规划 / 技能 / 策略统一展开为可勾选的步骤
+  var steps = [];
+  function pushSteps(prefix, list) {
+    if (!Array.isArray(list)) return;
+    list.forEach(function(item) {
+      var text = (item && item.title) ? item.title : '';
+      if (!text) return;
+      steps.push(prefix + text);
+    });
+  }
+  pushSteps('🗺️ ', d.roadmap);
+  pushSteps('⏰ ', d.timeline);
+  pushSteps('📈 ', d.skills);
+  pushSteps('💼 ', d.strategy);
+  if (inputs.interests) steps.push('✨ 结合兴趣：' + inputs.interests);
+  if (inputs.strengths) steps.push('💪 发挥优势：' + inputs.strengths);
+
+  // 描述：综合展示该方案的核心信息
+  var descParts = [];
+  descParts.push('基于「' + (inputs.name || '') + ' · ' + (inputs.major || '') + ' · ' + (inputs.grade || '') + ' · ' + (inputs.career || '') + '」的规划方案自动创建。');
+  if (d.roadmap && d.roadmap[0]) descParts.push('目标方向：' + d.roadmap[0].title + ' → ' + d.roadmap[d.roadmap.length - 1].title + '。');
+  if (steps.length) descParts.push('已拆解为 ' + steps.length + ' 个子步骤，请前往「目标」页面查看并逐步完成。');
+
+  var goal = {
+    id: Date.now(),
+    title: (inputs.name || '我的') + '的职业目标：' + (inputs.career || '方向探索'),
+    desc: descParts.join(''),
+    cat: cat,
+    color: 'linear-gradient(90deg,#1d4ed8,#60a5fa)',
+    deadline: deadline,
+    done: false,
+    steps: steps.map(function(s) { return { text: s, done: false }; }),
+    progress: 0,
+    fromPlan: true,
+    createdAt: new Date().toISOString()
+  };
+
+  var STORAGE_KEY = 'career_goals_v2';
+  var goals = [];
+  try {
+    var raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) goals = JSON.parse(raw);
+  } catch (e) {}
+  if (!Array.isArray(goals)) goals = [];
+
+  // 避免重复：标题相同则提示
+  var dup = goals.find(function(g) { return g.title === goal.title; });
+  if (dup) {
+    if (!confirm('已存在同名目标，是否仍要添加一个新目标？')) return;
+  }
+
+  goals.unshift(goal);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(goals));
+  showToast('✅ 已同步到目标，正在跳转…');
+  setTimeout(function() { window.location.href = 'goals.html'; }, 900);
 }
 
 // ============ Utils ============
