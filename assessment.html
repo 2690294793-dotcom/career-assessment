@@ -824,7 +824,7 @@ body {
 
 <div class="toast-el" id="toastEl"></div>
 
-<script src="js/config.js?v=20260708-22"></script>
+<script src="js/config.js?v=20260708-23"></script>
 <script>
 // ============================================================
 //  GLOBAL STATE
@@ -1797,93 +1797,53 @@ function renderHolland(scores) {
   var analysisText = getHollandAnalysis(code, sorted);
   var dims = test.dimensions;
 
-  // ========== 三模块打分表 ==========
+  // ========== 综合打分表（兴趣 / 能力 / 回馈 / 总分 合一） ==========
   var moduleRaws = state.moduleRaws || {};
-  var moduleScores = state.moduleScores || {};
-
-  function buildModuleTable(modKey, modLabel, modIcon, rawData, normData) {
-    var headerCells = dims.map(function(d) {
-      return '<th class="hl-th-code" style="background:'+test.dimColors[d]+'15;color:'+test.dimColors[d]+'">'+d+'</th>';
-    }).join('');
-
-    var rawRow = '<tr><td class="hl-row-label">' + modIcon + ' ' + modLabel + '（原始分）</td>' +
-      dims.map(function(d){ var v = (rawData && rawData[d]) ? rawData[d] : 0; return '<td class="hl-cell-score">'+v+'</td>'; }).join('') + '</tr>';
-
-    var normRow = '<tr><td class="hl-row-label">百分制换算</td>' +
-      dims.map(function(d){ var v = (normData && normData[d]) ? normData[d] : 0; return '<td class="hl-cell-score">'+v+'%</td>'; }).join('') + '</tr>';
-
-    // 条形图行
-    var barRow = '<tr><td class="hl-row-label" style="vertical-align:middle;">得分对比</td>' +
-      dims.map(function(d){
-        var v = (normData && normData[d]) ? normData[d] : 0;
-        return '<td class="hl-cell-bar"><div style="display:flex;align-items:center;gap:4px;">'+
-          '<div style="flex:1;height:8px;background:var(--bg-secondary);border-radius:4px;overflow:hidden;">'+
-          '<div style="width:'+v+'%;height:100%;background:'+test.dimColors[d]+';border-radius:4px;"></div></div>'+
-          '<span style="font-size:11px;font-weight:600;color:'+test.dimColors[d]+'">'+v+'</span></div></td>';
-      }).join('') + '</tr>';
-
-    return '<div class="hl-table-card" style="margin-bottom:16px;">'+
-      '<div class="hl-table-title" style="background:linear-gradient(135deg,'+test.dimColors[dims[0]]+'10,'+test.dimColors[dims[3]]+'10);">'+
-        modIcon+' '+modLabel+' 模块打分表</div>'+
-      '<table class="hl-table" style="margin-bottom:0;">'+
-        '<thead><tr><th class="hl-th-dim"></th>'+headerCells+'</tr></thead>'+
-        '<tbody>'+rawRow+normRow+barRow+'</tbody>'+
-      '</table></div>';
-  }
-
-  // 构建三张表
-  var interestTable = buildModuleTable('interest', '兴趣', '💡',
-    (moduleRaws.interest || {}), (moduleScores.interest || {}));
-  var abilityTable = buildModuleTable('ability', '能力', '💪',
-    (moduleRaws.ability || {}), (moduleScores.ability || {}));
-  var feedbackTable = buildModuleTable('feedback', '回馈', '🎁',
-    (moduleRaws.feedback || {}), (moduleScores.feedback || {}));
-
-  // 旧的综合总分表也保留（向后兼容）
-  var interestScores = dims.map(function(d){ return raw[d] || 0; });
-  var totalTableHtml = '';
-  if (!state.moduleRaws) {
-    // 旧版（无模块数据），使用原表
-    var headerCells = dims.map(function(d) {
-      return '<th class="hl-th-code" style="background:'+test.dimColors[d]+'15;color:'+test.dimColors[d]+'">'+d+'</th>';
-    }).join('');
-    totalTableHtml = '<div class="hl-table-card">'+
-      '<div class="hl-table-title">📊 以下得分表示了您的职业倾向性程度</div>'+
-      '<table class="hl-table">'+
-        '<thead><tr><th class="hl-th-dim"></th>'+headerCells+'</tr></thead>'+
-        '<tbody><tr><td class="hl-row-label">您所感兴趣的活动（兴趣）</td>'+
-          interestScores.map(function(s){ return '<td class="hl-cell-score">'+s+'</td>'; }).join('')+'</tr>'+
-        '<tr><td class="hl-row-label">总分</td>'+
-          interestScores.map(function(s){ return '<td class="hl-cell-score">'+s+'</td>'; }).join('')+'</tr></tbody>'+
-      '</table></div>';
-  }
-
-  // 各维度简述
-  var dimDescs = {
-    R: '喜欢动手操作、使用工具，偏好具体实际的工作。',
-    I: '喜欢独立思考、探索规律，偏好研究和分析。',
-    A: '喜欢创新表达、追求美感，偏好创意和艺术。',
-    S: '喜欢与人交往、帮助他人，偏好服务和教育。',
-    E: '喜欢领导组织、说服他人，偏好管理和商业。',
-    C: '喜欢规范有序、处理数据，偏好行政和事务。'
+  var rawByMod = {
+    interest: moduleRaws.interest || {},
+    ability: moduleRaws.ability || {},
+    feedback: moduleRaws.feedback || {}
   };
-  var dimAnalysisHtml = '<div class="hl-analysis-card">'+
-    '<div class="hl-table-title">📝 六维分析解读</div>'+
-    '<div class="hl-dim-list">'+
-    sorted.map(function(e, i) {
-      var name = test.dimNames[e.dim].split(' ')[0];
-      var rainbowColors = ['#EF4444','#F97316','#EAB308','#22C55E','#3B82F6','#8B5CF6'];
-      var borderColor = rainbowColors[i] || rainbowColors[0];
-      return '<div class="hl-dim-item'+(i<3?' hl-dim-highlight':'')+'" style="border-left:4px solid '+borderColor+';">'+
-        '<span class="hl-dim-tag" style="background:'+test.dimColors[e.dim]+'20;color:'+test.dimColors[e.dim]+'">'+name+'</span>'+
-        '<span class="hl-dim-desc">'+dimDescs[e.dim]+' 你的得分'+e.raw+'分，'+(i<3?'属于优势领域':'相对较弱')+'。</span>'+
-      '</div>';
-    }).join('')+
-    '</div>'+
-  '</div>';
+  var totalByDim = {};
+  dims.forEach(function(d) {
+    totalByDim[d] = (rawByMod.interest[d]||0) + (rawByMod.ability[d]||0) + (rawByMod.feedback[d]||0);
+  });
+  if (!state.moduleRaws) {
+    dims.forEach(function(d) { totalByDim[d] = raw[d] || 0; });
+  }
+
+  function buildScoreRow(label, modKey, isTotal) {
+    return '<tr>' +
+      '<td class="hl-row-label">' + label + '</td>' +
+      dims.map(function(d) {
+        var val;
+        if (isTotal) val = totalByDim[d];
+        else if (state.moduleRaws) val = rawByMod[modKey][d] || 0;
+        else val = raw[d] || 0;
+        return '<td class="hl-cell-score">' + val + '</td>';
+      }).join('') +
+    '</tr>';
+  }
+
+  var headerCells = dims.map(function(d) {
+    return '<th class="hl-th-code" style="background:' + test.dimColors[d] + '15;color:' + test.dimColors[d] + '">' + d + '</th>';
+  }).join('');
+
+  var combinedTable =
+    '<div class="hl-table-card" style="margin-bottom:16px;">'+
+    '<div class="hl-table-title">📊 以下得分表示了您的职业倾向性程度</div>'+
+    '<table class="hl-table" style="margin-bottom:0;">'+
+    '<thead><tr><th class="hl-th-dim"></th>' + headerCells + '</tr></thead>'+
+    '<tbody>' +
+      buildScoreRow('您所感兴趣的活动（兴趣）', 'interest', false) +
+      buildScoreRow('您所擅长的活动（能力）', 'ability', false) +
+      buildScoreRow('您所喜欢的职业（回馈）', 'feedback', false) +
+      buildScoreRow('总分', '', true) +
+    '</tbody>'+
+    '</table></div>';
 
   document.getElementById('pageBody').innerHTML =
-    '<div class="page-header"><div class="page-title">霍兰德报告</div><div class="page-subtitle">RIASEC 职业兴趣 · 能力 · 回馈三模块分析</div></div>'+
+    '<div class="page-header"><div class="page-title">霍兰德报告</div><div class="page-subtitle">RIASEC 职业兴趣 · 能力 · 回馈综合打分</div></div>'+
     '<div class="report-export-wrap" id="reportExportWrap">'+
     buildReportInfoBar()+
     '<div class="hl-hero">'+
@@ -1900,18 +1860,11 @@ function renderHolland(scores) {
         }).join('')+
       '</div>'+
     '</div>'+
-    // 三模块打分表
-    '<div class="hl-module-tabs" style="display:flex;gap:8px;margin:16px 0;flex-wrap:wrap;">'+
-      '<div style="padding:8px 16px;background:var(--primary-light);color:var(--primary-dark);border-radius:20px;font-size:13px;font-weight:600;">💡 兴趣 · 能力 · 回馈 三模块打分</div>'+
-    '</div>'+
-    interestTable + abilityTable + feedbackTable +
-    (totalTableHtml || '') +
+    combinedTable +
     '<div class="hl-analysis-card">'+
       '<div class="hl-table-title">🔍 三码分析</div>'+
       '<div class="hl-analysis-text">'+analysisText+'</div>'+
     '</div>'+
-    dimAnalysisHtml+
-    buildHollandPlanCard(code, top3)+
     '</div>'+
     buildExportBtnRow();
 }
@@ -2984,7 +2937,7 @@ function submitToSupabase(scores) {
 // ============================================================
 //  INIT
 // ============================================================
-console.log('[DEBUG] assessment.html v20260708-22 loaded');
+console.log('[DEBUG] assessment.html v20260708-23 loaded');
 console.log('[DEBUG] TESTS available:', typeof TESTS !== 'undefined' ? Object.keys(TESTS).join(', ') : 'UNDEFINED');
 state._locking = false;
 // 调用 config.js 的 initSupabase()，设置全局 db 变量
