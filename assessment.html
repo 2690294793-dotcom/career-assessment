@@ -714,13 +714,11 @@ body {
   aspect-ratio: 1 / 1;
   overflow: hidden;
   display: flex; flex-direction: column;
+  padding: 14px;
 }
 .mbti-card-grid .mbti-card-body {
-  flex: 1; overflow: hidden;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 5;
-  text-overflow: ellipsis;
+  flex: 1;
+  overflow-y: auto;
   font-size: 12px; line-height: 1.6;
 }
 
@@ -2967,7 +2965,7 @@ function submitToSupabase(scores) {
 // ============================================================
 //  INIT
 // ============================================================
-console.log('[DEBUG] assessment.html v20260708-16 loaded');
+console.log('[DEBUG] assessment.html v20260708-17 loaded');
 console.log('[DEBUG] TESTS available:', typeof TESTS !== 'undefined' ? Object.keys(TESTS).join(', ') : 'UNDEFINED');
 state._locking = false;
 // 调用 config.js 的 initSupabase()，设置全局 db 变量
