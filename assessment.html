@@ -2278,21 +2278,7 @@ function renderMbti(scores) {
     '</div>';
 
   // 侧边栏
-  var sidebarCard =
-    '<div class="mbti-sidebar-card">'+
-      '<div class="mbti-sidebar-avatar">'+test.icon+'</div>'+
-      '<div class="mbti-sidebar-type">'+info.name+'</div>'+
-      '<div class="mbti-sidebar-code">'+mbtiType+'-A</div>'+
-      '<div class="mbti-sidebar-group">'+groupName+' · 16型人格</div>'+
-    '</div>';
-
-  var tocCard =
-    '<div class="mbti-sidebar-toc">'+
-      '<div class="mbti-toc-item"><span class="mbti-toc-num">1</span>人格特征</div>'+
-      '<div class="mbti-toc-item"><span class="mbti-toc-num">2</span>职业道路</div>'+
-      '<div class="mbti-toc-item"><span class="mbti-toc-num">3</span>人际关系</div>'+
-      '<div class="mbti-toc-item"><span class="mbti-toc-num">4</span>个人成长</div>'+
-    '</div>';
+  var sidebarHtml = dimsCard;
 
   var mainHtml =
     personalityCard +
@@ -2305,7 +2291,7 @@ function renderMbti(scores) {
   var layoutHtml =
     '<div class="mbti-layout">'+
       '<div class="mbti-main">'+mainHtml+'</div>'+
-      '<div class="mbti-sidebar">'+sidebarCard+tocCard+dimsCard+'</div>'+
+      '<div class="mbti-sidebar">'+sidebarHtml+'</div>'+
     '</div>';
 
   document.getElementById('pageBody').innerHTML =
@@ -2981,7 +2967,7 @@ function submitToSupabase(scores) {
 // ============================================================
 //  INIT
 // ============================================================
-console.log('[DEBUG] assessment.html v20260708-19 loaded');
+console.log('[DEBUG] assessment.html v20260708-20 loaded');
 console.log('[DEBUG] TESTS available:', typeof TESTS !== 'undefined' ? Object.keys(TESTS).join(', ') : 'UNDEFINED');
 state._locking = false;
 // 调用 config.js 的 initSupabase()，设置全局 db 变量
