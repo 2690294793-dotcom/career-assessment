@@ -797,55 +797,165 @@ var TESTS = {
 
   // ---- DISC 性格色彩 ----
   disc: {
-    id: 'disc',
-    name: 'DISC性格色彩测试',
-    icon: '🎨',
-    iconBg: '#FEF3C7',
-    shortDesc: '红黄绿蓝四色人格',
-    desc: '基于DISC行为风格理论，从支配型(D-红)、影响型(I-黄)、稳健型(S-绿)、谨慎型(C-蓝)四个维度分析你的行为风格和沟通偏好。',
-    meta: '32 题 · 约 5 分钟',
-    dimensions: ['D','I','S','C'],
-    dimNames: {D:'支配型 Dominance',I:'影响型 Influence',S:'稳健型 Steadiness',C:'谨慎型 Compliance'},
-    dimIcons: {D:'🔴',I:'🟡',S:'🟢',C:'🔵'},
-    dimColors: {D:'#EF4444',I:'#F59E0B',S:'#10B981',C:'#3B82F6'},
+    id: 'strength',
+    name: '优势潜能测评',
+    icon: '🌟',
+    iconBg: '#EEF2FF',
+    shortDesc: '34主题·探索天赋优势',
+    desc: '基于CSSPI-34中国大学生优势潜能模型，从行动执行、表达影响、关系协同、认知探索四大领域共34个主题，全面探索你的优势潜能和天赋线索。',
+    meta: '136 题 · 约 18–25 分钟',
+    dimensions: ["ACT01", "ACT02", "ACT03", "ACT04", "ACT05", "ACT06", "ACT07", "ACT08", "ACT09", "INF01", "INF02", "INF03", "INF04", "INF05", "INF06", "INF07", "INF08", "REL01", "REL02", "REL03", "REL04", "REL05", "REL06", "REL07", "REL08", "REL09", "COG01", "COG02", "COG03", "COG04", "COG05", "COG06", "COG07", "COG08"],
+    dimNames: {ACT01:'目标推进', ACT02:'持续投入', ACT03:'计划秩序', ACT04:'责任兑现', ACT05:'风险审慎', ACT06:'问题修复', ACT07:'资源统筹', ACT08:'规则公平', ACT09:'信念驱动', INF01:'主动启动', INF02:'立场表达', INF03:'清晰沟通', INF04:'舞台呈现', INF05:'优化提升', INF06:'竞争进取', INF07:'自信判断', INF08:'支持争取', REL01:'变化适应', REL02:'他人成长', REL03:'情绪共感', REL04:'共识调和', REL05:'包容连接', REL06:'个体识别', REL07:'氛围点亮', REL08:'深度联结', REL09:'群体关联', COG01:'逻辑分析', COG02:'经验回顾', COG03:'未来想象', COG04:'创意构想', COG05:'信息搜集', COG06:'深度思考', COG07:'持续学习', COG08:'策略路径'},
+    dimIcons: {ACT01:'⚡', ACT02:'⚡', ACT03:'⚡', ACT04:'⚡', ACT05:'⚡', ACT06:'⚡', ACT07:'⚡', ACT08:'⚡', ACT09:'⚡', INF01:'🎤', INF02:'🎤', INF03:'🎤', INF04:'🎤', INF05:'🎤', INF06:'🎤', INF07:'🎤', INF08:'🎤', REL01:'🤝', REL02:'🤝', REL03:'🤝', REL04:'🤝', REL05:'🤝', REL06:'🤝', REL07:'🤝', REL08:'🤝', REL09:'🤝', COG01:'💡', COG02:'💡', COG03:'💡', COG04:'💡', COG05:'💡', COG06:'💡', COG07:'💡', COG08:'💡'},
+    dimColors: {ACT01:'#F59E0B', ACT02:'#F59E0B', ACT03:'#F59E0B', ACT04:'#F59E0B', ACT05:'#F59E0B', ACT06:'#F59E0B', ACT07:'#F59E0B', ACT08:'#F59E0B', ACT09:'#F59E0B', INF01:'#3B82F6', INF02:'#3B82F6', INF03:'#3B82F6', INF04:'#3B82F6', INF05:'#3B82F6', INF06:'#3B82F6', INF07:'#3B82F6', INF08:'#3B82F6', REL01:'#10B981', REL02:'#10B981', REL03:'#10B981', REL04:'#10B981', REL05:'#10B981', REL06:'#10B981', REL07:'#10B981', REL08:'#10B981', REL09:'#10B981', COG01:'#8B5CF6', COG02:'#8B5CF6', COG03:'#8B5CF6', COG04:'#8B5CF6', COG05:'#8B5CF6', COG06:'#8B5CF6', COG07:'#8B5CF6', COG08:'#8B5CF6'},
+    domains: {
+      '行动执行':{name:'行动执行',themes:["ACT01", "ACT02", "ACT03", "ACT04", "ACT05", "ACT06", "ACT07", "ACT08", "ACT09"]},
+      '表达影响':{name:'表达影响',themes:["INF01", "INF02", "INF03", "INF04", "INF05", "INF06", "INF07", "INF08"]},
+      '关系协同':{name:'关系协同',themes:["REL01", "REL02", "REL03", "REL04", "REL05", "REL06", "REL07", "REL08", "REL09"]},
+      '认知探索':{name:'认知探索',themes:["COG01", "COG02", "COG03", "COG04", "COG05", "COG06", "COG07", "COG08"]}
+    },
     questions: [
-      {dim:'D',q:'我喜欢掌控局面并快速做出决定'},
-      {dim:'I',q:'我善于在社交场合活跃气氛'},
-      {dim:'S',q:'我做事喜欢按部就班，不喜欢突然的变化'},
-      {dim:'C',q:'做决定前我会收集大量信息反复核实'},
-      {dim:'D',q:'我喜欢挑战和竞争，渴望成为最优秀的'},
-      {dim:'I',q:'我经常用故事和比喻来吸引听众'},
-      {dim:'S',q:'���很有耐心，愿意花时间倾听他人'},
-      {dim:'C',q:'我追求完美，对细节有极高的要求'},
-      {dim:'D',q:'面对困难我倾向于直面挑战而非回避'},
-      {dim:'I',q:'我很容易和陌生人建立友好关系'},
-      {dim:'S',q:'我不喜欢冲突，会尽量维持和谐'},
-      {dim:'C',q:'我喜欢按规则和流程办事'},
-      {dim:'D',q:'说话直接，不喜欢拐弯抹角'},
-      {dim:'I',q:'我乐观开朗，总能发现事物积极的一面'},
-      {dim:'S',q:'我是个忠诚可靠的朋友和同事'},
-      {dim:'C',q:'我善于发现计划中的漏洞和风险'},
-      {dim:'D',q:'我追求结果，不喜欢拖泥带水'},
-      {dim:'I',q:'我喜欢鼓励和激励身边的人'},
-      {dim:'S',q:'在团队中我更愿意配合而非主导'},
-      {dim:'C',q:'我做事严谨，注重数据和事实'},
-      {dim:'D',q:'我敢于冒险，不怕失败'},
-      {dim:'I',q:'我在人群中总是充满活力和热情'},
-      {dim:'S',q:'我说话温和，不喜欢咄咄逼人'},
-      {dim:'C',q:'我喜欢用逻辑和分析来解决问题'},
-      {dim:'D',q:'我对自己和他人都有很高的期望'},
-      {dim:'I',q:'我能很快适应新环境和新朋友'},
-      {dim:'S',q:'我做事稳重可靠，让人放心'},
-      {dim:'C',q:'我不轻易下结论，需要充分证据'},
-      {dim:'D',q:'我愿意承担别人不敢接的任务'},
-      {dim:'I',q:'我的热情经常感染到身边的人'},
-      {dim:'S',q:'我更喜欢稳定可预测的工作环境'},
-      {dim:'C',q:'我会反复检查自己的工作确保无误'}
+      {dim:'ACT01',q:'当我确定一个阶段目标后，我会主动把它拆成可以执行的小步骤。'},
+      {dim:'ACT02',q:'即使任务过程比较重复，我也愿意持续投入，直到看到具体成果。'},
+      {dim:'ACT03',q:'面对课程、活动和个人事务同时出现时，我会先整理顺序和时间安排。'},
+      {dim:'ACT04',q:'只要我答应了别人一件事，就会尽量按时、按要求完成。'},
+      {dim:'ACT05',q:'在做重要决定前，我会先想清楚可能的风险和代价。'},
+      {dim:'ACT06',q:'遇到流程卡住或结果出错时，我会想办法找到原因并修正。'},
+      {dim:'ACT07',q:'在小组任务中，我常能把人手、时间、资料和任务重新组合起来。'},
+      {dim:'ACT08',q:'我希望团队规则清楚一致，不喜欢有人长期享受特殊待遇。'},
+      {dim:'ACT09',q:'当一件事符合我认同的价值时，我会更愿意坚持投入。'},
+      {dim:'INF01',q:'当大家还在观望时，我有时会先开始尝试，带动事情动起来。'},
+      {dim:'INF02',q:'在需要做决定的时候，我敢于表达自己的判断和立场。'},
+      {dim:'INF03',q:'我能把复杂想法讲成别人比较容易理解的表达。'},
+      {dim:'INF04',q:'当有展示、汇报或公开表达机会时，我通常愿意站出来。'},
+      {dim:'INF05',q:'对已经不错的作品或方案，我仍会想办法让它更精致、更有效。'},
+      {dim:'INF06',q:'当身边有优秀同伴或明确排名时，我更容易被激发出行动力。'},
+      {dim:'INF07',q:'面对不确定选择时，我通常比较相信自己的判断。'},
+      {dim:'INF08',q:'我比较擅长让陌生人或不熟的人愿意听我介绍、支持我尝试。'},
+      {dim:'REL01',q:'当计划被临时打乱时，我能较快调整自己，继续把事情往前推进。'},
+      {dim:'REL02',q:'我容易看到别人正在进步的地方，并愿意给出鼓励或建议。'},
+      {dim:'REL03',q:'我能比较快觉察到别人情绪上的变化。'},
+      {dim:'REL04',q:'当团队意见不一致时，我会尝试找到大家都能接受的共同点。'},
+      {dim:'REL05',q:'我会注意到边缘、沉默或不太敢参与的人，并尽量把他们带进来。'},
+      {dim:'REL06',q:'我习惯根据每个人的特点安排不同沟通方式或任务角色。'},
+      {dim:'REL07',q:'我能用积极的话语或行动，让团队气氛变得轻松一些。'},
+      {dim:'REL08',q:'比起认识很多人，我更看重少数稳定而深入的关系。'},
+      {dim:'REL09',q:'我常会把个人经历、团队变化和社会环境联系起来理解。'},
+      {dim:'COG01',q:'面对一个观点，我会自然地想知道它的证据和推理是否站得住。'},
+      {dim:'COG02',q:'做选择时，我会回看过去类似经历，从中寻找线索。'},
+      {dim:'COG03',q:'我经常会想象未来几年的学习、职业或生活可能出现什么变化。'},
+      {dim:'COG04',q:'我常能从看似普通的材料中想到新的点子或组合方式。'},
+      {dim:'COG05',q:'对感兴趣的问题，我会主动收集资料、案例、链接或工具。'},
+      {dim:'COG06',q:'我喜欢独自思考一些比较深、比较复杂的问题。'},
+      {dim:'COG07',q:'即使暂时用不上，我也愿意学习新知识、新方法或新技能。'},
+      {dim:'COG08',q:'面对多个可选方案时，我能比较快看出哪条路径更有机会。'},
+      {dim:'ACT01',q:'为了完成一个目标，我会定期检查自己有没有偏离方向。'},
+      {dim:'ACT02',q:'一天结束时，如果我完成了不少具体事项，会感到很满足。'},
+      {dim:'ACT03',q:'我喜欢把资料、任务或日程整理得清楚有序。'},
+      {dim:'ACT04',q:'即使没人监督，我也会努力完成自己承诺过的事情。'},
+      {dim:'ACT05',q:'面对机会时，我不会只看吸引人的部分，也会考虑可能踩坑的地方。'},
+      {dim:'ACT06',q:'当同学遇到技术、流程或方法上的困难时，我常能帮忙排查问题。'},
+      {dim:'ACT07',q:'如果原计划不可行，我能迅速调整资源，找出新的执行组合。'},
+      {dim:'ACT08',q:'我在意评价标准是否透明，也会关注同伴是否被公平对待。'},
+      {dim:'ACT09',q:'我做事不只看结果，也在意它是否符合我的原则和长期方向。'},
+      {dim:'INF01',q:'发现一个值得尝试的想法后，我倾向于先做一个小版本验证。'},
+      {dim:'INF02',q:'在讨论中，如果我认为方向不对，会直接提出不同意见。'},
+      {dim:'INF03',q:'我能根据听众不同，调整自己的表达方式。'},
+      {dim:'INF04',q:'我希望自己的作品、表达或贡献能被更多人看见。'},
+      {dim:'INF05',q:'我对高质量成果很敏感，会留意哪里还可以进一步优化。'},
+      {dim:'INF06',q:'和强者同场合作或竞争时，我会更想证明自己的能力。'},
+      {dim:'INF07',q:'即使别人暂时不理解，我也能坚定推进自己看准的方向。'},
+      {dim:'INF08',q:'我能比较自然地建立初次连接，让别人愿意继续交流。'},
+      {dim:'REL01',q:'我不太害怕变化，很多时候会把变化当作新的可能性。'},
+      {dim:'REL02',q:'我愿意花时间陪别人练习、复盘或找到更适合自己的方式。'},
+      {dim:'REL03',q:'和别人交流时，我常能感受到对方真正介意的点。'},
+      {dim:'REL04',q:'我不喜欢让冲突扩大，会主动缓和语气或调整讨论方式。'},
+      {dim:'REL05',q:'我会努力让不同背景、不同性格的人都能在团队里找到位置。'},
+      {dim:'REL06',q:'我能较快发现一个人的独特优势，而不是只看他的外在标签。'},
+      {dim:'REL07',q:'当大家低落或紧张时，我会想办法给团队补充一点能量。'},
+      {dim:'REL08',q:'我更愿意和信任的人长期合作，而不是频繁更换伙伴。'},
+      {dim:'REL09',q:'我容易相信很多事情之间存在相互影响，而不是孤立发生。'},
+      {dim:'COG01',q:'我喜欢用数据、事实或案例来检验一个判断。'},
+      {dim:'COG02',q:'我会从过去的成功和失败里总结规律，帮助自己下次做得更好。'},
+      {dim:'COG03',q:'我常会提前设想一种更理想的未来状态，并被它吸引。'},
+      {dim:'COG04',q:'我喜欢提出和常规做法不一样的新方案。'},
+      {dim:'COG05',q:'我的手机、电脑或笔记里常保存着以后可能有用的信息。'},
+      {dim:'COG06',q:'比起马上给答案，我更愿意把问题想透一点。'},
+      {dim:'COG07',q:'当我掌握一个新概念或新技能时，会明显感到兴奋。'},
+      {dim:'COG08',q:'我能在复杂情境中找到一个比较省力或更有效的切入点。'},
+      {dim:'ACT01',q:'我会把长期目标转化为本周就能完成的具体行动。'},
+      {dim:'ACT02',q:'即使短期看不到回报，我也能保持稳定练习或投入。'},
+      {dim:'ACT03',q:'开始一项任务前，我会先明确截止时间、步骤和交付标准。'},
+      {dim:'ACT04',q:'如果因为意外无法按承诺完成，我会主动说明并设法补救。'},
+      {dim:'ACT05',q:'参与新项目或新机会前，我会提前准备备选方案。'},
+      {dim:'ACT06',q:'看到系统、流程或作品中不顺的地方，我会忍不住想把它改好。'},
+      {dim:'ACT07',q:'我能根据任务变化，重新分配团队成员的工作重点。'},
+      {dim:'ACT08',q:'在集体任务中，我会希望贡献、评价和回报相互匹配。'},
+      {dim:'ACT09',q:'当任务和我的长期追求一致时，我会更能承受其中的辛苦。'},
+      {dim:'INF01',q:'与其等别人安排，我更愿意先提出一个可尝试的起点。'},
+      {dim:'INF02',q:'当现场需要有人拍板或表态时，我不太会回避这个角色。'},
+      {dim:'INF03',q:'我会把观点组织成故事、例子或结构，让别人更容易记住。'},
+      {dim:'INF04',q:'如果一个成果有机会公开发布或展示，我会更愿意把它做好。'},
+      {dim:'INF05',q:'我常会比较不同方案的优缺点，并选择更高质量的做法。'},
+      {dim:'INF06',q:'明确的挑战目标会让我更想投入时间和精力。'},
+      {dim:'INF07',q:'在别人犹豫不决时，我常能依据直觉和经验作出选择。'},
+      {dim:'INF08',q:'我愿意主动联系老师、学长学姐或外部资源，为项目争取帮助。'},
+      {dim:'REL01',q:'面对新的规则、环境或伙伴，我通常能较快找到适应方式。'},
+      {dim:'REL02',q:'看到别人掌握了新方法或变得更自信，我会真心替他高兴。'},
+      {dim:'REL03',q:'我能从语气、表情或沉默中感受到别人没有说出口的压力。'},
+      {dim:'REL04',q:'当讨论变得紧张时，我会先把大家共同认可的部分说出来。'},
+      {dim:'REL05',q:'组织活动时，我会考虑如何让不同性格的人都能参与。'},
+      {dim:'REL06',q:'我会留意每个人不同的动机、节奏和擅长方式。'},
+      {dim:'REL07',q:'我常能用鼓励、幽默或认可让别人重新愿意投入。'},
+      {dim:'REL08',q:'我愿意在长期关系中投入耐心，而不是只维持表面联系。'},
+      {dim:'REL09',q:'我会从更大的背景里理解一件事为什么会发生。'},
+      {dim:'COG01',q:'当信息很多时，我会先区分事实、假设和个人感受。'},
+      {dim:'COG02',q:'我会通过复盘过去的经历，判断现在应该避开什么或延续什么。'},
+      {dim:'COG03',q:'我容易被一个清晰的未来愿景激发，愿意为它提前准备。'},
+      {dim:'COG04',q:'我喜欢把不同领域的知识、材料或经验组合成新东西。'},
+      {dim:'COG05',q:'我在开始做一件事前，通常会先找资料、案例和可参考的方法。'},
+      {dim:'COG06',q:'我享受把一个问题反复推敲到更清楚、更本质的过程。'},
+      {dim:'COG07',q:'学会一个新东西后，我常会继续找更深入的资料或练习方式。'},
+      {dim:'COG08',q:'当局面复杂时，我会寻找能带动全局变化的关键一步。'},
+      {dim:'ACT01',q:'当任务周期较长时，我会设置阶段节点提醒自己持续前进。'},
+      {dim:'ACT02',q:'为了把一项能力练扎实，我愿意反复练习，而不是只停留在理解。'},
+      {dim:'ACT03',q:'我会把重要资料、待办事项和时间节点整理到固定位置。'},
+      {dim:'ACT04',q:'如果团队依赖我的部分，我会格外注意不让自己的拖延影响别人。'},
+      {dim:'ACT05',q:'面对看起来很诱人的机会，我会先确认信息来源和现实条件。'},
+      {dim:'ACT06',q:'看到一个方案无法落地时，我会主动寻找可以调整的关键环节。'},
+      {dim:'ACT07',q:'我能把分散的信息和人脉资源整合成可执行的方案。'},
+      {dim:'ACT08',q:'当评价或分工不清楚时，我会希望先把规则讲明白。'},
+      {dim:'ACT09',q:'如果一件事能回应我关心的社会议题或人生方向，我会更愿意投入。'},
+      {dim:'INF01',q:'我不太喜欢长期停留在讨论里，通常会推动大家先做一次尝试。'},
+      {dim:'INF02',q:'即使我的观点可能不受欢迎，只要重要，我也愿意说出来。'},
+      {dim:'INF03',q:'我会用提纲、图示或关键词帮助别人抓住重点。'},
+      {dim:'INF04',q:'我愿意通过汇报、作品集或展示页面呈现自己的成果。'},
+      {dim:'INF05',q:'完成初稿后，我常会主动寻求反馈并继续修改。'},
+      {dim:'INF06',q:'看到可量化的目标或排名，我会更想提高自己的表现。'},
+      {dim:'INF07',q:'在关键选择上，我能承担自己判断带来的结果。'},
+      {dim:'INF08',q:'需要推进事情时，我愿意主动向别人介绍价值并邀请加入。'},
+      {dim:'REL01',q:'在不同课程、团队或实习环境中，我能调整自己的做事方式。'},
+      {dim:'REL02',q:'我愿意把自己学会的方法分享给还不熟练的同学。'},
+      {dim:'REL03',q:'别人表面说没事时，我有时能感到他其实需要被理解。'},
+      {dim:'REL04',q:'我会把双方争论的观点翻译成更容易相互理解的话。'},
+      {dim:'REL05',q:'在活动或讨论中，我会留意是否有人被忽略或插不上话。'},
+      {dim:'REL06',q:'我不太相信一种方法适合所有人，会根据对象调整建议。'},
+      {dim:'REL07',q:'我常会用肯定和具体反馈让别人更有信心。'},
+      {dim:'REL08',q:'我愿意在重要关系中保持稳定回应和持续支持。'},
+      {dim:'REL09',q:'我会思考一个选择对身边人、团队或更大环境的连锁影响。'},
+      {dim:'COG01',q:'面对复杂信息，我会先找变量、条件和因果关系。'},
+      {dim:'COG02',q:'每完成一个重要任务后，我会回顾哪些做法值得保留。'},
+      {dim:'COG03',q:'我会把未来想做的事转化为画面、清单或路线图。'},
+      {dim:'COG04',q:'我喜欢把一个普通任务设计得更有趣、更有辨识度。'},
+      {dim:'COG05',q:'我会建立自己的资料夹、标签或笔记系统保存有用信息。'},
+      {dim:'COG06',q:'我对一个问题感兴趣时，会追问它背后的假设和边界。'},
+      {dim:'COG07',q:'遇到不懂的概念，我会愿意查资料、看教程或请教别人直到弄明白。'},
+      {dim:'COG08',q:'面对资源有限的情况，我会优先寻找投入产出比更高的做法。'}
     ],
-    reverseItems: []
+    reverseItems: [],
+    scoring:{type:'sum',perTheme:4,range:[4,24]}
   },
 };
-
 // ============================================================
 //  ANSWER OPTIONS
 // ============================================================
@@ -1328,55 +1438,103 @@ function renderHolland(scores) {
 }
 
 // ============================================================
-//  DISC REPORT
+//  STRENGTH REPORT (CSSPI-34 优势潜能)
 // ============================================================
-function renderDisc(scores) {
-  var test = TESTS.disc;
-  var sorted = test.dimensions.map(function(d){return {dim:d,score:scores[d]};}).sort(function(a,b){return b.score-a.score;});
-  var discNames = getDiscNames();
-  var discDescs = getDiscDescs();
-
-  var top = sorted[0];
-  var isHigh = top.score >= 50;
-  var tags = isHigh ? discDescs[top.dim].highTags : discDescs[top.dim].lowTags;
-
+function renderStrength(scores) {
+  var test = TESTS.strength;
+  // scores: each dim = sum of 4 questions (range 4-24)
+  var sorted = test.dimensions.map(function(d){return {dim:d,score:scores[d]||0};}).sort(function(a,b){return b.score-a.score;});
+  var top5 = sorted.slice(0, 5);
   var heroHtml = buildHero(scores, test);
 
-  var tagsHtml = tags.map(function(t){return '<span class="trait-tag trait-pos">'+t+'</span>';}).join(' ');
-  var second = sorted[1];
-  var secondDesc = (second.score>=50 ? discDescs[second.dim].highTags : discDescs[second.dim].lowTags).slice(0,2);
-  var secondHtml = secondDesc.map(function(t){return '<span class="trait-tag trait-neu">'+t+'</span>';}).join(' ');
-
-  // DISC: colored bar chart — clean 2-line layout
-  var discEn = {D:'Dominance', I:'Influence', S:'Steadiness', C:'Compliance'};
-  var scoresHtml = sorted.map(function(e){
+  // Top 5 bar chart
+  var top5Html = top5.map(function(e, i){
     var color = test.dimColors[e.dim];
-    var name = test.dimNames[e.dim].split(' ')[0];
-    var en = discEn[e.dim] || '';
-    return '<div class="disc-item">'+
-      '<div class="disc-item-header">'+
-        '<span class="disc-item-name">'+
-          '<span class="disc-dot-sm disc-'+e.dim+'"></span>'+name+
-          (en ? ' <span class="disc-item-en">'+en+'</span>' : '')+
-        '</span>'+
-        '<span class="disc-item-pct">'+e.score+'%</span>'+
-      '</div>'+
-      '<div class="disc-bar-wrap">'+
-        '<div class="disc-bar-fill" style="width:'+e.score+'%;background:'+color+'"></div>'+
-      '</div>'+
-    '</div>';
+    var pct = Math.round((e.score / 24) * 100);
+    return '<div class="disc-item"><div class="disc-item-header">'+
+      '<span class="disc-item-name"><span class="disc-dot-sm" style="background:'+color+'"></span><b>'+(i+1)+'. '+test.dimNames[e.dim]+'</b></span>'+
+      '<span class="disc-item-pct">'+e.score+'/24</span></div>'+
+      '<div class="disc-bar-wrap"><div class="disc-bar-fill" style="width:'+pct+'%;background:'+color+'"></div></div></div>';
   }).join('');
 
+  // Domain averages
+  var domains = ['行动执行','表达影响','关系协同','认知探索'];
+  var dColors = {'行动执行':'#F59E0B','表达影响':'#3B82F6','关系协同':'#10B981','认知探索':'#8B5CF6'};
+  var domainHtml = domains.map(function(dom){
+    var themes = test.domains[dom].themes;
+    var total = themes.reduce(function(s,d){return s+(scores[d]||0);}, 0);
+    var avg = Math.round(total / themes.length);
+    var pct = Math.round((avg / 24) * 100);
+    return '<div class="disc-item"><div class="disc-item-header">'+
+      '<span class="disc-item-name"><span class="disc-dot-sm" style="background:'+dColors[dom]+'"></span>'+dom+'</span>'+
+      '<span class="disc-item-pct">均分 '+avg+'/24</span></div>'+
+      '<div class="disc-bar-wrap"><div class="disc-bar-fill" style="width:'+pct+'%;background:'+dColors[dom]+'"></div></div></div>';
+  }).join('');
+
+  // All 34 themes table
+  var allHtml = '<table class="hl-table" style="font-size:13px;margin-top:8px"><thead><tr><th>#</th><th>主题</th><th>领域</th><th>得分</th><th>一句话解释</th></tr></thead><tbody>'+
+    sorted.map(function(e,i){
+      var color = test.dimColors[e.dim];
+      var dom = domains.find(function(d){return test.domains[d].themes.indexOf(e.dim)!==-1;})||'';
+      var oneLiner = getStrengthOneLiner(e.dim);
+      var rowStyle = i<5 ? ' style="font-weight:bold;background:'+color+'10"' : '';
+      return '<tr'+rowStyle+'><td>'+(i+1)+'</td><td>'+test.dimNames[e.dim]+'</td>'+
+        '<td><span class="pill" style="background:'+dColors[dom]+'20;color:'+dColors[dom]+'">'+dom+'</span></td>'+
+        '<td><b>'+e.score+'</b>/24</td><td style="color:#555">'+oneLiner+'</td></tr>';
+    }).join('')+
+    '</tbody></table>';
+
   document.getElementById('pageBody').innerHTML =
-    '<div class="page-header"><div class="page-title">DISC报告</div><div class="page-subtitle">红黄绿蓝 · 性格色彩分析</div></div>'+
+    '<div class="page-header"><div class="page-title">优势潜能报告</div><div class="page-subtitle">CSSPI-34 · 34主题优势探索</div></div>'+
     '<div class="report-export-wrap" id="reportExportWrap">'+
     buildReportInfoBar()+
     heroHtml+
-    '<div class="score-card"><div class="score-title">性格色彩特征</div>'+scoresHtml+'</div>'+
-    '<div class="trait-card"><div class="score-title">主色调特质</div><div class="trait-row">'+tagsHtml+'</div></div>'+
-    '<div class="trait-card"><div class="score-title">辅色调特质 — '+discNames[second.dim].split('·')[0]+'</div><div class="trait-row">'+secondHtml+'</div></div>'+
+    '<div class="score-card"><div class="score-title">✨ 当前最常使用的优势线索（Top 5）</div>'+top5Html+'</div>'+
+    '<div class="score-card"><div class="score-title">📊 四大领域平均得分</div>'+domainHtml+'</div>'+
+    '<div class="score-card"><div class="score-title">📋 全部34主题排序</div>'+allHtml+'</div>'+
     '</div>'+
     buildExportBtnRow();
+}
+
+// One-liner descriptions for each theme
+function getStrengthOneLiner(dim) {
+  var map = {
+    'ACT01':'擅长锁定方向，并把目标拆成步骤。',
+    'ACT02':'通过不断完成任务获得成就感。',
+    'ACT03':'喜欢清晰安排、稳定节奏和可控流程。',
+    'ACT04':'重视承诺，愿意为答应的事情负责到底。',
+    'ACT05':'做决定前会预判风险，减少踩坑。',
+    'ACT06':'擅长发现故障、定位问题并修正。',
+    'ACT07':'能把人、事、时间和资源重新组合。',
+    'ACT08':'重视规则透明和机会一致。',
+    'ACT09':'需要价值感、原则和长期意义来支撑行动。',
+    'INF01':'愿意先行动，用尝试推动局面打开。',
+    'INF02':'敢于说出判断，并推动方向选择。',
+    'INF03':'能把想法讲清楚，让别人理解。',
+    'INF04':'希望成果被看见，愿意承担展示角色。',
+    'INF05':'喜欢把已有成果继续打磨到更好。',
+    'INF06':'容易被优秀同伴、排名和挑战激发。',
+    'INF07':'相信自己的方向感和关键判断。',
+    'INF08':'擅长建立初次连接并获得支持。',
+    'REL01':'面对变化能较快调整节奏和策略。',
+    'REL02':'能看见他人的进步空间并支持成长。',
+    'REL03':'能敏感觉察他人的情绪和真实感受。',
+    'REL04':'倾向减少冲突，寻找共同点。',
+    'REL05':'愿意让边缘成员被看见、被带入。',
+    'REL06':'能看到每个人的独特性和适配方式。',
+    'REL07':'能给团队带来鼓励和正向能量。',
+    'REL08':'重视稳定、真诚和长期关系。',
+    'REL09':'容易看到人与事之间的相互影响。',
+    'COG01':'重视证据、因果、推理和判断质量。',
+    'COG02':'会从过往经验中提取规律。',
+    'COG03':'能描绘未来图景，并被可能性吸引。',
+    'COG04':'喜欢生成新点子、新组合和新方案。',
+    'COG05':'喜欢收集资料、工具、案例和资源。',
+    'COG06':'喜欢把问题想深、想透、想清楚。',
+    'COG07':'享受学习新知识和掌握新技能的过程。',
+    'COG08':'能比较路径，找到更有效的切入点。'
+  };
+  return map[dim] || '';
 }
 
 // ============================================================
@@ -1703,7 +1861,7 @@ function renderPartialReport(scores) {
   switch (state.testKey) {
     case 'bigfive': subtitle = 'OCEAN 五维人格分析'; break;
     case 'holland': subtitle = 'RIASEC 职业兴趣分析'; break;
-    case 'disc': subtitle = '红黄绿蓝 · 性格色彩分析'; break;
+    case 'strength': subtitle = 'CSSPI-34 · 优势潜能探索'; break;
     case 'mbti': subtitle = '16种人格类型测试'; break;
   }
 
@@ -1757,16 +1915,13 @@ function buildHero(scores, test) {
         '<div class="result-hero-desc">你最适合的领域集中在：'+test.dimNames[top3[0]].split(' ')[0]+'、'+test.dimNames[top3[1]].split(' ')[0]+'、'+test.dimNames[top3[2]].split(' ')[0]+'</div>'+
       '</div>';
     }
-    case 'disc': {
-      var discNames = getDiscNames();
-      var discDescs = getDiscDescs();
-      var top = sorted[0];
-      var isHigh = top.score >= 50;
-      var desc = isHigh ? discDescs[top.dim].high : discDescs[top.dim].low;
+    case 'strength': {
+      var top5 = sorted.slice(0, 5);
       return '<div class="result-hero">'+
-        '<div class="result-hero-icon"><span class="disc-dot disc-'+top.dim+'" style="width:44px;height:44px;"></span></div>'+
-        '<div class="result-hero-name">'+discNames[top.dim]+'</div>'+
-        '<div class="result-hero-desc">'+desc+'</div>'+
+        '<div class="result-hero-type">你的优势线索 Top 5</div>'+
+        '<div class="result-hero-code">'+top5.map(function(e){return test.dimNames[e.dim];}).join(' · ')+'</div>'+
+        '<div class="result-hero-name">'+top5[0].score+'/24 分 — '+test.dimNames[top5[0].dim]+'</div>'+
+        '<div class="result-hero-desc">你最常使用的前5个优势主题，它们是你做得更好、更有能量感的行动方式。</div>'+
       '</div>';
     }
     case 'mbti': {
@@ -1870,7 +2025,7 @@ function unlockFullReport(scores) {
   switch (state.testKey) {
     case 'bigfive': renderBigFive(scores); break;
     case 'holland': renderHolland(scores); break;
-    case 'disc': renderDisc(scores); break;
+    case 'strength': renderStrength(scores); break;
     case 'mbti': renderMbti(scores); break;
   }
   document.getElementById('pageBody').scrollTop = 0;
@@ -1906,19 +2061,6 @@ function getHollandTypeNames() {
     ESI:'销售管理型',ESR:'业务拓展型',ERC:'运营总监型',EAR:'品牌创意型',EAI:'市场创新型',ECA:'商务分析型',EAC:'营销管理型',
     CSE:'行政管理型',CIR:'数据管理型',CRE:'财务审计型',CSI:'合规风控型',CAE:'运营管理型',CIE:'供应链管理型',
     CSR:'事务管理型',CES:'行政助理型',CAR:'数据创意型',CEI:'财务策划型',CRI:'信息管理型'
-  };
-}
-
-function getDiscNames() {
-  return {D:'支配型·红色',I:'影响型·黄色',S:'稳健型·绿色',C:'谨慎型·蓝色'};
-}
-
-function getDiscDescs() {
-  return {
-    D: {high:'你是一位天生的领导者，目标明确、行动果断。喜欢掌控局面，追求效率和结果。',low:'你更倾向于配合而非主导，做决定前会充分考虑。',highTags:['💪 目标导向','⚡ 行动力强','🎯 追求结果','🔥 勇于挑战'],lowTags:['🤝 善于配合','⏳ 三思后行','🎧 乐于倾听','🌿 随和灵活']},
-    I: {high:'你是人群中的焦点，热情开朗、善于表达。用乐观和感染力带动身边的人。',low:'你更偏向于深度交流而非广泛社交。',highTags:['🎤 善于表达','😄 热情开朗','🌟 感染力强','🤹 社交达人'],lowTags:['🤫 低调内敛','📖 喜欢深度交流','🧘 沉稳冷静','💭 思考深入']},
-    S: {high:'你是团队中最可靠的存在，温和耐心、忠诚稳重。善于倾听，追求和谐稳定的关系。',low:'你更倾向于快速响应变化而非追求绝对稳定。',highTags:['🤲 温和耐心','🛡 忠诚可靠','🌿 追求和谐','🎧 善于倾听'],lowTags:['⚡ 适应力强','🔄 拥抱变化','🚀 效率优先','🎯 目标导向']},
-    C: {high:'你追求精确和品质，做事严谨、逻辑清晰。注重数据和事实，是团队的质量守护者。',low:'你更关注大局而非细节，能快速做出判断。',highTags:['🔍 严谨细致','📊 数据导向','✅ 追求品质','🧠 逻辑清晰'],lowTags:['🌍 关注大局','⚡ 快速决策','🎨 灵活应变','💡 创新思维']}
   };
 }
 
@@ -1967,10 +2109,10 @@ function saveAssessmentResult(scores) {
       payload.type = (scores.EI>=50?'E':'I') + (scores.SN>=50?'S':'N') + (scores.TF>=50?'T':'F') + (scores.JP>=50?'J':'P');
       payload.summary = getMbtiInfo(payload.type).name;
       localStorage.setItem('mbti_result', JSON.stringify(payload));
-    } else if (state.testKey === 'disc') {
+    } else if (state.testKey === 'strength') {
       payload.type = sorted[0].dim;
-      payload.summary = getDiscNames()[sorted[0].dim];
-      localStorage.setItem('disc_result', JSON.stringify(payload));
+      payload.summary = test.dimNames[sorted[0].dim];
+      localStorage.setItem('strength_result', JSON.stringify(payload));
     } else if (state.testKey === 'bigfive') {
       payload.summary = test.dimNames[sorted[0].dim];
       localStorage.setItem('bigfive_result', JSON.stringify(payload));
@@ -2011,10 +2153,9 @@ function submitToSupabase(scores) {
     resultCode = (scores.EI>=50?'E':'I') + (scores.SN>=50?'S':'N') + (scores.TF>=50?'T':'F') + (scores.JP>=50?'J':'P');
     var info = getMbtiInfo(resultCode);
     resultSummary = info.name;
-  } else if (state.testKey === 'disc') {
+  } else if (state.testKey === 'strength') {
     resultCode = sorted[0].dim;
-    var discNames = getDiscNames();
-    resultSummary = discNames[sorted[0].dim];
+    resultSummary = test.dimNames[sorted[0].dim];
   } else {
     resultCode = sorted[0].dim;
     resultSummary = test.dimNames[sorted[0].dim];
