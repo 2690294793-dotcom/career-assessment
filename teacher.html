@@ -24,7 +24,7 @@ body {
 /* Top bar */
 .top-bar {
   background: linear-gradient(135deg, var(--primary-dark), var(--primary));
-  color: #fff; padding: 0 32px; height: 60px; display: flex; align-items: center;
+  color: #fff; padding: 0 40px; height: 60px; display: flex; align-items: center;
   justify-content: space-between; box-shadow: 0 2px 12px rgba(99,102,241,0.2);
   position: sticky; top: 0; z-index: 100;
 }
@@ -44,7 +44,7 @@ body {
 .top-bar .nav-links a svg { width: 15px; height: 15px; }
 
 /* Container */
-.container { max-width: 1200px; margin: 0 auto; padding: 28px 24px; }
+.container { max-width: 960px; margin: 0 auto; padding: 28px 40px; }
 
 /* Login */
 .login-wrap {
@@ -500,8 +500,8 @@ tr.selected td:not(:first-child) { background: rgba(99,102,241,0.06); }
 }
 
 @media (max-width: 768px) {
-  .container { padding: 14px; }
-  .top-bar { padding: 0 16px; }
+  .container { padding: 16px; }
+  .top-bar { padding: 0 20px; }
   .top-bar .nav-links a { padding: 5px 10px; font-size: 12px; }
   .tab-bar { flex-direction: row; }
   .tab-btn { padding: 10px 12px; font-size: 13px; }
