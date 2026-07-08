@@ -1242,13 +1242,14 @@ function renderHolland(scores) {
   var typeName = typeNames[code];
   if (!typeName) {
     var dims = top3.map(function(d){return test.dimNames[d.dim].split(' ')[0];});
-    typeName = dims[0] + '·' + dims[1] + '·' + dims[2] + '型';
+    typeName = dims[0] + '·' + dims[1] + '·' + dims[2];
   }
 
   // 三码头部分析文字
   var analysisText = getHollandAnalysis(code, sorted);
 
-  // 参考图表格：R I A S E C 列，总分一行（当前仅有兴趣测评）
+  // 参考图表格：R I A S E C 列，四行（兴趣/能力/回馈/总分）
+  // 当前系统仅完成兴趣测评，能力/回馈暂显示 "—"
   var raw = state.rawScores || {};
   var dims = test.dimensions;
 
@@ -1257,12 +1258,27 @@ function renderHolland(scores) {
     return '<th class="hl-th-code" style="background:'+test.dimColors[d]+'15;color:'+test.dimColors[d]+'">'+d+'</th>';
   }).join('');
 
-  // 只保留总分行（当前仅有兴趣测评，能力/回馈未测）
-  var totalScores = dims.map(function(d){ return raw[d] || 0; });
-  var tableRow = '<tr>'+
-    '<td class="hl-row-label">总分</td>'+
-    totalScores.map(function(s){ return '<td class="hl-cell-score">'+s+'</td>'; }).join('')+
-  '</tr>';
+  var interestScores = dims.map(function(d){ return raw[d] || 0; });
+  var dashCells = dims.map(function(){ return '<td class="hl-cell-score">—</td>'; }).join('');
+
+  var tableRows = [
+    '<tr>'+
+      '<td class="hl-row-label">您所感兴趣的活动（兴趣）</td>'+
+      interestScores.map(function(s){ return '<td class="hl-cell-score">'+s+'</td>'; }).join('')+
+    '</tr>',
+    '<tr>'+
+      '<td class="hl-row-label">您所擅长的活动（能力）</td>'+
+      dashCells +
+    '</tr>',
+    '<tr>'+
+      '<td class="hl-row-label">您所喜欢的职业（回馈）</td>'+
+      dashCells +
+    '</tr>',
+    '<tr>'+
+      '<td class="hl-row-label">总分</td>'+
+      interestScores.map(function(s){ return '<td class="hl-cell-score">'+s+'</td>'; }).join('')+
+    '</tr>'
+  ].join('');
 
   var tableHtml = '<div class="hl-table-card">'+
     '<div class="hl-table-title">📊 以下得分表示了您的职业倾向性程度</div>'+
@@ -1270,7 +1286,7 @@ function renderHolland(scores) {
       '<thead>'+
         '<tr><th class="hl-th-dim"></th>'+headerCells+'</tr>'+
       '</thead>'+
-      '<tbody>'+tableRow+'</tbody>'+
+      '<tbody>'+tableRows+'</tbody>'+
     '</table>'+
   '</div>';
 
@@ -1745,7 +1761,7 @@ function buildHero(scores, test) {
   var typeName = typeNames[code];
   if (!typeName) {
     var dims = top3.map(function(d){return test.dimNames[d].split(' ')[0];});
-    typeName = dims[0] + '·' + dims[1] + '·' + dims[2] + '型';
+    typeName = dims[0] + '·' + dims[1] + '·' + dims[2];
   }
       return '<div class="result-hero">'+
         '<div class="result-hero-type">你的霍兰德职业代码</div>'+
