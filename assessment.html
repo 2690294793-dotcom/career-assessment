@@ -472,6 +472,65 @@ body {
   60% { transform: translateX(-6px); }
   80% { transform: translateX(6px); }
 }
+
+/* ===== Holland 规划方案卡片 ===== */
+.hl-plan-card {
+  background: linear-gradient(135deg, #ede9fe 0%, #fce7f3 100%);
+  border-radius: 18px; padding: 18px; margin: 16px 0;
+  box-shadow: 0 4px 16px rgba(126,34,206,0.12);
+  position: relative; overflow: hidden;
+}
+.hl-plan-card::before {
+  content: ''; position: absolute; top: -30px; right: -30px;
+  width: 120px; height: 120px; border-radius: 50%;
+  background: rgba(255,255,255,0.35);
+}
+.hl-plan-header { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.hl-plan-icon {
+  width: 36px; height: 36px; border-radius: 12px;
+  background: linear-gradient(135deg, #7e22ce, #a855f7);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; box-shadow: 0 4px 12px rgba(126,34,206,0.3);
+}
+.hl-plan-title { font-size: 17px; font-weight: 800; color: var(--primary-dark); }
+.hl-plan-subtitle { font-size: 12px; color: #6B7280; margin-bottom: 14px; }
+.hl-plan-title2 {
+  font-size: 14px; font-weight: 700; color: #4c1d95;
+  background: rgba(255,255,255,0.6); padding: 8px 12px; border-radius: 10px;
+  margin-bottom: 8px;
+}
+.hl-plan-desc {
+  font-size: 12px; color: #5b21b6; line-height: 1.65;
+  background: rgba(255,255,255,0.5); padding: 10px 12px; border-radius: 10px;
+  margin-bottom: 12px;
+}
+.hl-plan-steps { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.plan-step {
+  display: flex; align-items: flex-start; gap: 10px;
+  background: rgba(255,255,255,0.7); border-radius: 10px;
+  padding: 8px 10px;
+}
+.plan-step-num {
+  flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%;
+  background: linear-gradient(135deg, #7e22ce, #a855f7);
+  color: #fff; font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  margin-top: 1px;
+}
+.plan-step-text { font-size: 13px; color: #1e1b4b; line-height: 1.5; flex: 1; }
+.hl-plan-btn {
+  width: 100%; padding: 12px 16px; border-radius: 24px; border: none;
+  background: linear-gradient(135deg, #7e22ce, #a855f7);
+  color: #fff; font-size: 14px; font-weight: 700; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  box-shadow: 0 4px 14px rgba(126,34,206,0.35);
+  transition: all 0.2s; font-family: inherit;
+}
+.hl-plan-btn:active { transform: scale(0.97); }
+.hl-plan-note {
+  text-align: center; font-size: 11px; color: #6B7280;
+  margin-top: 10px; opacity: 0.85;
+}
 </style>
 <script src="https://beacon.cdn.qq.com/sdk/4.5.9/beacon_web.min.js"></script>
 <script>
@@ -1485,6 +1544,7 @@ function renderHolland(scores) {
   var sorted = test.dimensions.map(function(d){return {dim:d, score:scores[d], raw: raw[d] || 0};}).sort(function(a,b){return b.score-a.score;});
   var top3 = sorted.slice(0,3);
   var code = top3.map(function(e){return e.dim;}).join('');
+  state.lastHollandCode = code; // 保存当前霍兰德代码，供规划方案使用
   var typeNames = getHollandTypeNames();
   var typeName = typeNames[code];
   if (!typeName) {
@@ -1607,8 +1667,128 @@ function renderHolland(scores) {
       '<div class="hl-analysis-text">'+analysisText+'</div>'+
     '</div>'+
     dimAnalysisHtml+
+    buildHollandPlanCard(code, top3)+
     '</div>'+
     buildExportBtnRow();
+}
+
+// 生成霍兰德规划方案卡片（含"加入目标"按钮）
+function buildHollandPlanCard(code, top3) {
+  var plan = generateHollandPlan(code, top3);
+  state.currentPlan = plan; // 暂存当前方案，便于点击按钮时写入目标
+  var stepsHtml = plan.steps.map(function(s, i) {
+    return '<div class="plan-step">'+
+      '<span class="plan-step-num">'+(i+1)+'</span>'+
+      '<span class="plan-step-text">'+escapeHtml(s)+'</span>'+
+    '</div>';
+  }).join('');
+  return '<div class="hl-plan-card">'+
+    '<div class="hl-plan-header">'+
+      '<div class="hl-plan-icon">🎯</div>'+
+      '<div class="hl-plan-title">推荐规划方案</div>'+
+    '</div>'+
+    '<div class="hl-plan-subtitle">基于你的测评结果 '+code+'，自动生成如下行动建议</div>'+
+    '<div class="hl-plan-title2">'+escapeHtml(plan.title)+'</div>'+
+    '<div class="hl-plan-desc">'+escapeHtml(plan.desc)+'</div>'+
+    '<div class="hl-plan-steps">'+stepsHtml+'</div>'+
+    '<button class="hl-plan-btn" onclick="addPlanToGoals()">'+
+      '<span>加入目标</span>'+
+      '<span style="font-size:12px;opacity:.8;font-weight:500;">满意此方案则一键创建</span>'+
+    '</button>'+
+    '<div class="hl-plan-note">仍可前往「目标」页手动创建或修改目标</div>'+
+  '</div>';
+}
+
+// 根据霍兰德三码生成规划方案
+function generateHollandPlan(code, top3) {
+  var dimNames = {
+    R: '现实型', I: '研究型', A: '艺术型',
+    S: '社会型', E: '企业型', C: '常规型'
+  };
+  var dimCareerMap = {
+    R: ['技术/工程类', '操作/运维类', '户外/体育类'],
+    I: ['研究/分析类', '数据/研发类', '学术/科研类'],
+    A: ['设计/创意类', '文案/媒体类', '艺术/表演类'],
+    S: ['教育/培训类', '咨询/服务类', '社工/护理类'],
+    E: ['管理/销售类', '创业/市场类', '领导/协调类'],
+    C: ['行政/财务类', '文档/审计类', '流程/质控类']
+  };
+  var dimActions = {
+    R: ['参加一次实操实训或技能工作坊，积累动手能力',
+        '考取与你目标职业相关的 1 项技能证书',
+        '使用专业工具完成一个小项目并记录过程'],
+    I: ['精读 1 本专业领域论文或行业研究报告',
+        '尝试独立完成一个数据分析/实验探究类小课题',
+        '学习一种研究或分析方法论（如 SPSS、Python 数据分析等）'],
+    A: ['整理并更新个人作品集，展示你的创意成果',
+        '参加一次创意工作坊、设计比赛或艺术展览',
+        '学习 1 个相关创作工具（如 PS、剪辑、写作等）'],
+    S: ['参与志愿服务或社会实践，锻炼沟通与助人能力',
+        '加入社团或学生组织，担任一次活动策划或主持人',
+        '与 1 位目标职业前辈进行深度访谈或职业咨询'],
+    E: ['参加一次商业模拟、创业比赛或路演活动',
+        '主动牵头完成一个小组项目，锻炼团队领导力',
+        '学习项目管理、市场营销或财务基础中的 1 项'],
+    C: ['建立个人学习与职业档案，养成系统记录习惯',
+        '熟练使用办公软件，完成一次数据整理或流程优化任务',
+        '参加行政、财务或办公自动化相关培训']
+  };
+  var commonSteps = [
+    '调研 2-3 个目标职业的入职要求、薪资路径与行业趋势',
+    '用 SMART 原则把本方案细化为可执行的周计划'
+  ];
+  var d1 = top3[0].dim, d2 = top3[1].dim, d3 = top3[2].dim;
+  var title = code + ' 职业探索与发展计划';
+  var careerTypes = (dimCareerMap[d1] || []).slice(0, 2).join('、') + '，兼顾 ' + (dimCareerMap[d2] || []).slice(0, 1).join('') + '与' + (dimCareerMap[d3] || []).slice(0, 1).join('') + '方向';
+  var desc = '你的核心优势偏向「' + dimNames[d1] + '」，同时兼具「' + dimNames[d2] + '」与「' + dimNames[d3] + '」特质。推荐优先关注：' + careerTypes + '。';
+  var steps = [];
+  // 为 top3 各取 2 个行动建议
+  [d1, d2, d3].forEach(function(d) {
+    var actions = dimActions[d] || [];
+    steps.push(actions[0]);
+    if (actions[1]) steps.push(actions[1]);
+  });
+  // 加入通用步骤
+  steps = steps.concat(commonSteps);
+  return { title: title, desc: desc, cat: '技能提升', steps: steps };
+}
+
+// 把当前规划方案加入目标列表
+function addPlanToGoals() {
+  var plan = state.currentPlan || generateHollandPlan(state.lastHollandCode || 'RIASEC', []);
+  if (!plan || !plan.steps) { showToast('暂无可用方案'); return; }
+
+  var STORAGE_KEY = 'career_goals_v2';
+  var goals = [];
+  try {
+    var raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) goals = JSON.parse(raw);
+  } catch(e) {}
+  if (!Array.isArray(goals)) goals = [];
+
+  var d = new Date();
+  d.setDate(d.getDate() + 30);
+  var deadline = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+
+  var goal = {
+    id: Date.now(),
+    title: plan.title,
+    desc: plan.desc,
+    cat: plan.cat || '技能提升',
+    color: 'linear-gradient(90deg,#1d4ed8,#60a5fa)',
+    deadline: deadline,
+    done: false,
+    steps: plan.steps.map(function(s) { return {text: s, done: false}; }),
+    progress: 0
+  };
+  goals.push(goal);
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(goals));
+    showToast('已加入目标，即将跳转…');
+    setTimeout(function() { window.location.href = 'goals.html'; }, 900);
+  } catch(e) {
+    showToast('保存失败：' + e.message);
+  }
 }
 
 // ============================================================
@@ -2382,7 +2562,7 @@ function submitToSupabase(scores) {
 // ============================================================
 //  INIT
 // ============================================================
-console.log('[DEBUG] assessment.html v20260708-7 loaded');
+console.log('[DEBUG] assessment.html v20260708-8 loaded');
 console.log('[DEBUG] TESTS available:', typeof TESTS !== 'undefined' ? Object.keys(TESTS).join(', ') : 'UNDEFINED');
 state._locking = false;
 // 调用 config.js 的 initSupabase()，设置全局 db 变量
