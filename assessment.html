@@ -1248,31 +1248,18 @@ function renderHolland(scores) {
   // 三码头部分析文字
   var analysisText = getHollandAnalysis(code, sorted);
 
-  // 参考图表格：R I A S E C 列，四行（兴趣/能力/回馈/总分）
-  // 当前系统仅完成兴趣测评，能力/回馈暂显示 "—"
   var raw = state.rawScores || {};
   var dims = test.dimensions;
 
-  // R I A S E C 表头（每列带维度颜色）
   var headerCells = dims.map(function(d) {
     return '<th class="hl-th-code" style="background:'+test.dimColors[d]+'15;color:'+test.dimColors[d]+'">'+d+'</th>';
   }).join('');
 
   var interestScores = dims.map(function(d){ return raw[d] || 0; });
-  var dashCells = dims.map(function(){ return '<td class="hl-cell-score">—</td>'; }).join('');
-
   var tableRows = [
     '<tr>'+
       '<td class="hl-row-label">您所感兴趣的活动（兴趣）</td>'+
       interestScores.map(function(s){ return '<td class="hl-cell-score">'+s+'</td>'; }).join('')+
-    '</tr>',
-    '<tr>'+
-      '<td class="hl-row-label">您所擅长的活动（能力）</td>'+
-      dashCells +
-    '</tr>',
-    '<tr>'+
-      '<td class="hl-row-label">您所喜欢的职业（回馈）</td>'+
-      dashCells +
     '</tr>',
     '<tr>'+
       '<td class="hl-row-label">总分</td>'+
