@@ -634,113 +634,138 @@ body {
 .mbti-report-explorers { --c-accent: #E0A94E; --c-accent-10: rgba(224,169,78,0.1); }
 
 .mbti-hero {
-  position: relative; border-radius: 0 0 24px 24px;
-  padding: 32px 22px; color: #fff; overflow: hidden;
-  margin-bottom: 16px; min-height: 160px; display: flex; align-items: center;
+  position: relative; border-radius: 20px;
+  padding: 28px 22px; color: #fff; overflow: hidden;
+  margin-bottom: 18px; min-height: 180px;
 }
-.mbti-hero-bg { position: absolute; inset: 0; z-index: 1; }
-.mbti-hero-content { position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: center; width: 100%; }
-.mbti-hero-left { flex: 1; }
-.mbti-hero-label { font-size: 13px; opacity: 0.9; margin-bottom: 6px; font-weight: 500; }
-.mbti-hero-type { font-size: 34px; font-weight: 900; line-height: 1.1; margin-bottom: 6px; }
-.mbti-hero-code { font-size: 18px; font-weight: 700; opacity: 0.95; letter-spacing: 3px; }
-.mbti-hero-svg { width: 130px; height: 130px; flex-shrink: 0; margin-left: 10px; }
+.mbti-hero-bg { position: absolute; inset: 0; z-index: 1; background: var(--c-accent); border-radius: 20px; opacity: .95; }
+.mbti-hero-content { position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: flex-start; width: 100%; gap: 12px; }
+.mbti-hero-left { flex: 1; padding-top: 8px; }
+.mbti-hero-label { font-size: 14px; opacity: .9; margin-bottom: 8px; font-weight: 500; letter-spacing: 2px; }
+.mbti-hero-type { font-size: 32px; font-weight: 900; line-height: 1.15; margin-bottom: 6px; }
+.mbti-hero-code { font-size: 17px; font-weight: 700; opacity: .95; letter-spacing: 3px; }
+.mbti-hero-img {
+  width: 150px; height: 150px; flex-shrink: 0; border-radius: 16px;
+  object-fit: cover; box-shadow: 0 8px 24px rgba(0,0,0,.15);
+}
 
-.mbti-desc-wrap {
-  font-size: 14px; line-height: 1.8; color: #333;
-  padding: 20px 22px; background: var(--card); border-radius: 16px;
-  margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+/* 类型介绍段落 */
+.mbti-intro-text {
+  font-size: 14.5px; line-height: 1.85; color: #333;
+  padding: 22px 24px; background: var(--card); border-radius: 16px;
+  margin-bottom: 18px; box-shadow: 0 2px 10px rgba(0,0,0,.04);
 }
-.mbti-desc-wrap p { margin-bottom: 12px; }
-.mbti-desc-wrap p:last-child { margin-bottom: 0; }
+.mbti-intro-text p { margin-bottom: 14px; text-indent: 2em; }
+.mbti-intro-text p:last-child { margin-bottom: 0; }
 
-.mbti-layout { display: flex; gap: 14px; flex-direction: column; }
-.mbti-main { flex: 1; min-width: 0; }
-.mbti-sidebar { width: 100%; }
+/* 全宽场景插图 */
+.mbti-scene-img-wrap {
+  margin-bottom: 18px; border-radius: 16px; overflow: hidden;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+  display: flex; align-items: center; justify-content: center;
+  min-height: 200px; position: relative;
+}
+.mbti-scene-img {
+  max-width: 100%; border-radius: 16px; display: block;
+}
 
-.mbti-card {
-  background: var(--card); border-radius: 16px;
-  padding: 18px; margin-bottom: 14px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-  border-left: 4px solid var(--c-accent);
+/* 章节标题：带圈数字 */
+.mbti-section-title {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 19px; font-weight: 800; color: #222;
+  margin-bottom: 16px; padding-left: 4px;
 }
-.mbti-card-title {
-  font-size: 16px; font-weight: 800; color: var(--text-primary);
-  margin-bottom: 10px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-}
-.mbti-card-body { font-size: 13px; line-height: 1.75; color: var(--text-secondary); }
-.mbti-card-body p { margin-bottom: 8px; }
-
-.mbti-sidebar-card {
-  background: var(--card); border-radius: 16px;
-  padding: 16px; margin-bottom: 14px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04); text-align: center;
-}
-.mbti-sidebar-avatar {
-  width: 60px; height: 60px; border-radius: 50%;
+.mbti-section-num {
+  width: 32px; height: 32px; border-radius: 50%;
   background: var(--c-accent); color: #fff;
   display: flex; align-items: center; justify-content: center;
-  font-size: 28px; margin: 0 auto 8px;
+  font-size: 17px; font-weight: 800; flex-shrink: 0;
 }
-.mbti-sidebar-type { font-size: 18px; font-weight: 800; color: var(--text-primary); }
-.mbti-sidebar-code { font-size: 13px; color: var(--text-light); margin-bottom: 4px; }
-.mbti-sidebar-group { font-size: 12px; color: var(--text-secondary); font-weight: 500; }
-.mbti-sidebar-toc {
+
+/* 维度条 - 截图风格 */
+.mbti-dim-card {
   background: var(--card); border-radius: 16px;
-  padding: 14px; margin-bottom: 14px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  padding: 20px; margin-bottom: 18px;
+  box-shadow: 0 2px 10px rgba(0,0,0,.04);
 }
-.mbti-toc-item { font-size: 13px; color: var(--text-secondary); padding: 7px 0; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 6px; }
-.mbti-toc-item:last-child { border-bottom: 0; }
-.mbti-toc-num { color: var(--c-accent); font-weight: 800; width: 18px; }
-
-.mbti-career-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
-.mbti-career-tag {
-  background: var(--c-accent-10); color: var(--c-accent);
-  font-size: 12px; padding: 4px 10px; border-radius: 20px;
-  font-weight: 600;
+.mbti-dim-row {
+  margin-bottom: 20px;
 }
+.mbti-dim-row:last-child { margin-bottom: 0; }
 
-.mbti-dim-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 12px; }
-.mbti-dim-bar-label { width: 36px; font-weight: 600; color: var(--text-primary); }
-.mbti-dim-bar-track { flex: 1; height: 12px; border-radius: 6px; background: var(--bg); display: flex; overflow: hidden; }
-.mbti-dim-bar-seg { height: 100%; transition: width 0.8s ease; }
-.mbti-dim-bar-val { width: 32px; text-align: right; font-weight: 700; color: var(--text-primary); }
-
-.mbti-card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; width: 100%; }
-.mbti-card-grid .mbti-card {
-  margin-bottom: 0;
-  aspect-ratio: 1 / 1;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  padding: 10px;
-  min-height: 0;
+/* 维度条头部：标签+百分比+问号 */
+.mbti-dim-header {
+  display: flex; align-items: center; gap: 6px; margin-bottom: 8px;
 }
-.mbti-card-grid .mbti-card-title {
+.mbti-dim-label {
+  font-size: 14px; font-weight: 700;
+}
+.mbti-dim-pct {
+  font-size: 14px; font-weight: 700;
+}
+.mbti-dim-help {
+  width: 18px; height: 18px; border-radius: 50%;
+  background: #ddd; color: #666;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; cursor: help;
   flex-shrink: 0;
-  font-size: 13px;
-  font-weight: 700;
-  margin-bottom: 4px;
-  gap: 4px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
-.mbti-card-grid .mbti-card-body {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  font-size: 11px;
-  line-height: 1.5;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
+
+/* 维度条主体 */
+.mbti-dim-track-wrap {
+  position: relative;
 }
-.mbti-card-grid .mbti-card-body::-webkit-scrollbar { display: none; }
+.mbti-dim-track {
+  height: 14px; border-radius: 7px; overflow: visible !important;
+  display: flex; position: relative;
+}
+.mbti-dim-seg {
+  height: 100%;
+}
+.mbti-dim-dot {
+  position: absolute; top: 50%; transform: translate(-50%, -50%);
+  width: 26px; height: 26px; border-radius: 50%;
+  background: #fff; border: 3px solid #ccc;
+  box-shadow: 0 2px 8px rgba(0,0,0,.12);
+  z-index: 3;
+}
+
+/* 维度条底部标签 */
+.mbti-dim-footer {
+  display: flex; justify-content: space-between; margin-top: 6px;
+  font-size: 13px; color: #888;
+}
+
+/* 底部描述文字卡片 */
+.mbti-desc-card {
+  background: var(--card); border-radius: 16px;
+  padding: 20px 24px; margin-bottom: 18px;
+  box-shadow: 0 2px 10px rgba(0,0,0,.04);
+  font-size: 14.5px; line-height: 1.85; color: #333;
+}
+.mbti-desc-card p { margin-bottom: 14px; text-indent: 2em; }
+.mbti-desc-card p:last-child { margin-bottom: 0; }
+
+/* 底部操作按钮 */
+.mbti-action-row {
+  display: flex; gap: 12px; margin-bottom: 18px;
+}
+.mbti-action-btn {
+  flex: 1; padding: 12px 16px; border-radius: 28px;
+  font-size: 14px; font-weight: 700; text-align: center;
+  cursor: pointer; border: none; display: flex; align-items: center;
+  justify-content: center; gap: 6px; transition: all .25s ease;
+}
+.mbti-action-btn-primary {
+  background: var(--c-accent); color: #fff;
+}
+.mbti-action-btn-secondary {
+  background: #fff; color: #888; border: 1.5px solid #ddd;
+}
 
 @media (min-width: 640px) {
-  .mbti-layout { flex-direction: row; }
-  .mbti-sidebar { width: 200px; flex-shrink: 0; }
+  .mbti-hero { padding: 38px 30px; min-height: 210px; }
+  .mbti-hero-img { width: 180px; height: 180px; }
 }
 </style>
 <script src="https://beacon.cdn.qq.com/sdk/4.5.9/beacon_web.min.js"></script>
@@ -796,7 +821,7 @@ body {
 
 <div class="toast-el" id="toastEl"></div>
 
-<script src="js/config.js?v=20260708-19"></script>
+<script src="js/config.js?v=20260708-20"></script>
 <script>
 // ============================================================
 //  GLOBAL STATE
@@ -2188,119 +2213,116 @@ function renderMbti(scores) {
   var group = getMbtiGroup(mbtiType);
   var groupName = getMbtiGroupName(group);
   var accentColor = getMbtiGroupColor(group);
+  var photoUrl = getMbtiPhotoUrl(mbtiType);
 
-  // 顶部大横幅（16P风格）
+  // 1. 顶部横幅：左侧文字 + 右侧人物照片
   var heroHtml =
-    '<div class="mbti-hero" style="background:'+accentColor+'">'+
+    '<div class="mbti-hero">'+
       '<div class="mbti-hero-bg"></div>'+
       '<div class="mbti-hero-content">'+
         '<div class="mbti-hero-left">'+
-          '<div class="mbti-hero-label">你的人格类型是：</div>'+
+          '<div class="mbti-hero-label">你的人格类型是</div>'+
           '<div class="mbti-hero-type">'+info.name+'</div>'+
-          '<div class="mbti-hero-code">'+mbtiType+'-A</div>'+
+          '<div class="mbti-hero-code">'+mbtiType+'</div>'+
         '</div>'+
-        '<div class="mbti-hero-svg">'+getMbtiSvg(mbtiType)+'</div>'+
+        '<img class="mbti-hero-img" src="'+photoUrl+'" alt="'+info.name+'">'+
       '</div>'+
     '</div>';
 
-  // 描述段落
-  var descHtml = '<div class="mbti-desc-wrap"><p>作为一位 <b>'+mbtiType+'（'+info.name+'）</b>，'+info.desc+'</p><p>你属于 <b>'+groupName+'</b> 阵营，这一人格群体通常以'+info.traits.join('、')+'著称。</p></div>';
+  // 2. 类型介绍文案
+  var introHtml =
+    '<div class="mbti-intro-text">'+
+      '<p>作为一名 <b>'+mbtiType+'（'+info.name+'）</b>，'+info.desc+'</p>'+
+      '<p>你属于 <b>'+groupName+'</b> 阵营，这一人格群体通常以'+info.traits.join('、')+'著称。'+info.relationships+' '+info.growth+'</p>'+
+    '</div>';
 
-  // 特征标签
-  var traitsHtml = '<div class="mbti-career-tags">'+
-    info.traits.map(function(t){return '<span class="mbti-career-tag">'+t+'</span>';}).join('')+
-  '</div>';
+  // 3. 全宽场景人物图片
+  var sceneHtml =
+    '<div class="mbti-scene-img-wrap">'+
+      '<img class="mbti-scene-img" src="'+photoUrl+'" alt="'+info.name+' 场景">'+
+    '</div>';
 
-  // 维度倾向（新版双段条形）
+  // 4. 维度条：截图风格
   var mbtiDims = [
-    {key:'EI', header:'能量', left:'外倾', right:'内倾', leftColor:'#3B82F6', rightColor:'#F59E0B'},
-    {key:'SN', header:'心智', left:'感觉', right:'直觉', leftColor:'#F59E0B', rightColor:'#3B82F6'},
-    {key:'TF', header:'天性', left:'思维', right:'情感', leftColor:'#10B981', rightColor:'#EF4444'},
-    {key:'JP', header:'应对', left:'判断', right:'感知', leftColor:'#8B5CF6', rightColor:'#EC4899'}
+    {key:'EI', label:'能量', leftText:'外向', rightText:'内向', leftColor:'#3B82F6', rightColor:'#F59E0B'},
+    {key:'SN', label:'心智', leftText:'感觉', rightText:'直觉', leftColor:'#F59E0B', rightColor:'#3B82F6'},
+    {key:'TF', label:'天性', leftText:'思维', rightText:'情感', leftColor:'#10B981', rightColor:'#EF4444'},
+    {key:'JP', label:'应对', leftText:'判断', rightText:'感知', leftColor:'#8B5CF6', rightColor:'#EC4899'}
   ];
   var dimsHtml = mbtiDims.map(function(d){
     var s = Math.round(scores[d.key]);
-    var sL = s;
-    var sR = 100 - s;
+    var sL = s, sR = 100 - s;
     var isLeft = s >= 50;
-    var activeLabel = isLeft ? d.left : d.right;
+    var activeText = isLeft ? d.leftText : d.rightText;
     var activeColor = isLeft ? d.leftColor : d.rightColor;
-    return '<div class="mbti-dim-bar-row">'+
-      '<div class="mbti-dim-bar-label" style="color:'+activeColor+'">'+activeLabel+'</div>'+
-      '<div class="mbti-dim-bar-track">'+
-        '<div class="mbti-dim-bar-seg" style="width:'+sL+'%;background:'+d.leftColor+'"></div>'+
-        '<div class="mbti-dim-bar-seg" style="width:'+sR+'%;background:'+d.rightColor+'"></div>'+
+    var dotBorder = activeColor;
+    var dotLeft = s + '%';
+    return '<div class="mbti-dim-row">'+
+      '<div class="mbti-dim-header">'+
+        '<span class="mbti-dim-label" style="color:'+activeColor+'">'+d.label+'</span>'+
+        '<span class="mbti-dim-pct" style="color:'+activeColor+'">'+s+'% '+activeText+'</span>'+
+        '<span class="mbti-dim-help" title="该维度反映你在这组特质上的偏好强度">?</span>'+
       '</div>'+
-      '<div class="mbti-dim-bar-val" style="color:'+activeColor+'">'+s+'%</div>'+
+      '<div class="mbti-dim-track-wrap">'+
+        '<div class="mbti-dim-track">'+
+          '<div class="mbti-dim-seg" style="width:'+sL+'%;background:'+d.leftColor+'"></div>'+
+          '<div class="mbti-dim-seg" style="width:'+sR+'%;background:'+d.rightColor+'"></div>'+
+        '</div>'+
+        '<div class="mbti-dim-dot" style="left:'+dotLeft+';border-color:'+dotBorder+'"></div>'+
+      '</div>'+
+      '<div class="mbti-dim-footer">'+
+        '<span>'+d.leftText+'</span>'+
+        '<span>'+d.rightText+'</span>'+
+      '</div>'+
     '</div>';
   }).join('');
 
-  // 职业标签
-  var careersHtml = '<div class="mbti-career-tags">'+
+  var section1Html =
+    '<div class="mbti-section-title"><div class="mbti-section-num">1</div><div>人格特征</div></div>'+
+    '<div class="mbti-dim-card">'+dimsHtml+'</div>';
+
+  // 5. 人格画像
+  var section2Html =
+    '<div class="mbti-section-title"><div class="mbti-section-num">2</div><div>人格画像</div></div>'+
+    '<div class="mbti-desc-card">'+
+      '<p>作为一名 '+info.name+'，你的核心特质包括 <b>'+info.traits.join('、')+'</b>。'+info.desc+'</p>'+
+      '<p>'+info.relationships+'</p>'+
+      '<p>'+info.growth+'</p>'+
+    '</div>';
+
+  // 6. 职业道路
+  var careersTagHtml = '<div class="mbti-career-tags">'+
     info.careers.map(function(c){return '<span class="mbti-career-tag">'+c+'</span>';}).join('')+
   '</div>';
-
-  // 内容卡片
-  var personalityCard =
-    '<div class="mbti-card">'+
-      '<div class="mbti-card-title">🧠 人格特征</div>'+
-      '<div class="mbti-card-body">'+
-        '<p>'+info.desc+'</p>'+
-        '<p>核心特质：</p>'+traitsHtml+
-      '</div>'+
+  var section3Html =
+    '<div class="mbti-section-title"><div class="mbti-section-num">3</div><div>职业道路</div></div>'+
+    '<div class="mbti-desc-card">'+
+      '<p>适合你的职业方向通常需要你发挥 '+info.traits.join('、')+' 的特质。以下领域与角色，更容易让你感到如鱼得水：</p>'+
+      careersTagHtml+
     '</div>';
 
-  var careersCard =
-    '<div class="mbti-card">'+
-      '<div class="mbti-card-title">💼 职业道路</div>'+
-      '<div class="mbti-card-body">'+
-        '<p>适合你的职业方向通常需要你发挥'+info.traits.join('、')+'的特质：</p>'+
-        careersHtml+
-      '</div>'+
+  // 7. 个人成长
+  var section4Html =
+    '<div class="mbti-section-title"><div class="mbti-section-num">4</div><div>个人成长</div></div>'+
+    '<div class="mbti-desc-card">'+
+      '<p>'+info.growth+'</p>'+
+      '<p>尽管你在 '+info.traits.join('、')+' 上展现出独特优势，也要注意在关系与目标之间找到平衡。持续探索自我，会让你在成长之路上走得更稳、更远。</p>'+
     '</div>';
 
-  var relationshipsCard =
-    '<div class="mbti-card">'+
-      '<div class="mbti-card-title">❤️ 人际关系</div>'+
-      '<div class="mbti-card-body"><p>'+info.relationships+'</p></div>'+
+  // 8. 底部操作按钮（装饰性，与截图一致）
+  var actionHtml =
+    '<div class="mbti-action-row">'+
+      '<button class="mbti-action-btn mbti-action-btn-primary" onclick="showToast(\'报告发送功能开发中\')">&#9993; 发送报告</button>'+
+      '<button class="mbti-action-btn mbti-action-btn-secondary" onclick="showToast(\'对比功能开发中\')">&#9829; 比较</button>'+
     '</div>';
 
-  var growthCard =
-    '<div class="mbti-card">'+
-      '<div class="mbti-card-title">🌱 个人成长</div>'+
-      '<div class="mbti-card-body"><p>'+info.growth+'</p></div>'+
-    '</div>';
-
-  var dimsCard =
-    '<div class="mbti-card">'+
-      '<div class="mbti-card-title">📊 维度倾向</div>'+
-      '<div class="mbti-card-body">'+dimsHtml+'</div>'+
-    '</div>';
-
-  // 侧边栏
-  var sidebarHtml = dimsCard;
-
-  var mainHtml =
-    personalityCard +
-    careersCard +
-    '<div class="mbti-card-grid">'+
-      relationshipsCard +
-      growthCard +
-    '</div>';
-
-  var layoutHtml =
-    '<div class="mbti-layout">'+
-      '<div class="mbti-main">'+mainHtml+'</div>'+
-      '<div class="mbti-sidebar">'+sidebarHtml+'</div>'+
-    '</div>';
+  var allHtml = heroHtml + introHtml + sceneHtml + section1Html + section2Html + section3Html + section4Html + actionHtml;
 
   document.getElementById('pageBody').innerHTML =
     '<div class="page-header"><div class="page-title">MBTI报告</div><div class="page-subtitle">16种人格 · '+info.name+'</div></div>'+
     '<div class="report-export-wrap mbti-report mbti-report-'+group+'" id="reportExportWrap">'+
     buildReportInfoBar()+
-    heroHtml+
-    descHtml+
-    layoutHtml+
+    allHtml +
     '</div>'+
     buildExportBtnRow();
 }
@@ -2806,6 +2828,9 @@ function getMbtiGroupName(group) {
 }
 function getMbtiGroupColor(group) {
   return {analysts:'#5B5BC5', diplomats:'#4DAB6E', sentinels:'#4A90A4', explorers:'#E0A94E'}[group] || '#4DAB6E';
+}
+function getMbtiPhotoUrl(type) {
+  return 'assets/mbti/' + type + '.png';
 }
 function getMbtiSvg(type) {
   var group = getMbtiGroup(type);
