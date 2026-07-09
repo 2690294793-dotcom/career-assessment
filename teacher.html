@@ -74,6 +74,31 @@ body {
   50% { transform: translateY(-10px) rotate(5deg); opacity: 0.3; }
 }
 
+.growth-bars {
+  position: absolute; bottom: 70px; left: 30px;
+  display: flex; align-items: flex-end; gap: 4px;
+  opacity: 0.2; z-index: 0;
+}
+.growth-bar {
+  width: 10px; border-radius: 3px 3px 0 0;
+  background: linear-gradient(to top, #6366f1, #a5b4fc);
+  animation: barRise 4s ease-in-out infinite;
+}
+.growth-bar:nth-child(1) { height: 16px; animation-delay: 0s; }
+.growth-bar:nth-child(2) { height: 26px; animation-delay: 0.3s; }
+.growth-bar:nth-child(3) { height: 38px; animation-delay: 0.6s; }
+.growth-bar:nth-child(4) { height: 52px; animation-delay: 0.9s; }
+.growth-bar:nth-child(5) { height: 68px; animation-delay: 1.2s; }
+@keyframes barRise {
+  0%, 100% { transform: scaleY(0.7); opacity: 0.5; }
+  50% { transform: scaleY(1); opacity: 1; }
+}
+
+.career-path-svg {
+  position: absolute; bottom: 0; left: 0; right: 0; height: 200px;
+  opacity: 0.15; z-index: 0; pointer-events: none;
+}
+
 /* Scroll Area */
 .scroll-area {
   flex: 1; overflow-y: auto; overflow-x: hidden;
@@ -600,6 +625,12 @@ tr.selected td:not(:first-child) { background: rgba(99,102,241,0.06); }
     <span class="career-icon career-icon-9">🔧</span>
     <span class="career-icon career-icon-10">⭐</span>
   </div>
+  <div class="growth-bars"><div class="growth-bar"></div><div class="growth-bar"></div><div class="growth-bar"></div><div class="growth-bar"></div><div class="growth-bar"></div></div>
+    <svg class="career-path-svg" viewBox="0 0 390 200" fill="none" preserveAspectRatio="none">
+      <path d="M0,180 Q60,140 100,160 T200,120 T300,90 T390,40" stroke="#6366f1" stroke-width="2" stroke-dasharray="8 6" fill="none"/>
+      <circle cx="100" cy="160" r="4" fill="#6366f1"/><circle cx="200" cy="120" r="4" fill="#6366f1"/><circle cx="300" cy="90" r="4" fill="#6366f1"/><circle cx="390" cy="40" r="4" fill="#6366f1"/>
+    </svg>
+  </div>
 
   <div class="top-bar">
     <div class="brand">
@@ -627,7 +658,7 @@ tr.selected td:not(:first-child) { background: rgba(99,102,241,0.06); }
       <input type="password" id="pwdInput" placeholder="请输入密码"
         onkeydown="if(event.key==='Enter') doLogin()">
       <button onclick="doLogin()">登 录</button>
-      <div style="margin-top:16px;color:#ccc;font-size:11px;">v20260709-17</div>
+      <div style="margin-top:16px;color:#ccc;font-size:11px;">v20260709-19</div>
     </div>
   </div>
 
