@@ -825,6 +825,123 @@ body {
   .mbti-hero { padding: 38px 30px; min-height: 210px; }
   .mbti-hero-img { width: 180px; height: 180px; }
 }
+
+/* ====== HOLLAND MATRIX TABLE ====== */
+.hl-mx-wrap { display: flex; flex-direction: column; gap: 0; }
+.hl-mx-header { text-align: center; padding: 4px 0 14px; }
+.hl-mx-title { font-size: 17px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px; }
+.hl-mx-subtitle { font-size: 12px; color: var(--text-secondary); }
+.hl-mx-guide {
+  display: flex; justify-content: center; gap: 18px;
+  margin-bottom: 12px; padding: 8px 12px;
+  background: var(--card); border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+}
+.hl-mx-guide-item {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 11px; color: var(--text-secondary);
+}
+.hl-mx-guide-dot {
+  width: 14px; height: 14px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; color: #fff; flex-shrink: 0;
+}
+.hl-mx-guide-dot.g0 { background: #d1d5db; }
+.hl-mx-guide-dot.g1 { background: #94a3b8; }
+.hl-mx-guide-dot.g2 { background: var(--primary); }
+
+.hl-mx-table-wrap {
+  background: var(--card); border-radius: 14px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+  overflow: hidden;
+}
+.hl-mx-table {
+  width: 100%; border-collapse: collapse; font-size: 12px;
+}
+.hl-mx-table thead th {
+  position: sticky; top: 0; z-index: 2;
+  background: #f8fafc; padding: 10px 6px;
+  font-weight: 700; font-size: 11px; color: var(--text-secondary);
+  text-align: center; border-bottom: 2px solid var(--border);
+  white-space: nowrap;
+}
+.hl-mx-table thead th.mx-th-num { width: 32px; color: #b0b8c8; }
+.hl-mx-table thead th.mx-th-act { text-align: left; padding-left: 10px; min-width: 140px; }
+.hl-mx-table thead th.mx-th-score { width: 68px; }
+.hl-mx-table thead th.mx-th-score .mx-th-label { font-size: 12px; color: var(--text-primary); }
+.hl-mx-table thead th.mx-th-score .mx-th-hint { font-size: 10px; color: #b0b8c8; font-weight: 400; margin-top: 2px; }
+
+.hl-mx-table tbody td {
+  padding: 8px 6px; text-align: center;
+  border-bottom: 1px solid #f1f5f9; vertical-align: middle;
+}
+.hl-mx-table tbody td.mx-td-num {
+  font-size: 11px; color: #b0b8c8; font-weight: 600;
+}
+.hl-mx-table tbody td.mx-td-act {
+  text-align: left; padding-left: 10px;
+  font-size: 12px; color: var(--text-primary); line-height: 1.5;
+}
+.hl-mx-table tbody td.mx-td-score { padding: 8px 2px; }
+.hl-mx-table tbody tr.dim-R { background: #fef2f2; }
+.hl-mx-table tbody tr.dim-I { background: #eff6ff; }
+.hl-mx-table tbody tr.dim-A { background: #f5f3ff; }
+.hl-mx-table tbody tr.dim-S { background: #ecfdf5; }
+.hl-mx-table tbody tr.dim-E { background: #fffbeb; }
+.hl-mx-table tbody tr.dim-C { background: #eef2ff; }
+
+/* Score cell: three small circular buttons */
+.mx-score-cell {
+  display: flex; justify-content: center; gap: 5px;
+}
+.mx-btn {
+  width: 26px; height: 26px; border-radius: 50%;
+  border: 1.5px solid #d1d5db; background: #fff;
+  font-size: 12px; font-weight: 700; color: #9ca3af;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s ease; flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+.mx-btn:active { transform: scale(0.92); }
+.mx-btn.sel-0 { background: #f3f4f6; border-color: #d1d5db; color: #6b7280; }
+.mx-btn.sel-1 { background: #e0e7ff; border-color: #a5b4fc; color: var(--primary-dark); }
+.mx-btn.sel-2 { background: var(--primary); border-color: var(--primary-dark); color: #fff; }
+
+.hl-mx-prog {
+  display: flex; align-items: center; gap: 10px; padding: 14px 0 6px;
+}
+.hl-mx-prog-bar {
+  flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden;
+}
+.hl-mx-prog-fill {
+  height: 100%; border-radius: 3px; background: var(--primary); transition: width 0.3s ease;
+}
+.hl-mx-prog-text { font-size: 12px; color: var(--text-secondary); white-space: nowrap; font-weight: 500; }
+
+.hl-mx-submit {
+  display: block; width: 100%; padding: 14px;
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+  color: #fff; border: none; border-radius: 14px;
+  font-size: 15px; font-weight: 700; cursor: pointer;
+  margin-top: 12px; transition: opacity 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.hl-mx-submit:active { opacity: 0.85; }
+
+/* Dim group separator */
+.hl-mx-table tbody tr.mx-sep td {
+  padding: 3px 0; border-bottom: none; background: transparent;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 400px) {
+  .hl-mx-table thead th.mx-th-score { width: 58px; }
+  .hl-mx-table tbody td.mx-td-act { font-size: 11px; }
+  .mx-btn { width: 22px; height: 22px; font-size: 11px; }
+  .mx-score-cell { gap: 3px; }
+  .hl-mx-guide { gap: 10px; padding: 6px 8px; }
+  .hl-mx-guide-item { font-size: 10px; }
+}
 </style>
 <script src="https://beacon.cdn.qq.com/sdk/4.5.9/beacon_web.min.js"></script>
 <script>
@@ -901,110 +1018,63 @@ var TESTS = {
   // ---- HOLLAND RIASEC 霍兰德 ----
   holland: {
     id: 'holland',
-    name: '霍兰德职业兴趣测试',
+    name: '霍兰德职业倾向三维量表',
     icon: '🧭',
     iconBg: '#DCFCE7',
     borderColor: '#EF4444',
     shortDesc: 'RIASEC六维模型',
-    desc: '基于O*NET职业兴趣测评（霍兰德RIASEC模型），从现实型、研究型、艺术型、社会型、企业型、常规型六个维度评估你的职业兴趣偏好、能力优势和价值回馈。题目源自美国劳工部O*NET数据库，共66题，分兴趣/能力/回馈三个模块。',
-    meta: '66 题 · 约 12 分钟 · 兴趣+能力+回馈三模块',
+    desc: '基于霍兰德RIASEC六型思路设计的30题矩阵量表，每个活动场景同时考察兴趣、能力、反馈三个维度，共计90个评分点。适合大学生生涯课程、团体辅导和咨询导入。',
+    meta: '30 个场景 · 约 10 分钟 · 兴趣+能力+反馈三栏矩阵评分',
     dimensions: ['R','I','A','S','E','C'],
     dimNames: {R:'现实型 Realistic',I:'研究型 Investigative',A:'艺术型 Artistic',S:'社会型 Social',E:'企业型 Enterprising',C:'常规型 Conventional'},
     dimIcons: {R:'🔧',I:'🔬',A:'🎨',S:'🤝',E:'💼',C:'📊'},
     dimColors: {R:'#EF4444',I:'#3B82F6',A:'#8B5CF6',S:'#10B981',E:'#F59E0B',C:'#6366f1'},
-    // 三个测评模块
-    modules: [
-      {key:'interest', name:'兴趣', icon:'💡', desc:'你喜欢做什么 —— 发现你的职业兴趣方向'},
-      {key:'ability',  name:'能力', icon:'💪', desc:'你擅长做什么 —— 评估你的实际能力优势'},
-      {key:'feedback', name:'回馈', icon:'🎁', desc:'你看重什么 —— 探索你的内在价值驱动'}
+    // 评分维度标签
+    scoreCols: [
+      {key:'interest', label:'兴趣', short:'我喜欢做这类事'},
+      {key:'ability',  label:'能力', short:'我觉得自己能做好'},
+      {key:'feedback', label:'反馈', short:'我做过且得到认可'}
     ],
-    interestQuestions: [      {dim:'R',q:'如果这是我工作的一部分，我喜欢制作厨房橱柜'},
-      {dim:'I',q:'如果这是我工作的一部分，我喜欢研发新药物'},
-      {dim:'A',q:'如果这是我工作的一部分，我喜欢写书或剧本'},
-      {dim:'S',q:'如果这是我工作的一部分，我喜欢教他人做健身运动'},
-      {dim:'E',q:'如果这是我工作的一部分，我喜欢买卖股票和债券'},
-      {dim:'C',q:'如果这是我工作的一部分，我喜欢使用电脑软件制作电子表格'},
-      {dim:'R',q:'如果这是我工作的一部分，我喜欢开卡车给办公室和家庭送包裹'},
-      {dim:'I',q:'如果这是我工作的一部分，我喜欢调查火灾原因'},
-      {dim:'A',q:'如果这是我工作的一部分，我喜欢为戏剧画舞台布景'},
-      {dim:'S',q:'如果这是我工作的一部分，我喜欢教孩子们做体育运动'},
-      {dim:'E',q:'如果这是我工作的一部分，我喜欢谈判商业合同'},
-      {dim:'C',q:'如果这是我工作的一部分，我喜欢计算员工工资'},
-      {dim:'R',q:'如果这是我工作的一部分，我喜欢铺砖或瓷砖'},
-      {dim:'I',q:'如果这是我工作的一部分，我喜欢研究减少水污染的方法'},
-      {dim:'A',q:'如果这是我工作的一部分，我喜欢演奏乐器'},
-      {dim:'S',q:'如果这是我工作的一部分，我喜欢帮助有个人或情感问题的人'},
-      {dim:'E',q:'如果这是我工作的一部分，我喜欢管理零售店'},
-      {dim:'C',q:'如果这是我工作的一部分，我喜欢校对记录或表格'},
-      {dim:'R',q:'如果这是我工作的一部分，我喜欢在出货前测试零件质量'},
-      {dim:'I',q:'如果这是我工作的一部分，我喜欢开发更好的天气预报方法'},
-      {dim:'A',q:'如果这是我工作的一部分，我喜欢为电影或电视节目写剧本'},
-      {dim:'S',q:'如果这是我工作的一部分，我喜欢教聋人或听力障碍者手语'},
-      {dim:'E',q:'如果这是我工作的一部分，我喜欢在诉讼中代表客户'},
-      {dim:'C',q:'如果这是我工作的一部分，我喜欢使用手持电脑盘点物资'},
-      {dim:'R',q:'如果这是我工作的一部分，我喜欢修理家用电器'},
-      {dim:'I',q:'如果这是我工作的一部分，我喜欢做化学实验'},
-      {dim:'A',q:'如果这是我工作的一部分，我喜欢作曲或编曲'},
-      {dim:'S',q:'如果这是我工作的一部分，我喜欢给人们提供职业指导'},
-      {dim:'E',q:'如果这是我工作的一部分，我喜欢经营美容院或理发店'},
-      {dim:'C',q:'如果这是我工作的一部分，我喜欢在大型网络的电脑上安装软件'},
+    // 评分说明
+    scoreGuide: [
+      {score:0, label:'不喜欢/不擅长/没做过'},
+      {score:1, label:'一般/可以接受/有些经验'},
+      {score:2, label:'喜欢/擅长/有明确成果'}
     ],
-    abilityQuestions: [
-      // R - 现实型能力 (动手 & 机械)
-      {dim:'R',q:'我能够修理简单的家用电器或日常物品'},
-      {dim:'R',q:'我擅长使用各种工具和机械设备'},
-      {dim:'R',q:'我能够快速学会操作新的设备或仪器'},
-      // I - 研究型能力 (分析 & 研究)
-      {dim:'I',q:'我擅长分析和解决复杂的逻辑问题'},
-      {dim:'I',q:'我能够理解抽象的科学概念和原理'},
-      {dim:'I',q:'我擅长收集信息并进行系统性研究'},
-      // A - 艺术型能力 (创意 & 表达)
-      {dim:'A',q:'我擅长用文字、画面或其他形式表达创意'},
-      {dim:'A',q:'我能够创造出独特新颖的作品或方案'},
-      {dim:'A',q:'我擅长想象和构思具有美感的新事物'},
-      // S - 社会型能力 (人际 & 帮助)
-      {dim:'S',q:'我擅长倾听并理解他人的感受和需求'},
-      {dim:'S',q:'我能够有效地教导、指导或培训他人'},
-      {dim:'S',q:'我擅长调解矛盾和促进人与人之间的理解'},
-      // E - 企业型能力 (领导 & 说服)
-      {dim:'E',q:'我擅长说服他人接受我的观点或方案'},
-      {dim:'E',q:'我能够有效地组织和管理项目或活动'},
-      {dim:'E',q:'我擅长在压力或不确定性下做决策'},
-      // C - 常规型能力 (组织 & 细节)
-      {dim:'C',q:'我擅长整理和归档文件、信息和资料'},
-      {dim:'C',q:'我能够准确高效地处理数据和数字'},
-      {dim:'C',q:'我擅长按照既定流程和规范执行任务'},
+    // 30个活动场景矩阵（每个维度5题）
+    matrixQuestions: [
+      {dim:'R', activity:'组装、维修或制作具体物品（如家具、模型、设备、手工装置）'},
+      {dim:'R', activity:'操作工具、机器或设备，完成运输、安装、维护等实际任务'},
+      {dim:'R', activity:'参与建筑、装修、布置、场地搭建或空间改造类工作'},
+      {dim:'R', activity:'检查产品、设备或材料的质量，发现并排除实际故障'},
+      {dim:'R', activity:'修理日常电器、电脑硬件、车辆、器材或其他实物设备'},
+      {dim:'I', activity:'探索医学、生命科学、心理、社会或技术问题背后的规律'},
+      {dim:'I', activity:'调查事故、异常现象或复杂问题的原因，并提出证据'},
+      {dim:'I', activity:'研究环境、社会、健康或技术问题，并寻找改进方法'},
+      {dim:'I', activity:'建立模型、分析数据或改进预测方法'},
+      {dim:'I', activity:'做实验、查资料、验证假设，用系统方法寻找答案'},
+      {dim:'A', activity:'写故事、文章、剧本、文案、歌词或短视频脚本'},
+      {dim:'A', activity:'做视觉设计（海报、PPT、展板、空间氛围等）'},
+      {dim:'A', activity:'演奏、演唱、表演、主持、配音、舞蹈或参与舞台呈现'},
+      {dim:'A', activity:'为视频、戏剧、活动或新媒体内容设计创意方案'},
+      {dim:'A', activity:'创作音乐、影像、图像、文字、手工或其他原创作品'},
+      {dim:'S', activity:'教别人运动、技能、学习方法，让对方掌握要领'},
+      {dim:'S', activity:'带领儿童、同学或伙伴练习、训练或完成成长任务'},
+      {dim:'S', activity:'倾听并帮助有情绪、人际、学习或生活困扰的人'},
+      {dim:'S', activity:'帮助有特殊需要或沟通困难的人更好地参与学习和生活'},
+      {dim:'S', activity:'为别人提供升学、求职、职业选择或人生方向建议'},
+      {dim:'E', activity:'参与投资、商业分析、项目收益或市场机会判断'},
+      {dim:'E', activity:'与他人谈判、争取合作、协调利益或促成协议'},
+      {dim:'E', activity:'管理团队、店铺、社团、项目或线上账号的运营'},
+      {dim:'E', activity:'在辩论、路演、竞赛或正式场合中表达和争取'},
+      {dim:'E', activity:'经营小生意、个人品牌、服务项目或社群活动'},
+      {dim:'C', activity:'使用表格、软件整理数据、预算、名单、进度和记录'},
+      {dim:'C', activity:'计算工资、费用、报销、预算、库存等精确数据'},
+      {dim:'C', activity:'校对表格、合同、文档、记录或材料，确保准确无误'},
+      {dim:'C', activity:'清点物资、管理资料、维护档案，保证信息和物品有序'},
+      {dim:'C', activity:'安装、维护或管理电脑软件、信息系统或流程工具'}
     ],
-    feedbackQuestions: [
-      // R - 现实型价值观
-      {dim:'R',q:'在工作中，我看重能够动手制作和实际操作的机会'},
-      {dim:'R',q:'我看重工作成果是看得见、摸得着的具体东西'},
-      {dim:'R',q:'我看重有明确的操作流程和技术标准'},
-      // I - 研究型价值观
-      {dim:'I',q:'在工作中，我看重能够不断学习新知识和探索未知'},
-      {dim:'I',q:'我看重有独立思考和深入分析的空间'},
-      {dim:'I',q:'我看重能够挑战自己、解决有难度的复杂问题'},
-      // A - 艺术型价值观
-      {dim:'A',q:'在工作中，我看重能够自由地表达想法和创意'},
-      {dim:'A',q:'我看重工作环境和氛围富有艺术和文化气息'},
-      {dim:'A',q:'我看重能够创造出独特、美好的作品'},
-      // S - 社会型价值观
-      {dim:'S',q:'在工作中，我看重能够帮助他人成长和进步'},
-      {dim:'S',q:'我看重工作氛围温暖、人际关系和谐'},
-      {dim:'S',q:'我看重自己的工作能对社会产生积极正面的影响'},
-      // E - 企业型价值观
-      {dim:'E',q:'在工作中，我看重获得丰厚的经济回报和物质保障'},
-      {dim:'E',q:'我看重有机会管理和带领团队实现目标'},
-      {dim:'E',q:'我看重能够实现自己的事业理想和抱负'},
-      // C - 常规型价值观
-      {dim:'C',q:'在工作中，我看重稳定性和可预期的工作环境'},
-      {dim:'C',q:'我看重有清晰的规定、标准和流程'},
-      {dim:'C',q:'我看重能够按计划有条不紊地推进工作'},
-    ],
-    reverseItems: [],
-    // 当前激活的题目列表（startTest时动态设置）
-    moduleBreaks: [],
-    _interestLen: 0
+    reverseItems: []
   },
 
   // ---- MBTI 性格测试 ----
@@ -1473,15 +1543,9 @@ function startTest(testKey) {
     state._submitted = false;
     clearTimeout(state.autoTimer);
 
-    // 霍兰德测试：组装三个模块的题目
+    // 霍兰德测试：初始化矩阵答题
     if (testKey === 'holland') {
-      var test = TESTS.holland;
-      var interestLen = test.interestQuestions.length;
-      var abilityLen = test.abilityQuestions.length;
-      test.questions = test.interestQuestions.concat(test.abilityQuestions, test.feedbackQuestions);
-      test.moduleBreaks = [interestLen, interestLen + abilityLen];
-      test._interestLen = interestLen;
-      test._abilityLen = abilityLen;
+      state.hollandMatrix = {};
     }
 
     console.log('[DEBUG] state.testKey =', state.testKey);
@@ -1500,6 +1564,11 @@ function startTest(testKey) {
 function renderQuestion(animate) {
   try {
   clearTimeout(state.autoTimer);
+  // 霍兰德测试使用矩阵答题界面
+  if (state.testKey === 'holland') {
+    renderHollandMatrix();
+    return;
+  }
   var test = TESTS[state.testKey];
   console.log('[DEBUG] renderQuestion: testKey=' + state.testKey + ', test=' + (test ? test.name : 'NULL') + ', questions=' + (test ? test.questions.length : 'N/A'));
   if (!test) { showToast('❌ 未找到测评: ' + state.testKey); return; }
@@ -1596,6 +1665,183 @@ function renderQuestion(animate) {
 }
 
 // ============================================================
+//  HOLLAND MATRIX RENDERER — 30 activities × 3 score cols
+// ============================================================
+function renderHollandMatrix() {
+  var test = TESTS.holland;
+  var questions = test.matrixQuestions;
+  var cols = test.scoreCols;
+  var guide = test.scoreGuide;
+  var total = questions.length * cols.length; // 90 scoring points
+
+  // Count filled cells
+  var filled = 0;
+  for (var i = 0; i < questions.length; i++) {
+    var row = state.hollandMatrix[i];
+    if (row) {
+      cols.forEach(function(c) {
+        if (row[c.key] !== undefined) filled++;
+      });
+    }
+  }
+  var progress = Math.round((filled / total) * 100);
+
+  // Build guide bar
+  var guideHtml = '<div class="hl-mx-guide">' +
+    guide.map(function(g) {
+      return '<div class="hl-mx-guide-item"><span class="hl-mx-guide-dot g'+g.score+'">'+g.score+'</span><span>'+g.label+'</span></div>';
+    }).join('') +
+    '</div>';
+
+  // Build table header
+  var headHtml = '<tr>' +
+    '<th class="mx-th-num">#</th>' +
+    '<th class="mx-th-act">活动场景</th>' +
+    cols.map(function(c) {
+      return '<th class="mx-th-score"><div class="mx-th-label">'+c.label+'</div><div class="mx-th-hint">'+c.short+'</div></th>';
+    }).join('') +
+    '</tr>';
+
+  // Build table body — group by dimension with subtle color
+  var bodyHtml = '';
+  var prevDim = '';
+  for (var i = 0; i < questions.length; i++) {
+    var q = questions[i];
+    var rowData = state.hollandMatrix[i] || {};
+
+    // Separator row between dimension groups
+    if (i > 0 && q.dim !== prevDim) {
+      bodyHtml += '<tr class="mx-sep"><td colspan="'+(1+1+cols.length)+'"></td></tr>';
+    }
+    prevDim = q.dim;
+
+    // Score cells for each column
+    var scoreCells = cols.map(function(c) {
+      var sel = (rowData[c.key] !== undefined) ? rowData[c.key] : -1;
+      return '<td class="mx-td-score"><div class="mx-score-cell">' +
+        [0,1,2].map(function(v) {
+          return '<span class="mx-btn'+(sel===v?' sel-'+v:'')+'" onclick="matrixSelect('+i+',\''+c.key+'\','+v+')">'+v+'</span>';
+        }).join('') +
+        '</div></td>';
+    }).join('');
+
+    bodyHtml += '<tr class="dim-'+q.dim+'" data-row="'+i+'">' +
+      '<td class="mx-td-num">'+(i+1)+'</td>' +
+      '<td class="mx-td-act">'+q.activity+'</td>' +
+      scoreCells +
+      '</tr>';
+  }
+
+  // Submit button text
+  var submitText = filled >= total ? '✅ 提交测评' : '📝 提交测评（还剩 '+(total-filled)+' 个评分点）';
+  var unfilledWarning = filled < total ? ' 未填项将默认为0分。' : '';
+
+  var body = document.getElementById('pageBody');
+  body.innerHTML =
+    '<div class="hl-mx-wrap">' +
+      '<div class="hl-mx-header">' +
+        '<div class="hl-mx-title">'+test.name+'</div>' +
+        '<div class="hl-mx-subtitle">30 个活动场景 × 兴趣 · 能力 · 反馈 三栏评分（共90个评分点）</div>' +
+      '</div>' +
+      guideHtml +
+      '<div class="hl-mx-prog">' +
+        '<div class="hl-mx-prog-bar"><div class="hl-mx-prog-fill" style="width:'+progress+'%"></div></div>' +
+        '<span class="hl-mx-prog-text">'+filled+' / '+total+'</span>' +
+      '</div>' +
+      '<div class="hl-mx-table-wrap">' +
+        '<table class="hl-mx-table">' +
+          '<thead>' + headHtml + '</thead>' +
+          '<tbody>' + bodyHtml + '</tbody>' +
+        '</table>' +
+      '</div>' +
+      '<button class="hl-mx-submit" onclick="submitHollandMatrix()">'+submitText+'</button>' +
+      '<div style="text-align:center;font-size:11px;color:#b0b8c8;margin-top:6px;">'+unfilledWarning+'如果某项活动没有真实做过，可根据相似经验判断兴趣和能力，但反馈建议填0。</div>' +
+    '</div>';
+
+  body.scrollTop = 0;
+}
+
+// Matrix cell click handler
+function matrixSelect(rowIdx, colKey, value) {
+  if (!state.hollandMatrix[rowIdx]) {
+    state.hollandMatrix[rowIdx] = {};
+  }
+  var current = state.hollandMatrix[rowIdx][colKey];
+  // Toggle: clicking same value deselects it
+  state.hollandMatrix[rowIdx][colKey] = (current === value) ? undefined : value;
+
+  // Update UI for this specific cell without full re-render
+  var tbody = document.querySelector('.hl-mx-table tbody');
+  if (!tbody) return;
+
+  // Find the row by data-row attribute
+  var row = tbody.querySelector('tr[data-row="'+rowIdx+'"]');
+  if (row) {
+    var colIdx = TESTS.holland.scoreCols.findIndex(function(c){return c.key===colKey;});
+    var cell = row.querySelectorAll('.mx-td-score')[colIdx];
+    if (cell) {
+      var sel = state.hollandMatrix[rowIdx][colKey];
+      sel = (sel !== undefined) ? sel : -1;
+      var btns = cell.querySelectorAll('.mx-btn');
+      btns.forEach(function(btn, vi) {
+        btn.className = 'mx-btn' + (vi===sel ? ' sel-'+vi : '');
+      });
+    }
+  }
+
+  // Update progress
+  updateMatrixProgress();
+}
+
+// Update matrix progress bar
+function updateMatrixProgress() {
+  var questions = TESTS.holland.matrixQuestions;
+  var cols = TESTS.holland.scoreCols;
+  var total = questions.length * cols.length;
+  var filled = 0;
+  for (var i = 0; i < questions.length; i++) {
+    var row = state.hollandMatrix[i];
+    if (row) {
+      cols.forEach(function(c) {
+        if (row[c.key] !== undefined) filled++;
+      });
+    }
+  }
+  var progress = Math.round((filled / total) * 100);
+  var fill = document.querySelector('.hl-mx-prog-fill');
+  var text = document.querySelector('.hl-mx-prog-text');
+  if (fill) fill.style.width = progress + '%';
+  if (text) text.textContent = filled + ' / ' + total;
+
+  var submitBtn = document.querySelector('.hl-mx-submit');
+  if (submitBtn) {
+    submitBtn.textContent = filled >= total ? '✅ 提交测评' : '📝 提交测评（还剩 '+(total-filled)+' 个评分点）';
+  }
+}
+
+// Submit matrix answers → calculate results
+function submitHollandMatrix() {
+  var questions = TESTS.holland.matrixQuestions;
+  var cols = TESTS.holland.scoreCols;
+  var total = questions.length * cols.length;
+  var filled = 0;
+  for (var i = 0; i < questions.length; i++) {
+    var row = state.hollandMatrix[i];
+    if (row) {
+      cols.forEach(function(c) {
+        if (row[c.key] !== undefined) filled++;
+      });
+    }
+  }
+  // Warn if less than half filled
+  if (filled < total * 0.5) {
+    if (!confirm('你仅完成了 ' + filled + ' / ' + total + ' 个评分点，未填项将按0分计。确定提交吗？')) return;
+  }
+  state._locking = true;
+  calcResults();
+}
+
+// ============================================================
 //  PROGRESSIVE UPDATE (no full re-render for small changes)
 // ============================================================
 function updateProgress(current, total) {
@@ -1624,6 +1870,7 @@ function updateDots(total) {
 // ============================================================
 function selectAnswer(idx) {
   if (state._locking) return; // Prevent double-tap during transition
+  if (state.testKey === 'holland') return; // Holland uses matrix interface
   clearTimeout(state.autoTimer);
 
   // Save answer
@@ -1708,49 +1955,42 @@ function calcResults() {
   var counts = {};
   test.dimensions.forEach(function(d) { scores[d]=0; counts[d]=0; });
 
-  // 霍兰德：按模块分别计分
-  if (state.testKey === 'holland' && test.modules) {
-    var interestLen = test._interestLen;
-    var abilityLen = test._abilityLen;
-    var moduleScores = { interest: {}, ability: {}, feedback: {} };
-    var moduleRaws = { interest: {}, ability: {}, feedback: {} };
+  // 霍兰德：从矩阵中按模块分别计分
+  if (state.testKey === 'holland') {
+    var questions = test.matrixQuestions;
+    var cols = test.scoreCols;
+    var moduleRaws = {}; // {interest: {R:5,...}, ability: {R:4,...}, feedback: {R:3,...}}
+    var moduleScores = {};
+    cols.forEach(function(c) { moduleRaws[c.key] = {}; moduleScores[c.key] = {}; });
 
-    function calcModule(qArr, startIdx, qCount) {
-      var s = {}, c = {};
-      test.dimensions.forEach(function(d) { s[d]=0; c[d]=0; });
-      for (var i = 0; i < qCount; i++) {
-        var qi = startIdx + i;
-        var q = qArr[i];
-        var rawScore = state.answers[qi] !== undefined ? state.answers[qi] : 3;
-        s[q.dim] += rawScore;
-        c[q.dim] += 1;
-      }
-      return { scores: s, counts: c };
+    // Sum scores per dimension per module
+    for (var i = 0; i < questions.length; i++) {
+      var q = questions[i];
+      var row = state.hollandMatrix[i] || {};
+      cols.forEach(function(c) {
+        var val = (row[c.key] !== undefined) ? row[c.key] : 0;
+        if (!moduleRaws[c.key][q.dim]) moduleRaws[c.key][q.dim] = 0;
+        moduleRaws[c.key][q.dim] += val;
+      });
     }
 
-    var interestRes = calcModule(test.interestQuestions, 0, interestLen);
-    var abilityRes = calcModule(test.abilityQuestions, interestLen, abilityLen);
-    var feedbackRes = calcModule(test.feedbackQuestions, interestLen + abilityLen, test.feedbackQuestions.length);
-
-    // Normalize each module to 0-100%
-    ['interest','ability','feedback'].forEach(function(mod) {
-      var res = mod === 'interest' ? interestRes : (mod === 'ability' ? abilityRes : feedbackRes);
-      var max = {};
+    // Normalize each module: max per dim = 5 questions * 2 = 10
+    var dimCount = {}; // questions per dim = 5
+    questions.forEach(function(q) { dimCount[q.dim] = (dimCount[q.dim] || 0) + 1; });
+    cols.forEach(function(c) {
+      var raw = moduleRaws[c.key];
       test.dimensions.forEach(function(d) {
-        max[d] = Math.round((res.scores[d] / (res.counts[d] * 6)) * 100);
+        moduleScores[c.key][d] = Math.round(((raw[d] || 0) / (dimCount[d] * 2)) * 100);
       });
-      moduleScores[mod] = max;
-      moduleRaws[mod] = res.scores;
     });
 
     state.moduleScores = moduleScores;
     state.moduleRaws = moduleRaws;
 
-    // 整体得分（兴趣为主，已在 scores 中）
-    test.questions.forEach(function(q, i) {
-      var rawScore = state.answers[i] !== undefined ? state.answers[i] : 3;
-      scores[q.dim] += rawScore;
-      counts[q.dim] += 1;
+    // 整体得分: sum all 3 modules, max per dim = 30
+    test.dimensions.forEach(function(d) {
+      scores[d] = (moduleRaws.interest[d]||0) + (moduleRaws.ability[d]||0) + (moduleRaws.feedback[d]||0);
+      counts[d] = dimCount[d] * 3;
     });
   } else {
     test.questions.forEach(function(q, i) {
@@ -1766,12 +2006,16 @@ function calcResults() {
 
   // Normalize to 0-100%
   var maxScore = {};
-  test.dimensions.forEach(function(d) {
-    maxScore[d] = Math.round((scores[d] / (counts[d] * 6)) * 100);
-  });
-
-  state.scores = maxScore;
-  state.rawScores = scores;
+  if (state.testKey === 'holland') {
+    // Holland: each dim has 5 activities × 3 cols, max raw = 30
+    test.dimensions.forEach(function(d) {
+      maxScore[d] = Math.round((scores[d] / (counts[d] * 2)) * 100);
+    });
+  } else {
+    test.dimensions.forEach(function(d) {
+      maxScore[d] = Math.round((scores[d] / (counts[d] * 6)) * 100);
+    });
+  }
 
   // Submit to Supabase
   submitToSupabase(maxScore);
@@ -3098,7 +3342,7 @@ function submitToSupabase(scores) {
     class_name: si.className || '',
     test_type: state.testKey,
     test_name: test.name,
-    answers: state.answers,
+    answers: (state.testKey === 'holland') ? state.hollandMatrix : state.answers,
     scores: scores,
     result_code: resultCode,
     result_summary: resultSummary
@@ -3108,7 +3352,8 @@ function submitToSupabase(scores) {
   if (state.testKey === 'holland' && state.moduleScores) {
     payload.scores = Object.assign({}, scores, {
       _module_scores: state.moduleScores,
-      _module_raws: state.moduleRaws
+      _module_raws: state.moduleRaws,
+      _matrix_answers: state.hollandMatrix
     });
   }
 
@@ -3143,7 +3388,7 @@ function submitToSupabase(scores) {
 // ============================================================
 //  INIT
 // ============================================================
-console.log('[DEBUG] assessment.html v20260709-07 loaded');
+console.log('[DEBUG] assessment.html v20260709-08 loaded');
 console.log('[DEBUG] TESTS available:', typeof TESTS !== 'undefined' ? Object.keys(TESTS).join(', ') : 'UNDEFINED');
 state._locking = false;
 // 调用 config.js 的 initSupabase()，设置全局 db 变量
