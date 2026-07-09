@@ -348,68 +348,59 @@ body {
 .mbti-bar-text { font-size: 11px; font-weight: 700; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.15); white-space: nowrap; }
 .mbti-section-footer { display: flex; justify-content: space-between; margin-top: 4px; font-size: 12px; color: var(--text-light); }
 
-/* Big Five classic bar */
-.bf-score-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
-.bf-score-row:last-child { margin-bottom: 0; }
-.bf-score-name {
-  width: 92px; flex-shrink: 0; display: flex; align-items: center; gap: 8px;
-  font-size: 13px; font-weight: 600; color: var(--text-primary);
-}
-.bf-score-name-icon {
-  width: 26px; height: 26px; border-radius: 8px; display: inline-flex;
-  align-items: center; justify-content: center; font-size: 14px;
-  color: #fff; flex-shrink: 0;
-  box-shadow: 0 2px 6px rgba(0,0,0,.08);
-}
-.bf-score-name-icon.bf-E { background: linear-gradient(135deg, #fb923c, #ea580c); }
-.bf-score-name-icon.bf-A { background: linear-gradient(135deg, #34d399, #059669); }
-.bf-score-name-icon.bf-C { background: linear-gradient(135deg, #60a5fa, #2563eb); }
-.bf-score-name-icon.bf-N { background: linear-gradient(135deg, #f472b6, #db2777); }
-.bf-score-name-icon.bf-O { background: linear-gradient(135deg, #818cf8, #4f46e5); }
-.bf-bar-wrap { flex: 1; height: 12px; background: #f0f0f5; border-radius: 6px; overflow: hidden; position: relative; }
-.bf-bar-fill { height: 100%; border-radius: 6px; transition: width 1s ease; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
-.bf-bar-zone { position: absolute; top: 0; height: 100%; border-right: 1px dashed rgba(0,0,0,0.1); }
-.bf-score-val { font-size: 14px; font-weight: 800; color: var(--text-primary); width: 42px; flex-shrink: 0; text-align: right; }
-.bf-score-tag { font-size: 11px; font-weight: 600; flex-shrink: 0; padding: 4px 10px; border-radius: 10px; text-align: center; white-space: nowrap; }
-.bf-score-tag.high { background: linear-gradient(135deg, #dcfce7, #bbf7d0); color: #166534; }
-.bf-score-tag.mid { background: linear-gradient(135deg, #fef3c7, #fde68a); color: #92400E; }
-.bf-score-tag.low { background: linear-gradient(135deg, #fee2e2, #fecaca); color: #991B1B; }
+/* Big Five: radar chart + score table + one-liner + advice */
+.bf-radar-card { background: #fff; border-radius: 20px; padding: 24px 20px 20px; margin-bottom: 16px; box-shadow: 0 2px 12px rgba(0,0,0,.06); text-align: center; }
+.bf-radar-card .bf-radar-title { font-size: 18px; font-weight: 800; color: #1f2937; margin-bottom: 12px; }
+.bf-radar-svg { max-width: 320px; width: 100%; height: auto; }
 
-/* Big Five strengths / weaknesses section — reference layout */
-.bf-sw-section { margin-top: 28px; }
-.bf-sw-section + .bf-sw-section { margin-top: 36px; }
-.bf-sw-title {
-  display: flex; align-items: center; gap: 10px;
-  font-size: 22px; font-weight: 800; color: #111827;
-  margin: 0 0 16px 2px;
-  letter-spacing: -0.5px;
-}
-.bf-sw-title-bar { display: inline-block; width: 5px; height: 22px; border-radius: 3px; }
-.bf-sw-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px 24px;
-}
-.bf-swi { display: flex; gap: 12px; align-items: flex-start; padding: 4px 0; }
-.bf-swi-icon {
-  flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%;
-  display: inline-flex; align-items: center; justify-content: center;
-  font-size: 14px; font-weight: 900; color: #fff; margin-top: 1px;
-  box-shadow: 0 2px 6px rgba(0,0,0,.1);
-  font-family: 'PingFang SC', -apple-system, BlinkMacSystemFont, sans-serif;
-}
-.bf-swi-icon.bf-swi-ok { background: linear-gradient(135deg, #34d399, #059669); }
-.bf-swi-icon.bf-swi-warn { background: linear-gradient(135deg, #fbbf24, #d97706); }
-.bf-swi-desc { font-size: 13px; color: #6B7280; line-height: 1.7; word-break: break-word; overflow-wrap: break-word; overflow: visible; }
-.bf-swi-body { flex: 1; min-width: 0; overflow: visible; }
-.bf-swi-title { font-size: 15px; font-weight: 800; color: #1F2937; margin-bottom: 4px; line-height: 1.4; }
+/* 分数表 */
+.bf-table-card { background: #fff; border-radius: 20px; padding: 20px 20px 16px; margin-bottom: 16px; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
+.bf-table-card .bf-table-title { font-size: 16px; font-weight: 800; color: #1f2937; margin-bottom: 14px; }
+.bf-table { width: 100%; border-collapse: collapse; }
+.bf-table th { font-size: 12px; font-weight: 600; color: #9ca3af; text-transform: uppercase; padding: 8px 6px; border-bottom: 2px solid #f3f4f6; text-align: center; }
+.bf-table th:first-child { text-align: left; padding-left: 0; width: 80px; }
+.bf-table td { font-size: 14px; padding: 10px 6px; text-align: center; border-bottom: 1px solid #f9fafb; }
+.bf-table td:first-child { text-align: left; padding-left: 0; font-weight: 700; color: #1f2937; }
+.bf-table .bf-td-bar-wrap { display: flex; align-items: center; gap: 8px; }
+.bf-table .bf-td-bar { flex: 1; height: 8px; border-radius: 4px; background: #f3f4f6; overflow: hidden; }
+.bf-table .bf-td-bar-fill { height: 100%; border-radius: 4px; transition: width 1s ease; }
+.bf-table .bf-td-val { font-size: 14px; font-weight: 700; color: #1f2937; min-width: 36px; }
+.bf-table .bf-td-tag { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 8px; }
+.bf-table .bf-td-tag.high { background: #dcfce7; color: #166534; }
+.bf-table .bf-td-tag.mid { background: #fef3c7; color: #92400E; }
+.bf-table .bf-td-tag.low { background: #fee2e2; color: #991B1B; }
+
+/* 一句话解释 */
+.bf-oneliner-card { background: #fff; border-radius: 20px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
+.bf-oneliner-card .bf-oneliner-title { font-size: 16px; font-weight: 800; color: #1f2937; margin-bottom: 14px; }
+.bf-oneliner-item { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px; padding: 10px 12px; border-radius: 12px; background: #f9fafb; }
+.bf-oneliner-item:last-child { margin-bottom: 0; }
+.bf-oneliner-dot { width: 10px; height: 10px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+.bf-oneliner-text { font-size: 13px; color: #4b5563; line-height: 1.7; }
+.bf-oneliner-text strong { color: #1f2937; }
+
+/* 应用建议卡片 */
+.bf-advice-card { background: #fff; border-radius: 20px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
+.bf-advice-card .bf-advice-title { font-size: 16px; font-weight: 800; color: #1f2937; margin-bottom: 6px; }
+.bf-advice-card .bf-advice-subtitle { font-size: 12px; color: #9ca3af; margin-bottom: 16px; }
+.bf-advice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.bf-advice-item { padding: 14px; border-radius: 14px; background: #f9fafb; border-left: 4px solid #e5e7eb; }
+.bf-advice-item .bf-advice-label { font-size: 12px; font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 5px; }
+.bf-advice-item .bf-advice-text { font-size: 12.5px; color: #6b7280; line-height: 1.65; }
+
 @media (max-width: 560px) {
-  .bf-sw-section { margin-top: 24px; }
-  .bf-sw-section + .bf-sw-section { margin-top: 30px; }
-  .bf-sw-title { font-size: 20px; margin-bottom: 12px; }
-  .bf-swi { padding: 2px 0; gap: 10px; }
-  .bf-swi-title { font-size: 14px; margin-bottom: 3px; }
-  .bf-swi-desc { font-size: 12.5px; line-height: 1.65; }
+  .bf-radar-card { padding: 20px 14px 16px; }
+  .bf-radar-svg { max-width: 260px; }
+  .bf-table-card { padding: 16px 14px 14px; }
+  .bf-table td { font-size: 12px; padding: 8px 4px; }
+  .bf-table th { font-size: 10px; padding: 6px 4px; }
+  .bf-table .bf-td-val { font-size: 12px; min-width: 28px; }
+  .bf-table .bf-td-tag { font-size: 10px; padding: 1px 6px; }
+  .bf-oneliner-card { padding: 16px 14px; }
+  .bf-oneliner-text { font-size: 12px; }
+  .bf-advice-grid { grid-template-columns: 1fr; }
+  .bf-advice-card { padding: 16px 14px; }
+  .bf-advice-item { padding: 12px; }
 }
 
 /* DISC colored bar — clean 2-line layout */
@@ -1747,87 +1738,125 @@ function renderBigFive(scores) {
   var test = TESTS.bigfive;
   var sorted = test.dimensions.map(function(d) { return {dim:d, score:scores[d]}; }).sort(function(a,b){return b.score-a.score;});
   var traitInfo = getBigFiveTraits();
-
-  var heroDim = sorted[0].dim;
-  var heroHtml = buildHero(scores, test);
-
-  // Big Five: classic percentile bar chart
   var bfNames = {E:'外向性', A:'宜人性', C:'尽责性', N:'神经质', O:'开放性'};
   var bfZones = {E:{lo:'内向沉静',hi:'外向活跃'}, A:{lo:'理性为先',hi:'情感细腻'}, C:{lo:'灵活随性',hi:'运筹帷幄'}, N:{lo:'从容淡定',hi:'情绪敏感'}, O:{lo:'保守务实',hi:'天马行空'}};
   var bfColors = test.dimColors || {E:'#F97316', A:'#10B981', C:'#3B82F6', N:'#EC4899', O:'#6366F1'};
+  var advIcons = {study:'📚',social:'🤝',career:'💼',stress:'🧘'};
 
-  var dimIcons = test.dimIcons || {E:'🎤', A:'🤝', C:'📋', N:'🧠', O:'💡'};
-  var scoresHtml = test.dimensions.map(function(d){
+  // ===== 1. SVG 雷达图 =====
+  var order = ['E','A','C','N','O']; // clockwise from top
+  var cx = 160, cy = 160, r = 125;
+  var angles = order.map(function(_,i){ return -Math.PI/2 + (2*Math.PI/5)*i; });
+  function pt(a, dist) { return [cx + dist*Math.cos(a), cy + dist*Math.sin(a)]; }
+
+  // Background grid
+  var gridPaths = [];
+  for (var lvl = 1; lvl <= 3; lvl++) {
+    var lr = r * lvl / 3;
+    var pts = angles.map(function(a){ var p=pt(a,lr); return p[0].toFixed(1)+','+p[1].toFixed(1); }).join(' ');
+    gridPaths.push('<polygon points="'+pts+'" fill="none" stroke="'+(lvl===3?'#d1d5db':'#e5e7eb')+'" stroke-width="'+(lvl===3?2:1)+'"/>');
+  }
+  // Axis lines
+  var axisLines = order.map(function(_,i){
+    var p = pt(angles[i], r);
+    return '<line x1="'+cx+'" y1="'+cy+'" x2="'+p[0].toFixed(1)+'" y2="'+p[1].toFixed(1)+'" stroke="#e5e7eb" stroke-width="1"/>';
+  }).join('');
+
+  // Score polygon
+  var scorePts = order.map(function(d,i){
+    var dist = r * (scores[d]/100);
+    var p = pt(angles[i], dist);
+    return p[0].toFixed(1)+','+p[1].toFixed(1);
+  }).join(' ');
+  var scoreFill = '<polygon points="'+scorePts+'" fill="rgba(99,102,241,0.15)" stroke="#6366f1" stroke-width="2.5" stroke-linejoin="round"/>';
+
+  // Score dots
+  var scoreDots = order.map(function(d,i){
+    var dist = r * (scores[d]/100);
+    var p = pt(angles[i], dist);
+    return '<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="5" fill="'+bfColors[d]+'" stroke="#fff" stroke-width="2"/>';
+  }).join('');
+
+  // Labels
+  var labels = order.map(function(d,i){
+    var labelR = r + 22;
+    var p = pt(angles[i], labelR);
+    var a = (angles[i] + Math.PI*2) % (Math.PI*2);
+    var anchor = a < 0.001 || a > 6.28 || Math.abs(a-Math.PI) < 0.01 ? 'middle' : (a < Math.PI ? 'start' : 'end');
+    return '<text x="'+p[0].toFixed(1)+'" y="'+p[1].toFixed(1)+'" text-anchor="'+anchor+'" dominant-baseline="middle" font-size="11" fill="#6b7280" font-weight="600">'+bfNames[d]+'</text>'+
+      '<text x="'+p[0].toFixed(1)+'" y="'+(p[1]+14).toFixed(1)+'" text-anchor="'+anchor+'" dominant-baseline="middle" font-size="13" fill="'+bfColors[d]+'" font-weight="800">'+scores[d]+'%</text>';
+  }).join('');
+
+  var radarSvg = '<svg viewBox="0 0 320 340" class="bf-radar-svg" xmlns="http://www.w3.org/2000/svg">'+
+    gridPaths.join('')+axisLines+scoreFill+scoreDots+labels+
+  '</svg>';
+
+  // ===== 2. 五维分数表 =====
+  var tableRows = test.dimensions.map(function(d){
     var s = scores[d];
     var z = bfZones[d];
     var tagCls = s >= 61 ? 'high' : (s >= 41 ? 'mid' : 'low');
     var tagText = s >= 61 ? z.hi : (s >= 41 ? '中等' : z.lo);
-    return '<div class="bf-score-row">'+
-      '<span class="bf-score-name"><span class="bf-score-name-icon bf-'+d+'">'+dimIcons[d]+'</span>'+bfNames[d]+'</span>'+
-      '<div class="bf-bar-wrap">'+
-        '<div class="bf-bar-fill" style="width:'+s+'%;background:'+bfColors[d]+'"></div>'+
-      '</div>'+
-      '<span class="bf-score-val">'+s+'%</span>'+
-      '<span class="bf-score-tag '+tagCls+'">'+tagText+'</span>'+
+    return '<tr>'+
+      '<td>'+bfNames[d]+'</td>'+
+      '<td><div class="bf-td-bar-wrap"><div class="bf-td-bar"><div class="bf-td-bar-fill" style="width:'+s+'%;background:'+bfColors[d]+'"></div></div><span class="bf-td-val">'+s+'%</span></div></td>'+
+      '<td><span class="bf-td-tag '+tagCls+'">'+tagText+'</span></td>'+
+    '</tr>';
+  }).join('');
+
+  var tableHtml = '<div class="bf-table-card">'+
+    '<div class="bf-table-title">📊 五维得分表</div>'+
+    '<table class="bf-table">'+
+    '<thead><tr><th>维度</th><th>得分</th><th>倾向</th></tr></thead>'+
+    '<tbody>'+tableRows+'</tbody>'+
+    '</table></div>';
+
+  // ===== 3. 每个维度一句话解释 =====
+  var oneLinerItems = test.dimensions.map(function(d){
+    var info = traitInfo[d];
+    var isHigh = scores[d] >= 50;
+    return '<div class="bf-oneliner-item">'+
+      '<span class="bf-oneliner-dot" style="background:'+bfColors[d]+'"></span>'+
+      '<div class="bf-oneliner-text"><strong>'+bfNames[d]+'：</strong>'+(isHigh ? info.oneLiner.high : info.oneLiner.low)+'</div>'+
     '</div>';
   }).join('');
 
-  // 强项/短板 - 取最高3个维度的强项（各2条）& 最低3个维度的短板（各2条）
-  var allStrengths = [];
-  var allWeaknesses = [];
+  var oneLinerHtml = '<div class="bf-oneliner-card">'+
+    '<div class="bf-oneliner-title">💡 五维一句话解读</div>'+
+    oneLinerItems+
+  '</div>';
 
-  // 强项：按得分从高到低取前3维度，每维度2条
-  for (var si = 0; si < 3 && si < sorted.length; si++) {
-    var dInfo = traitInfo[sorted[si].dim];
-    var isHighS = sorted[si].score >= 50;
-    var sList = isHighS ? dInfo.highStrengths : dInfo.lowStrengths;
-    allStrengths.push(sList[0], sList[1]);
-  }
-  // 短板：按得分从低到高取前3维度，每维度2条
-  var ascSorted = sorted.slice().sort(function(a,b){return a.score-b.score});
-  for (var wi = 0; wi < 3 && wi < ascSorted.length; wi++) {
-    var wInfo = traitInfo[ascSorted[wi].dim];
-    var isHighW = ascSorted[wi].score >= 50;
-    var wList = isHighW ? wInfo.highWeaknesses : wInfo.lowWeaknesses;
-    allWeaknesses.push(wList[0], wList[1]);
-  }
+  // ===== 4. 应用建议 =====
+  var adviceKeys = ['study','social','career','stress'];
+  var adviceLabels = {study:'学习建议',social:'人际建议',career:'职业探索',stress:'压力管理'};
 
-  function renderStrengthItem(item) {
-    return '<div class="bf-swi">'+
-      '<div class="bf-swi-icon bf-swi-ok">✓</div>'+
-      '<div class="bf-swi-body">'+
-        '<div class="bf-swi-title">'+item.title+'</div>'+
-        '<div class="bf-swi-desc">'+item.desc+'</div>'+
-      '</div>'+
+  var adviceItems = adviceKeys.map(function(key){
+    // 取最高和最低两个维度的建议
+    var topD = sorted[0].dim, bottomD = sorted[4].dim;
+    var topHigh = sorted[0].score >= 50;
+    var botHigh = sorted[4].score >= 50;
+    var topAdv = topHigh ? traitInfo[topD].advice.high[key] : traitInfo[topD].advice.low[key];
+    var botAdv = botHigh ? traitInfo[bottomD].advice.low[key] : traitInfo[bottomD].advice.high[key];
+    return '<div class="bf-advice-item" style="border-left-color:'+bfColors[topD]+'">'+
+      '<div class="bf-advice-label">'+advIcons[key]+' '+adviceLabels[key]+'</div>'+
+      '<div class="bf-advice-text">'+topAdv+'</div>'+
     '</div>';
-  }
-  function renderWeaknessItem(item) {
-    return '<div class="bf-swi">'+
-      '<div class="bf-swi-icon bf-swi-warn">!</div>'+
-      '<div class="bf-swi-body">'+
-        '<div class="bf-swi-title">'+item.title+'</div>'+
-        '<div class="bf-swi-desc">'+item.desc+'</div>'+
-      '</div>'+
-    '</div>';
-  }
+  }).join('');
 
-  var strengthsGrid = '<div class="bf-sw-grid">'+allStrengths.map(renderStrengthItem).join('')+'</div>';
-  var weaknessesGrid = '<div class="bf-sw-grid">'+allWeaknesses.map(renderWeaknessItem).join('')+'</div>';
+  var adviceHtml = '<div class="bf-advice-card">'+
+    '<div class="bf-advice-title">🎯 应用版建议</div>'+
+    '<div class="bf-advice-subtitle">基于你最突出维度「'+bfNames[sorted[0].dim]+'」的个性化指导</div>'+
+    '<div class="bf-advice-grid">'+adviceItems+'</div>'+
+  '</div>';
 
   document.getElementById('pageBody').innerHTML =
     '<div class="page-header"><div class="page-title">大五人格报告</div><div class="page-subtitle">OCEAN 五维人格分析</div></div>'+
     '<div class="report-export-wrap" id="reportExportWrap">'+
     buildReportInfoBar()+
-    heroHtml+
-    '<div class="score-card"><div class="score-title">人格特质特征</div>'+scoresHtml+'</div>'+
-    '<div class="bf-sw-section">'+
-      '<div class="bf-sw-title"><span class="bf-sw-title-bar" style="background:#10B981"></span><span>你的强项</span></div>'+
-      strengthsGrid+
-    '</div>'+
-    '<div class="bf-sw-section">'+
-      '<div class="bf-sw-title"><span class="bf-sw-title-bar" style="background:#F59E0B"></span><span>你的短板</span></div>'+
-      weaknessesGrid+
-    '</div>'+
+    '<div class="bf-radar-card"><div class="bf-radar-title">五维雷达图</div>'+radarSvg+'</div>'+
+    tableHtml+
+    oneLinerHtml+
+    adviceHtml+
     '</div>'+
     buildExportBtnRow();
 }
@@ -2764,6 +2793,8 @@ function getBigFiveTraits() {
   return {
     E: {
       high:'外向健谈、精力充沛、喜欢社交', low:'内敛安静、喜欢独处和深度思考',
+      oneLiner: {high:'你是天生的社交能量源，在人群中充电，用表达和行动影响世界。',low:'你是沉静的独立思想者，在内心深处寻找力量，用深度而非广度定义自己。'},
+      advice: {high:{study:'小组讨论、项目制学习、担任小组负责人能激发你的最佳状态；尽量避免长时间独自阅读。',social:'主动组织聚会和活动是你的天然优势；注意倾听而非主导对话，给对方留出表达空间。',career:'适合与人高频互动的工作：销售、公关、培训、管理、教育、市场推广等领域。',stress:'你的压力通常来自缺乏社交刺激；感到疲惫时约朋友聊天或参加团体活动能快速恢复。'},low:{study:'独立阅读、深入研究和书面输出是适合你的学习方式；选择安静的图书馆或独立工位效率更高。',social:'深度一对一交流比群体社交更适合你；不必强迫自己融入热闹场合，真诚比话多更重要。',career:'适合需要专注和深度的工作：研究、编程、写作、数据分析、创意设计等领域。',stress:'过度社交会让你快速消耗；给自己预留独处恢复时间，保护你的能量边界。'}},
       highStrengths:[
         {title:'社交洞察力',desc:'你善于发现人际交往中的契机，能快速建立关系网络并把握合作机会。'},
         {title:'精力充沛',desc:'你拥有旺盛的行动力，能在多项任务中保持热情，带动团队氛围。'},
@@ -2787,6 +2818,8 @@ function getBigFiveTraits() {
     },
     A: {
       high:'友善合作、富有同理心、信任他人', low:'理性客观、有主见、不易被影响',
+      oneLiner: {high:'你以温暖的同理心连接世界，相信合作比竞争更能创造价值。',low:'你以理性冷静的眼光看待世界，不轻易被情绪和他人观点左右。'},
+      advice: {high:{study:'协作式学习效果最佳；参与志愿服务、担任助教或学习小组协调者能获得额外成长。',social:'你的共情能力让人感到被理解；但要注意设立个人边界，不把别人的问题都当成自己的责任。',career:'适合助人型职业：心理咨询、教育、社工、人力资源、医疗护理、客户服务等领域。',stress:'冲突和人际冷漠是你的主要压力源；通过帮助他人或与信任的人倾诉来缓解紧张。'},low:{study:'独立研究和基于事实的学习方法更适合你；你擅长在不涉及人际因素的任务中保持客观判断。',social:'与人相处时不妨多关注对方的感受而非只讲道理；偶尔表达关心比解决问题更重要。',career:'适合需要客观判断的职业：技术审核、法务、金融分析、质量控制、独立顾问等领域。',stress:'过多情感诉求会让你烦躁；给自己冷静分析的空间，按下暂停键再回应他人需求。'}},
       highStrengths:[
         {title:'同理心沟通',desc:'你能够敏锐感知他人情绪，用温暖的方式化解冲突和隔阂。'},
         {title:'团队协作',desc:'你善于营造和谐氛围，是团队中的粘合剂和信任中心。'},
@@ -2810,6 +2843,8 @@ function getBigFiveTraits() {
     },
     C: {
       high:'自律有条理、追求成就、可靠负责', low:'灵活随性、不喜欢严格计划',
+      oneLiner: {high:'你是高效能的建设者，用秩序和执行力将计划变为实实在在的成果。',low:'你是灵活的即兴创作者，在自由和变化中找到独特的节奏和灵感。'},
+      advice: {high:{study:'制定详细学习计划并严格执行是你的强项；使用清单、甘特图和里程碑管理能提升效率。',social:'你的可靠让人信赖；但有时放下完美主义，允许自己和他人"够好就行"。',career:'适合需要组织和精准的职业：项目管理、财务审计、行政管理、供应链、法律合规等领域。',stress:'失控和混乱是你的头号压力源；建立清晰的日常流程和应急预案能有效缓解焦虑。'},low:{study:'弹性学习方式最适合你；把大目标拆成小块、利用deadline倒逼、切换学习场景保持新鲜感。',social:'你的随性让人感到轻松自在；但在重要承诺上，提前告知他人你的节奏和底线。',career:'适合需要创意和变化的职业：艺术设计、广告策划、内容创作、创业、自由职业等领域。',stress:'被严格规则束缚时容易焦虑；给自己留出自由空间，接受"完成比完美更重要"。'}},
       highStrengths:[
         {title:'可靠执行',desc:'你言出必行，一旦承诺就会全力以赴，是他人眼中最值得信赖的伙伴。'},
         {title:'条理清晰',desc:'你擅长制定计划并有序推进，能把复杂项目拆解成可执行的步骤。'},
@@ -2833,6 +2868,8 @@ function getBigFiveTraits() {
     },
     N: {
       high:'情绪敏感、容易焦虑、情绪波动', low:'情绪稳定、抗压能力强、心态平和',
+      oneLiner: {high:'你拥有细腻的情感雷达，对世界和周遭变化有着异于常人的敏锐感受力。',low:'你是一座情绪稳定的灯塔，在风暴中保持冷静，用从容面对生活的起伏。'},
+      advice: {high:{study:'找一个安静、低干扰的环境学习；把焦虑写下来转化为待办清单，将情绪能量导向行动。',social:'分享你的感受会让亲密关系更深入，但选择值得信任的对象很重要；过度倾诉可能适得其反。',career:'适合需要敏感度和共情的职业：艺术创作、心理咨询、文案写作、质量检测、风险管控等领域。',stress:'情绪波动是你的日常课题；练习正念冥想、规律运动，建立"情绪急救包"应对突发焦虑。'},low:{study:'高压环境下你依然能保持专注，这是你的核心优势；参加极限训练或高挑战项目能进一步激发潜力。',social:'你的稳定情绪让人感到安全和可靠；但也需注意，有时表达自己的脆弱反而能拉近关系距离。',career:'适合需要稳定性和抗压能力的职业：紧急救援、企业管理、金融交易、外科手术、安全保卫等领域。',stress:'你的压力阈值高，但长期忽视情绪可能导致积累性倦怠；定期给自己安排彻底放松的休息日。'}},
       highStrengths:[
         {title:'敏锐觉察',desc:'你对环境变化和潜在风险有超乎常人的敏感度，能提前预警问题。'},
         {title:'情感细腻',desc:'你拥有丰富的内心世界，能体验深刻而复杂的情感，共情能力极强。'},
@@ -2856,6 +2893,8 @@ function getBigFiveTraits() {
     },
     O: {
       high:'富有创造力、好奇心强、喜欢新体验', low:'务实传统、喜欢稳定和常规',
+      oneLiner: {high:'你是勇敢的探索者，用好奇心和想象力突破边界、发现新的可能性。',low:'你是可靠的践行者，在熟悉的土壤中深耕，用务实和专注创造踏实的价值。'},
+      advice: {high:{study:'跨学科学习、主题式探索和创意项目最适合你；避免过于狭窄的课程限制你的思维广度。',social:'与不同背景的人交流是你的能量来源；在团队中你能带来新视角，但要注意避免因为"下一个新鲜事"而忽略当前关系。',career:'适合需要创新和探索的职业：发明研究、产品设计、艺术导演、战略规划、旅游探险等领域。',stress:'重复和单调的工作会快速消耗你；为自己创造变化——换工作方式、学习新技能或旅行充电。'},low:{study:'结构化课程和循序渐进的学习方式让你稳步前行；选择有明确路径和认证体系的学习方向。',social:'你珍惜长久稳定的关系；与其追求泛泛之交，不如用心维护少数深度的友谊和连接。',career:'适合需要专注和积累的职业：财务会计、工程造价、图书管理、质量保证、行政管理等领域。',stress:'突如其来的变化会让你不安；提前了解变化的原因和预期结果，给自己充足的适应缓冲时间。'}},
       highStrengths:[
         {title:'创造力丰富',desc:'你善于打破常规思维，能提出令人耳目一新的想法和解决方案。'},
         {title:'好奇探索',desc:'你对未知领域充满热情，持续学习新知识和体验新事物。'},
