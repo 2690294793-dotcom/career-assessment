@@ -2172,13 +2172,10 @@ function renderStrength(scores) {
     '<div style="font-size:13px;color:var(--text-secondary);line-height:1.8">此图表显示了您特有的优势潜能 34 个主题才干在四大领域中的相对分布。这些类别是一个非常好的起点，您可以查看自己最有可能在哪些方面表现出色，以及如何为团队做出最佳贡献。<br>请参阅下面的图表，了解有关您的优势在各领域分布情况的更多详细信息。</div>'+
   '</div>';
 
-  // 4-domain stacked bar (Clifton-style)
-  var maxScore = 24;
-  var totalAll = domainAvgs.reduce(function(s,d){return s+d.avg;}, 0);
+  // 4-domain stacked bar (Clifton-style) — proportional to actual avg scores
   var stBarHtml = '<div class="st-domain-bar">'+
     domainAvgs.map(function(d){
-      var pct = (d.avg / maxScore) * 100;
-      return '<div class="st-domain-seg" style="flex:'+pct+';background:'+dColors[d.name]+'">'+d.avg.toFixed(1)+'</div>';
+      return '<div class="st-domain-seg" style="flex:'+d.avg+';background:'+dColors[d.name]+'">'+d.avg.toFixed(1)+'</div>';
     }).join('')+
   '</div>'+
   '<div class="st-domain-labels" style="grid-template-columns: repeat(4, 1fr)">'+
@@ -2198,20 +2195,28 @@ function renderStrength(scores) {
         '<div class="st-top-name" style="color:'+color+'">'+test.dimNames[e.dim]+' <span style="font-size:11px;color:var(--text-secondary);font-weight:400;margin-left:6px">· '+dom+'</span></div>'+
         '<div class="st-top-desc">'+oneLiner+'</div>'+
       '</div>'+
-      '<div class="st-top-score" style="color:'+color+'">'+e.score+'/24</div>'+
+      '<div class="st-top-score" style="color:'+color+'">'+e.score+'</div>'+
     '</div>';
   }).join('');
 
   // Domain averages as compact
-  var domainHtml = domains.map(function(dom){
+  var domainAvgsList = domains.map(function(dom){
     var themes = test.domains[dom].themes;
     var total = themes.reduce(function(s,d){return s+(scores[d]||0);}, 0);
-    var avg = Math.round(total / themes.length);
-    var pct = Math.round((avg / 24) * 100);
+    return {name: dom, avg: Math.round(total / themes.length)};
+  });
+  var maxAvgVal = Math.max.apply(null, domainAvgsList.map(function(d){return d.avg;}));
+  var minAvgVal = Math.min.apply(null, domainAvgsList.map(function(d){return d.avg;}));
+  var domainHtml = domainAvgsList.map(function(d){
+    var avg = d.avg;
+    var pct = avg; // scores are already 0-100 normalized, so bar width equals the score value
+    var label = avg + '分';
+    if (avg === maxAvgVal) label += '（最优）';
+    else if (avg === minAvgVal) label += '（短板）';
     return '<div class="disc-item"><div class="disc-item-header">'+
-      '<span class="disc-item-name"><span class="disc-dot-sm" style="background:'+dColors[dom]+'"></span><b>'+dom+'</b></span>'+
-      '<span class="disc-item-pct">均分 '+avg+'/24</span></div>'+
-      '<div class="disc-bar-wrap"><div class="disc-bar-fill" style="width:'+pct+'%;background:'+dColors[dom]+'"></div></div></div>';
+      '<span class="disc-item-name"><span class="disc-dot-sm" style="background:'+dColors[d.name]+'"></span><b>'+d.name+'</b></span>'+
+      '<span class="disc-item-pct">'+label+'</span></div>'+
+      '<div class="disc-bar-wrap"><div class="disc-bar-fill" style="width:'+pct+'%;background:'+dColors[d.name]+'"></div></div></div>';
   }).join('');
 
   // 34-theme grid (4 domains × 1 per domain, compact mobile-friendly, Clifton-style lighting)
@@ -2737,7 +2742,7 @@ function buildHero(scores, test) {
       return '<div class="result-hero">'+
         '<div class="result-hero-type">你的优势线索 Top 5</div>'+
         '<div class="result-hero-code">'+top5.map(function(e){return test.dimNames[e.dim];}).join(' · ')+'</div>'+
-        '<div class="result-hero-name">'+top5[0].score+'/24 分 — '+test.dimNames[top5[0].dim]+'</div>'+
+        '<div class="result-hero-name">'+top5[0].score+' 分 — '+test.dimNames[top5[0].dim]+'</div>'+
         '<div class="result-hero-desc">你最常使用的前5个优势主题，它们是你做得更好、更有能量感的行动方式。</div>'+
       '</div>';
     }
