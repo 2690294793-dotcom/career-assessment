@@ -478,6 +478,10 @@ function showToast(message) {
 }
 
 // ============ 我的测评 ============
+function viewAssessment(type) {
+  window.location.href = 'assessment.html?view=result&type=' + type;
+}
+
 function loadMyAssessments() {
   var container = document.getElementById('assessList');
   var tests = [];
@@ -494,8 +498,8 @@ function loadMyAssessments() {
     if (b) tests.push({ type:'bigfive', title:'大五人格测评', date:b.completedAt||b.date, code:'' });
   } catch(e) {}
   try {
-    var d = JSON.parse(localStorage.getItem('disc_result') || 'null');
-    if (d) tests.push({ type:'disc', title:'DISC行为风格测评', date:d.completedAt||d.date, code:d.type||'' });
+    var s = JSON.parse(localStorage.getItem('strength_result') || 'null');
+    if (s) tests.push({ type:'strength', title:'34项优势潜能测评', date:s.completedAt||s.date, code:s.type||'' });
   } catch(e) {}
 
   document.getElementById('assessBadge').textContent = tests.length;
@@ -508,15 +512,15 @@ function loadMyAssessments() {
   }
 
   var html = '';
-  var typeMap = { holland:'holland', mbti:'mbti', bigfive:'bigfive', disc:'disc' };
-  var tagMap = { holland:'holland', mbti:'mbti', bigfive:'bigfive', disc:'disc' };
-  var labelMap = { holland:'霍兰德', mbti:'MBTI', bigfive:'大五人格', disc:'DISC' };
+  var typeMap = { holland:'holland', mbti:'mbti', bigfive:'bigfive', strength:'strength' };
+  var tagMap = { holland:'holland', mbti:'mbti', bigfive:'bigfive', strength:'strength' };
+  var labelMap = { holland:'霍兰德', mbti:'MBTI', bigfive:'大五人格', strength:'优势潜能' };
   tests.sort(function(a,b) { return new Date(b.date||0) - new Date(a.date||0); });
   tests.forEach(function(t) {
     var dateStr = t.date ? new Date(t.date).toLocaleDateString('zh-CN') : '';
     var tagClass = tagMap[t.type] || '';
     var tagName = labelMap[t.type] || t.type;
-    html += '<div class="assess-list-item" onclick="window.location.href=\'assessment.html\'">';
+    html += '<div class="assess-list-item" onclick="viewAssessment(\'' + t.type + '\')">';
     html += '<div class="assess-title">' + esc(t.title) + '</div>';
     html += '<div class="assess-meta">' + (dateStr ? '完成于 ' + dateStr : '') + '</div>';
     html += '<span class="assess-tag ' + tagClass + '">' + tagName + (t.code ? ' · ' + esc(t.code) : '') + '</span>';
