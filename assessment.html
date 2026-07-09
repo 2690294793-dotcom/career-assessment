@@ -2,6 +2,9 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -2023,7 +2026,6 @@ function renderStrength(scores) {
   // Find dominant domain
   var domains = ['行动执行','表达影响','关系协同','认知探索'];
   var dColors = {'行动执行':'#F59E0B','表达影响':'#3B82F6','关系协同':'#10B981','认知探索':'#8B5CF6'};
-  var dIcon = {'行动执行':'⚡','表达影响':'🎤','关系协同':'🤝','认知探索':'💡'};
   var domainAvgs = domains.map(function(dom){
     var themes = test.domains[dom].themes;
     var total = themes.reduce(function(s,d){return s+(scores[d]||0);}, 0);
