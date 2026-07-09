@@ -18,68 +18,134 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
-  background: var(--bg); color: var(--text-primary); min-height: 100vh; -webkit-font-smoothing: antialiased;
+  background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 50%, #f5f7ff 100%);
+  display: flex; justify-content: center; align-items: center;
+  min-height: 100vh; padding: 16px;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Top bar */
+/* ====== Phone Frame ====== */
+.phone-frame {
+  width: 390px; height: 844px;
+  background: linear-gradient(180deg, #EBF0FF 0%, #F0F3FF 30%, #F8F9FF 70%, #FFFFFF 100%);
+  border-radius: 42px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(99,102,241,0.12), 0 0 0 1px rgba(99,102,241,0.08);
+  display: flex; flex-direction: column;
+}
+.phone-frame::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: radial-gradient(circle at 1px 1px, rgba(99,102,241,0.06) 1px, transparent 0);
+  background-size: 24px 24px;
+  pointer-events: none;
+  z-index: 0;
+}
+.phone-frame::after {
+  content: ''; position: absolute; bottom: 58px; left: 0; right: 0; height: 60px;
+  background: linear-gradient(to top, rgba(235,240,255,0.6), transparent);
+  pointer-events: none; z-index: 0;
+}
+
+/* Career background elements */
+.career-bg-layer {
+  position: absolute; inset: 0;
+  pointer-events: none; z-index: 0;
+  overflow: hidden;
+}
+.career-icon {
+  position: absolute; font-size: 20px;
+  opacity: 0.2; filter: grayscale(0.2);
+  animation: careerFloat 8s ease-in-out infinite;
+}
+.career-icon-1 { top: 70px; left: 20px; font-size: 22px; animation-delay: 0s; }
+.career-icon-2 { top: 120px; right: 18px; font-size: 18px; animation-delay: 1.2s; }
+.career-icon-3 { top: 200px; left: 12px; font-size: 16px; animation-delay: 2.5s; }
+.career-icon-4 { top: 250px; right: 25px; font-size: 20px; animation-delay: 0.8s; }
+.career-icon-5 { top: 380px; left: 15px; font-size: 18px; animation-delay: 3s; }
+.career-icon-6 { top: 420px; right: 20px; font-size: 16px; animation-delay: 1.8s; }
+.career-icon-7 { top: 500px; left: 22px; font-size: 20px; animation-delay: 2.2s; }
+.career-icon-8 { top: 550px; right: 15px; font-size: 18px; animation-delay: 0.5s; }
+.career-icon-9 { top: 620px; left: 18px; font-size: 16px; animation-delay: 3.5s; }
+.career-icon-10 { top: 680px; right: 22px; font-size: 22px; animation-delay: 1.5s; }
+@keyframes careerFloat {
+  0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.18; }
+  50% { transform: translateY(-10px) rotate(5deg); opacity: 0.3; }
+}
+
+/* Scroll Area */
+.scroll-area {
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+  z-index: 1;
+}
+.scroll-area::-webkit-scrollbar { width: 0; }
+
+/* Top bar (inside phone frame) */
 .top-bar {
   background: linear-gradient(135deg, var(--primary-dark), var(--primary));
-  color: #fff; padding: 0 40px; height: 60px; display: flex; align-items: center;
+  color: #fff; padding: 0 16px; height: 52px; display: flex; align-items: center;
   justify-content: space-between; box-shadow: 0 2px 12px rgba(99,102,241,0.2);
-  position: sticky; top: 0; z-index: 100;
+  flex-shrink: 0; position: relative; z-index: 10;
 }
-.top-bar .brand { display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 700; }
+.top-bar .brand { display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 700; }
 .top-bar .nav-links { display: inline-flex; align-items: center; gap: 0; background: rgba(255,255,255,0.15); border-radius: 22px; padding: 3px; }
 .top-bar .nav-links a {
   color: rgba(255,255,255,0.7); text-decoration: none;
-  padding: 7px 18px; border-radius: 19px; font-size: 13px; font-weight: 600;
+  padding: 5px 10px; border-radius: 19px; font-size: 12px; font-weight: 600;
   transition: all 0.3s cubic-bezier(.4,0,.2,1);
-  white-space: nowrap; display: flex; align-items: center; gap: 5px;
+  white-space: nowrap; display: flex; align-items: center; gap: 4px;
 }
 .top-bar .nav-links a:hover { color: rgba(255,255,255,0.95); }
 .top-bar .nav-links a.active {
   background: #fff; color: var(--primary-dark);
   box-shadow: 0 2px 8px rgba(0,0,0,0.12);
 }
-.top-bar .nav-links a svg { width: 15px; height: 15px; }
+.top-bar .nav-links a svg { width: 13px; height: 13px; }
 
 /* Container */
-.container { max-width: 960px; margin: 0 auto; padding: 28px 40px; }
+.container { padding: 12px 14px; }
 
 /* Login */
 .login-wrap {
-  display: flex; justify-content: center; align-items: center; min-height: calc(100vh - 60px);
+  display: flex; justify-content: center; align-items: center; flex: 1;
+  padding: 30px 14px;
 }
 .login-card {
-  background: var(--card); border-radius: var(--radius-lg); padding: 40px 36px;
-  max-width: 380px; width: 100%; text-align: center; box-shadow: 0 8px 32px rgba(99,102,241,0.1);
+  background: var(--card); border-radius: var(--radius-lg); padding: 32px 28px;
+  max-width: 320px; width: 100%; text-align: center; box-shadow: 0 8px 32px rgba(99,102,241,0.1);
+  margin: 0 14px;
 }
-.login-card .lock { font-size: 44px; margin-bottom: 16px; }
-.login-card h2 { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
-.login-card p { color: var(--text-secondary); font-size: 14px; margin-bottom: 24px; }
+.login-card .lock { font-size: 40px; margin-bottom: 14px; }
+.login-card h2 { font-size: 20px; font-weight: 800; margin-bottom: 8px; }
+.login-card p { color: var(--text-secondary); font-size: 13px; margin-bottom: 20px; }
 .login-card input {
-  width: 100%; padding: 14px 18px; border: 2px solid var(--border);
-  border-radius: var(--radius-sm); font-size: 15px; text-align: center;
-  outline: none; transition: border-color 0.2s; margin-bottom: 16px;
+  width: 100%; padding: 12px 16px; border: 2px solid var(--border);
+  border-radius: var(--radius-sm); font-size: 14px; text-align: center;
+  outline: none; transition: border-color 0.2s; margin-bottom: 14px;
 }
 .login-card input:focus { border-color: var(--primary); }
 .login-card button {
-  width: 100%; padding: 14px; border: none; border-radius: var(--radius-sm);
+  width: 100%; padding: 12px; border: none; border-radius: var(--radius-sm);
   background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-  color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; transition: transform 0.15s;
+  color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; transition: transform 0.15s;
 }
 .login-card button:active { transform: scale(0.97); }
-.login-card .hint { color: var(--text-light); font-size: 12px; margin-top: 18px; }
+.login-card .hint { color: var(--text-light); font-size: 11px; margin-top: 16px; }
 
 /* ===== TABS ===== */
 .tab-bar {
   display: flex; gap: 2px; background: var(--card); border-radius: var(--radius-md);
-  padding: 6px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  padding: 5px; margin-bottom: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  flex-wrap: wrap;
 }
 .tab-btn {
-  flex: 1; padding: 12px 20px; border: none; background: transparent;
-  border-radius: 14px; font-size: 15px; font-weight: 600; cursor: pointer;
+  flex: 1; padding: 8px 8px; border: none; background: transparent;
+  border-radius: 12px; font-size: 12px; font-weight: 600; cursor: pointer;
   color: var(--text-secondary); transition: all 0.2s; text-align: center;
+  white-space: nowrap;
 }
 .tab-btn.active { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; }
 .tab-btn:hover:not(.active) { background: var(--primary-light); color: var(--primary); }
@@ -93,15 +159,15 @@ body {
 
 /* Stats */
 .stats-grid {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 14px; margin-bottom: 24px;
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: 10px; margin-bottom: 14px;
 }
 .stat-card {
-  background: var(--card); border-radius: var(--radius-md); padding: 20px 18px;
+  background: var(--card); border-radius: var(--radius-md); padding: 14px 10px;
   box-shadow: 0 2px 12px rgba(0,0,0,0.04); text-align: center;
 }
-.stat-val { font-size: 28px; font-weight: 900; color: var(--primary); }
-.stat-label { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+.stat-val { font-size: 22px; font-weight: 900; color: var(--primary); }
+.stat-label { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
 .stat-card.warn .stat-val { color: var(--orange); }
 .stat-card.good .stat-val { color: var(--green); }
 .stat-card.danger .stat-val { color: var(--red); }
@@ -109,39 +175,40 @@ body {
 /* Table (测评管理) */
 .table-wrap {
   background: var(--card); border-radius: var(--radius-md);
-  box-shadow: 0 2px 12px rgba(0,0,0,0.04); overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.04); overflow-x: auto;
 }
 .toolbar {
-  display: flex; align-items: center; gap: 12px; padding: 14px 18px;
+  display: flex; align-items: center; gap: 8px; padding: 10px 12px;
   border-bottom: 1px solid var(--border); flex-wrap: wrap;
 }
 .toolbar input, .toolbar select {
-  padding: 8px 12px; border: 2px solid var(--border); border-radius: 10px;
-  font-size: 13px; outline: none; transition: border-color 0.2s;
+  padding: 7px 10px; border: 2px solid var(--border); border-radius: 10px;
+  font-size: 12px; outline: none; transition: border-color 0.2s;
   background: var(--card); color: var(--text-primary);
 }
-.toolbar input { flex: 1; min-width: 160px; }
+.toolbar input { flex: 1; min-width: 100px; }
 .toolbar input:focus, .toolbar select:focus { border-color: var(--primary); }
 .toolbar .btn {
-  padding: 8px 14px; border: none; border-radius: 10px; font-size: 13px; font-weight: 600;
+  padding: 7px 10px; border: none; border-radius: 10px; font-size: 12px; font-weight: 600;
   cursor: pointer; background: var(--primary-light); color: var(--primary); transition: all 0.2s;
+  white-space: nowrap;
 }
 .toolbar .btn:hover { background: var(--primary); color: #fff; }
 .toolbar .btn-danger { background: #FEE2E2; color: var(--red); }
 .toolbar .btn-danger:hover { background: var(--red); color: #fff; }
 
-table { width: 100%; border-collapse: collapse; }
+table { min-width: 520px; width: 100%; border-collapse: collapse; }
 th {
-  background: #F8F9FC; padding: 11px 12px; text-align: left; font-size: 11px;
+  background: #F8F9FC; padding: 10px 8px; text-align: left; font-size: 10px;
   font-weight: 700; color: var(--text-secondary); text-transform: uppercase;
-  letter-spacing: 0.5px; border-bottom: 2px solid var(--border); white-space: nowrap;
+  letter-spacing: 0.3px; border-bottom: 2px solid var(--border); white-space: nowrap;
 }
-td { padding: 11px 12px; border-bottom: 1px solid var(--border); font-size: 13px; }
+td { padding: 9px 8px; border-bottom: 1px solid var(--border); font-size: 12px; }
 tr:hover td { background: rgba(99,102,241,0.02); }
 tr:last-child td { border-bottom: none; }
 
 .badge {
-  display: inline-block; padding: 3px 9px; border-radius: 10px; font-size: 11px; font-weight: 700;
+  display: inline-block; padding: 2px 7px; border-radius: 8px; font-size: 10px; font-weight: 700;
 }
 .badge-bigfive { background: #FEF3C7; color: #92400e; }
 .badge-holland { background: #DBEAFE; color: #1e40af; }
@@ -156,23 +223,23 @@ tr:last-child td { border-bottom: none; }
 
 /* ===== APPOINTMENT CARDS ===== */
 .apt-filter-bar {
-  display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap;
+  display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap;
 }
 .apt-filter-chip {
-  padding: 8px 18px; border: 2px solid var(--border); border-radius: 20px;
-  font-size: 13px; font-weight: 600; cursor: pointer; background: var(--card);
+  padding: 6px 12px; border: 2px solid var(--border); border-radius: 20px;
+  font-size: 12px; font-weight: 600; cursor: pointer; background: var(--card);
   color: var(--text-secondary); transition: all 0.2s;
 }
 .apt-filter-chip:hover { border-color: var(--primary); color: var(--primary); }
 .apt-filter-chip.active { background: var(--primary); color: #fff; border-color: var(--primary); }
 .apt-filter-chip .count {
-  display: inline-block; min-width: 20px; background: rgba(255,255,255,0.25);
-  border-radius: 10px; padding: 1px 7px; font-size: 11px; margin-left: 4px;
+  display: inline-block; min-width: 18px; background: rgba(255,255,255,0.25);
+  border-radius: 10px; padding: 1px 6px; font-size: 10px; margin-left: 3px;
 }
 
 .apt-card {
-  background: var(--card); border-radius: var(--radius-md); padding: 20px 22px;
-  margin-bottom: 14px; box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  background: var(--card); border-radius: var(--radius-md); padding: 14px 16px;
+  margin-bottom: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.04);
   border-left: 4px solid var(--border); transition: all 0.2s;
 }
 .apt-card.pending { border-left-color: var(--orange); }
@@ -203,12 +270,13 @@ tr:last-child td { border-bottom: none; }
 .apt-row .value.mentor { color: var(--primary); }
 
 .apt-card-actions {
-  display: flex; gap: 10px; margin-top: 14px; padding-top: 14px;
+  display: flex; gap: 8px; margin-top: 12px; padding-top: 12px;
   border-top: 1px solid var(--border); flex-wrap: wrap;
 }
 .apt-card-actions button {
-  padding: 8px 20px; border: none; border-radius: 10px; font-size: 13px;
+  padding: 7px 12px; border: none; border-radius: 10px; font-size: 12px;
   font-weight: 700; cursor: pointer; transition: all 0.2s;
+  white-space: nowrap;
 }
 .apt-btn-accept { background: var(--green); color: #fff; }
 .apt-btn-accept:hover { background: #059669; }
@@ -310,20 +378,20 @@ tr:last-child td { border-bottom: none; }
 }
 .modal-bg.show { display: flex; }
 .modal {
-  background: var(--card); border-radius: var(--radius-lg); max-width: 560px;
+  background: var(--card); border-radius: var(--radius-lg); max-width: 360px;
   width: 100%; max-height: 85vh; overflow-y: auto; box-shadow: 0 16px 48px rgba(0,0,0,0.15);
 }
 .modal-head {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 20px 24px; border-bottom: 1px solid var(--border);
+  padding: 16px 18px; border-bottom: 1px solid var(--border);
 }
-.modal-head h3 { font-size: 18px; font-weight: 700; }
+.modal-head h3 { font-size: 16px; font-weight: 700; }
 .modal-close {
   background: none; border: none; font-size: 22px; cursor: pointer;
   color: var(--text-light); padding: 4px 8px; border-radius: 8px;
 }
 .modal-close:hover { background: var(--bg); }
-.modal-body { padding: 24px; }
+.modal-body { padding: 18px; }
 .detail-row {
   display: flex; padding: 10px 0; border-bottom: 1px solid var(--border);
 }
@@ -372,11 +440,12 @@ tr:last-child td { border-bottom: none; }
 /* ===== 时间管理 Tab ===== */
 .schedule-toggle-row {
   display: flex; align-items: center; justify-content: space-between;
-  background: var(--card); border-radius: var(--radius-md); padding: 18px 22px;
-  margin-bottom: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  background: var(--card); border-radius: var(--radius-md); padding: 14px 16px;
+  margin-bottom: 14px; box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  gap: 10px;
 }
-.schedule-toggle-label { font-size: 16px; font-weight: 700; color: var(--text-primary); }
-.schedule-toggle-desc { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+.schedule-toggle-label { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+.schedule-toggle-desc { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
 .toggle-switch {
   position: relative; width: 52px; height: 28px; cursor: pointer;
 }
@@ -394,38 +463,38 @@ tr:last-child td { border-bottom: none; }
 .toggle-switch input:checked + .toggle-slider::before { transform: translateX(24px); }
 
 .schedule-add-card {
-  background: var(--card); border-radius: var(--radius-md); padding: 20px 22px;
-  margin-bottom: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  background: var(--card); border-radius: var(--radius-md); padding: 14px 16px;
+  margin-bottom: 14px; box-shadow: 0 2px 12px rgba(0,0,0,0.04);
 }
-.schedule-add-title { font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 14px; }
+.schedule-add-title { font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; }
 .schedule-form-row {
-  display: flex; gap: 10px; align-items: center;
-}
+  display: flex; gap: 6px; align-items: center;
+  flex-wrap: wrap;
 .schedule-form-row select, .schedule-form-row input, .schedule-form-row button {
   flex-shrink: 0;
 }
-.schedule-form-row select { min-width: 90px; }
-.schedule-form-row input[type="date"] { min-width: 130px; width: 130px; }
-.schedule-form-row input[type="time"] { width: 95px; text-align: center; padding: 10px 8px; }
-.schedule-add-btn { padding: 10px 16px; }
+.schedule-form-row select { min-width: 70px; font-size: 12px; padding: 8px 6px; }
+.schedule-form-row input[type="date"] { min-width: 108px; width: 108px; font-size: 12px; padding: 8px 6px; }
+.schedule-form-row input[type="time"] { width: 78px; text-align: center; padding: 8px 4px; font-size: 12px; }
+.schedule-add-btn { padding: 8px 12px; }
 @media (max-width: 400px) {
-  .schedule-form-row { gap: 8px; }
-  .schedule-form-row input[type="date"] { min-width: 115px; width: 115px; }
-  .schedule-form-row input[type="time"] { width: 86px; }
-  .schedule-add-btn { padding: 10px 12px; }
+  .schedule-form-row { gap: 6px; }
+  .schedule-form-row input[type="date"] { min-width: 108px; width: 108px; }
+  .schedule-form-row input[type="time"] { width: 78px; }
+  .schedule-add-btn { padding: 8px 12px; }
 }
 .schedule-add-btn {
-  padding: 10px 20px; border: none; border-radius: 10px; font-size: 14px;
+  padding: 8px 12px; border: none; border-radius: 10px; font-size: 12px;
   font-weight: 700; cursor: pointer; background: var(--primary); color: #fff;
   transition: all 0.2s;
 }
 .schedule-add-btn:hover { background: var(--primary-dark); }
 
 .schedule-list-card {
-  background: var(--card); border-radius: var(--radius-md); padding: 20px 22px;
+  background: var(--card); border-radius: var(--radius-md); padding: 14px 16px;
   box-shadow: 0 2px 12px rgba(0,0,0,0.04);
 }
-.schedule-list-title { font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 14px; }
+.schedule-list-title { font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; }
 .schedule-day-group { margin-bottom: 16px; }
 .schedule-day-name {
   font-size: 13px; font-weight: 700; color: var(--primary);
@@ -434,8 +503,8 @@ tr:last-child td { border-bottom: none; }
 }
 .schedule-slot-item {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 10px 14px; background: #F8F9FC; border-radius: 10px;
-  margin-bottom: 6px; font-size: 14px;
+  padding: 8px 10px; background: #F8F9FC; border-radius: 10px;
+  margin-bottom: 6px; font-size: 13px;
 }
 .schedule-slot-time { font-weight: 600; color: var(--text-primary); }
 .schedule-slot-del {
@@ -500,14 +569,14 @@ tr.selected td:not(:first-child) { background: rgba(99,102,241,0.06); }
 }
 
 @media (max-width: 768px) {
-  .container { padding: 16px; }
-  .top-bar { padding: 0 20px; }
+  .container { padding: 12px 14px; }
+  .top-bar { padding: 0 16px; }
   .top-bar .nav-links a { padding: 5px 10px; font-size: 12px; }
   .tab-bar { flex-direction: row; }
-  .tab-btn { padding: 10px 12px; font-size: 13px; }
+  .tab-btn { padding: 8px 8px; font-size: 12px; }
   .toolbar { flex-direction: column; align-items: stretch; }
   .toolbar input, .toolbar select { width: 100%; }
-  th, td { padding: 9px 6px; font-size: 11px; }
+  th, td { padding: 9px 8px; font-size: 12px; }
   .hide-mobile { display: none; }
   .apt-card { padding: 14px 16px; }
   .apt-card-actions button { padding: 7px 14px; font-size: 12px; }
@@ -516,38 +585,56 @@ tr.selected td:not(:first-child) { background: rgba(99,102,241,0.06); }
 </head>
 <body>
 
-<div class="top-bar">
-  <div class="brand">
-    <span>🌟</span>
-    <span>自在生涯工作室</span>
-  </div>
-  <div class="nav-links">
-    <a href="index.html">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
-      学生端
-    </a>
-    <a href="teacher.html" class="active">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg>
-      教师端
-    </a>
-  </div>
-</div>
+<div class="phone-frame">
 
-<!-- Login -->
-<div class="login-wrap" id="loginPage">
-  <div class="login-card">
-    <div class="lock">🔐</div>
-    <h2>教师登录</h2>
-    <p>请输入密码查看学生数据</p>
-    <input type="password" id="pwdInput" placeholder="请输入密码"
-      onkeydown="if(event.key==='Enter') doLogin()">
-    <button onclick="doLogin()">登 录</button>
-    <div style="margin-top:16px;color:#ccc;font-size:11px;">v20260708-5</div>
+  <!-- Career Background Elements -->
+  <div class="career-bg-layer">
+    <span class="career-icon career-icon-1">💼</span>
+    <span class="career-icon career-icon-2">🎓</span>
+    <span class="career-icon career-icon-3">📊</span>
+    <span class="career-icon career-icon-4">💡</span>
+    <span class="career-icon career-icon-5">🎯</span>
+    <span class="career-icon career-icon-6">📝</span>
+    <span class="career-icon career-icon-7">🏆</span>
+    <span class="career-icon career-icon-8">📈</span>
+    <span class="career-icon career-icon-9">🔧</span>
+    <span class="career-icon career-icon-10">⭐</span>
   </div>
-</div>
 
-<!-- Dashboard -->
-<div class="container" id="dashboard" style="display:none;">
+  <div class="top-bar">
+    <div class="brand">
+      <span>🌟</span>
+      <span>自在生涯工作室</span>
+    </div>
+    <div class="nav-links">
+      <a href="index.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+        学生端
+      </a>
+      <a href="teacher.html" class="active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg>
+        教师端
+      </a>
+    </div>
+  </div>
+
+  <!-- Login -->
+  <div class="login-wrap" id="loginPage">
+    <div class="login-card">
+      <div class="lock">🔐</div>
+      <h2>教师登录</h2>
+      <p>请输入密码查看学生数据</p>
+      <input type="password" id="pwdInput" placeholder="请输入密码"
+        onkeydown="if(event.key==='Enter') doLogin()">
+      <button onclick="doLogin()">登 录</button>
+      <div style="margin-top:16px;color:#ccc;font-size:11px;">v20260709-17</div>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div class="scroll-area" id="dashboard" style="display:none;">
+
+    <div class="container">
 
   <!-- Tab Bar -->
   <div class="tab-bar">
@@ -664,7 +751,10 @@ tr.selected td:not(:first-child) { background: rgba(99,102,241,0.06); }
       </div>
     </div>
   </div>
-</div>
+    </div><!-- /.container -->
+  </div><!-- /.scroll-area -->
+
+</div><!-- /.phone-frame -->
 
 <!-- Detail Modal -->
 <div class="modal-bg" id="detailModal" onclick="if(event.target===this)closeModal()">
@@ -679,7 +769,7 @@ tr.selected td:not(:first-child) { background: rgba(99,102,241,0.06); }
 
 <!-- Holland Analysis Modal -->
 <div class="modal-bg" id="hollandModal" onclick="if(event.target===this)closeHollandModal()">
-  <div class="modal" style="max-width:520px;">
+  <div class="modal" style="max-width:340px;">
     <div class="modal-head">
       <h3>🔍 三码分析解读</h3>
       <button class="modal-close" onclick="closeHollandModal()">&times;</button>
@@ -739,7 +829,7 @@ function doLogin() {
 
 function showDashboard() {
   document.getElementById("loginPage").style.display = "none";
-  document.getElementById("dashboard").style.display = "block";
+  document.getElementById("dashboard").style.display = "flex";
   loadAssessments();
   loadAppointments();
   startRealtimeSubscription();
