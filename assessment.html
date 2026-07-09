@@ -724,17 +724,6 @@ body {
 .mbti-intro-text p { margin-bottom: 14px; text-indent: 2em; }
 .mbti-intro-text p:last-child { margin-bottom: 0; }
 
-/* 全宽场景插图 */
-.mbti-scene-img-wrap {
-  margin-bottom: 18px; border-radius: 16px; overflow: hidden;
-  background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
-  display: flex; align-items: center; justify-content: center;
-  min-height: 200px; position: relative;
-}
-.mbti-scene-img {
-  max-width: 100%; border-radius: 16px; display: block;
-}
-
 /* 章节标题：带圈数字 */
 .mbti-section-title {
   display: flex; align-items: center; gap: 10px;
@@ -2301,11 +2290,7 @@ function renderMbti(scores) {
       '<p>你属于 <b>'+groupName+'</b> 阵营，这一人格群体通常以'+info.traits.join('、')+'著称。'+info.relationships+' '+info.growth+'</p>'+
     '</div>';
 
-  // 3. 全宽场景人物图片
-  var sceneHtml =
-    '<div class="mbti-scene-img-wrap">'+
-      '<img class="mbti-scene-img" src="'+photoUrl+'" alt="'+info.name+' 场景">'+
-    '</div>';
+  // 3. 全宽场景人物图片已移除，只保留顶部人物照片
 
   // 4. 维度条：截图风格（单色填充+白圆点+5个维度）
   // 身份特征(A-T)：基于已有维度推算（N/T/P高→Turbulent高）
@@ -2370,7 +2355,7 @@ function renderMbti(scores) {
       '<p>尽管你在 '+info.traits.join('、')+' 上展现出独特优势，也要注意在关系与目标之间找到平衡。持续探索自我，会让你在成长之路上走得更稳、更远。</p>'+
     '</div>';
 
-  var allHtml = heroHtml + introHtml + sceneHtml + section1Html + section2Html + section3Html;
+  var allHtml = heroHtml + introHtml + section1Html + section2Html + section3Html;
 
   document.getElementById('pageBody').innerHTML =
     '<div class="page-header"><div class="page-title">测评结果</div><div class="page-subtitle">16种人格 · '+info.name+'</div></div>'+
