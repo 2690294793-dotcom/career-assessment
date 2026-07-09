@@ -517,6 +517,7 @@ tr:last-child td { border-bottom: none; }
 .schedule-form-row {
   display: flex; gap: 6px; align-items: center;
   flex-wrap: wrap;
+}
 .schedule-form-row select, .schedule-form-row input, .schedule-form-row button {
   flex-shrink: 0;
 }
@@ -538,11 +539,11 @@ tr:last-child td { border-bottom: none; }
 .schedule-add-btn:hover { background: var(--primary-dark); }
 
 .schedule-list-card {
-  background: var(--card); border-radius: var(--radius-md); padding: 14px 16px;
+  background: var(--card); border: 1.5px solid var(--border); border-radius: var(--radius-md); padding: 14px 16px;
   box-shadow: 0 2px 12px rgba(0,0,0,0.04);
 }
 .schedule-list-title { font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; }
-.schedule-day-group { margin-bottom: 10px; background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.03); }
+.schedule-day-group { margin-bottom: 10px; background: #fff; border: 1.5px solid #D5D8E0; border-radius: 12px; padding: 12px 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.03); }
 .schedule-day-name {
   font-size: 12px; font-weight: 700; color: var(--primary);
   padding: 4px 10px; background: var(--primary-light); border-radius: 8px;
@@ -561,11 +562,15 @@ tr:last-child td { border-bottom: none; }
 }
 .schedule-slot-del:hover { background: var(--red); color: #fff; }
 
-.schedule-mentor-tabs {
-  display: flex; gap: 6px; flex-wrap: wrap;
-  background: var(--card); border-radius: var(--radius-md); padding: 12px 14px;
+.schedule-mentor-card {
+  background: var(--card); border: 1.5px solid var(--border); border-radius: var(--radius-md); padding: 14px 16px;
   margin-bottom: 14px; box-shadow: 0 2px 12px rgba(0,0,0,0.04);
-  border: 1px solid var(--border);
+}
+.schedule-mentor-title {
+  font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 10px; display: flex; align-items: center; gap: 6px;
+}
+.schedule-mentor-tabs {
+  display: flex; gap: 8px; flex-wrap: wrap;
 }
 .schedule-mentor-tab {
   padding: 6px 10px; border: 1.5px solid var(--border); border-radius: 10px;
@@ -767,7 +772,10 @@ tr.selected td:not(:first-child) { background: rgba(99,102,241,0.06); }
   <!-- ========== Tab 4: 时间管理 ========== -->
   <div class="tab-panel" id="panelSchedule">
     <!-- 导师选择 -->
-    <div class="schedule-mentor-tabs" id="scheduleMentorTabs"></div>
+    <div class="schedule-mentor-card">
+      <div class="schedule-mentor-title">👩‍🏫 选择导师</div>
+      <div class="schedule-mentor-tabs" id="scheduleMentorTabs"></div>
+    </div>
 
     <!-- 预约开关 -->
     <div class="schedule-toggle-row" id="scheduleToggleRow">
