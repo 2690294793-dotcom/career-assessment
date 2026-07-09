@@ -364,38 +364,41 @@ body {
 .bf-score-tag.low { background: linear-gradient(135deg, #fee2e2, #fecaca); color: #991B1B; }
 
 /* Big Five strengths / weaknesses section — reference layout */
-.bf-sw-section { margin-top: 8px; }
-.bf-sw-section + .bf-sw-section { margin-top: 32px; }
+.bf-sw-section { margin-top: 28px; }
+.bf-sw-section + .bf-sw-section { margin-top: 36px; }
 .bf-sw-title {
   display: flex; align-items: center; gap: 10px;
   font-size: 22px; font-weight: 800; color: #111827;
-  margin: 0 0 18px 2px;
+  margin: 0 0 16px 2px;
   letter-spacing: -0.5px;
 }
 .bf-sw-title-bar { display: inline-block; width: 5px; height: 22px; border-radius: 3px; }
 .bf-sw-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 18px 32px;
+  gap: 10px 24px;
 }
-.bf-swi { display: flex; gap: 14px; align-items: flex-start; padding: 8px 0; }
+.bf-swi { display: flex; gap: 12px; align-items: flex-start; padding: 4px 0; }
 .bf-swi-icon {
-  flex-shrink: 0; width: 32px; height: 32px; border-radius: 50%;
+  flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%;
   display: inline-flex; align-items: center; justify-content: center;
-  font-size: 15px; font-weight: 900; color: #fff; margin-top: 2px;
+  font-size: 14px; font-weight: 900; color: #fff; margin-top: 1px;
   box-shadow: 0 2px 6px rgba(0,0,0,.1);
   font-family: 'PingFang SC', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 .bf-swi-icon.bf-swi-ok { background: linear-gradient(135deg, #34d399, #059669); }
 .bf-swi-icon.bf-swi-warn { background: linear-gradient(135deg, #fbbf24, #d97706); }
 .bf-swi-body { flex: 1; min-width: 0; }
-.bf-swi-title { font-size: 15px; font-weight: 800; color: #1F2937; margin-bottom: 8px; line-height: 1.5; }
-.bf-swi-desc { font-size: 13px; color: #6B7280; line-height: 1.8; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; }
+.bf-swi-title { font-size: 15px; font-weight: 800; color: #1F2937; margin-bottom: 4px; line-height: 1.4; }
+.bf-swi-desc { font-size: 13px; color: #6B7280; line-height: 1.7; word-break: break-word; overflow-wrap: break-word; }
 @media (max-width: 560px) {
-  .bf-sw-grid { grid-template-columns: 1fr; gap: 16px; }
-  .bf-sw-title { font-size: 20px; }
-  .bf-swi-title { font-size: 14px; }
-  .bf-swi-desc { font-size: 12.5px; }
+  .bf-sw-section { margin-top: 24px; }
+  .bf-sw-section + .bf-sw-section { margin-top: 30px; }
+  .bf-sw-grid { grid-template-columns: 1fr; gap: 8px; }
+  .bf-sw-title { font-size: 20px; margin-bottom: 12px; }
+  .bf-swi { padding: 2px 0; gap: 10px; }
+  .bf-swi-title { font-size: 14px; margin-bottom: 3px; }
+  .bf-swi-desc { font-size: 12.5px; line-height: 1.65; }
 }
 
 /* DISC colored bar — clean 2-line layout */
