@@ -919,69 +919,129 @@ var TESTS = {
     icon: '🧭',
     iconBg: '#DCFCE7',
     borderColor: '#EF4444',
-    shortDesc: 'RIASEC六维模型 · 30题',
-    desc: '从兴趣、能力、回馈三个维度评估你的RIASEC职业兴趣类型（现实型R/研究型I/艺术型A/社会型S/企业型E/常规型C），共30题，帮你发现最适合的职业方向。',
-    meta: '30 题 · 约 8 分钟',
+    shortDesc: 'RIASEC六维模型 · 90题',
+    desc: '从兴趣（我想不想做）、能力（我会不会做）、回馈（我有没有成果或认可）三个维度，全面评估你的RIASEC职业兴趣类型（现实型R/研究型I/艺术型A/社会型S/企业型E/常规型C），共90题，每类型15题，帮你发现最适合的职业方向。',
+    meta: '90 题 · 约 15 分钟',
     dimensions: ['R','I','A','S','E','C'],
     dimNames: {R:'现实型 Realistic',I:'研究型 Investigative',A:'艺术型 Artistic',S:'社会型 Social',E:'企业型 Enterprising',C:'常规型 Conventional'},
     dimIcons: {R:'🔧',I:'🔬',A:'🎨',S:'🤝',E:'💼',C:'📊'},
     dimColors: {R:'#EF4444',I:'#3B82F6',A:'#8B5CF6',S:'#10B981',E:'#F59E0B',C:'#6366f1'},
     options: ['非常不同意','不同意','不太确定','同意','非常同意'],
-    // 30题 = 6维度 × 5题，兴趣10题+能力10题+回馈10题，每类型各5题
+    // 90题 = 6维度 × 每维度15题，兴趣5题+能力5题+回馈5题
     questions: [
-      // === 兴趣模块（10题） ===
-      // R 现实型（2题）
+      // ===== 兴趣模块（1-30题）每类型5题 =====
+      // R 现实型（5题）
       {dim:'R',aspect:'interest',q:'我喜欢组装、维修或制作具体物品，例如家具、模型、设备、手工装置。'},
+      {dim:'R',aspect:'interest',q:'我喜欢操作工具、机器或设备，完成运输、安装、维护、搬运等实际任务。'},
+      {dim:'R',aspect:'interest',q:'我喜欢参与建筑、装修、布置、场地搭建或空间改造类工作。'},
       {dim:'R',aspect:'interest',q:'我喜欢检查产品、设备或材料的质量，发现并排除实际故障。'},
-      // I 研究型（2题）
+      {dim:'R',aspect:'interest',q:'我喜欢修理日常电器、电脑硬件、车辆、器材或其他实物设备。'},
+      // I 研究型（5题）
       {dim:'I',aspect:'interest',q:'我喜欢探索医学、生命科学、心理、社会或技术问题背后的规律。'},
+      {dim:'I',aspect:'interest',q:'我喜欢调查事故、异常现象或复杂问题的原因，并提出证据。'},
+      {dim:'I',aspect:'interest',q:'我喜欢研究环境、社会、健康或技术问题，并寻找改进方法。'},
       {dim:'I',aspect:'interest',q:'我喜欢建立模型、分析数据或改进预测方法，例如天气、市场、行为趋势。'},
-      // A 艺术型（1题）
+      {dim:'I',aspect:'interest',q:'我喜欢做实验、查资料、验证假设，用系统方法寻找答案。'},
+      // A 艺术型（5题）
       {dim:'A',aspect:'interest',q:'我喜欢写故事、文章、剧本、文案、歌词、公众号或短视频脚本。'},
-      // S 社会型（2题）
+      {dim:'A',aspect:'interest',q:'我喜欢做视觉设计、舞台布景、海报、PPT、展板、空间氛围设计。'},
+      {dim:'A',aspect:'interest',q:'我喜欢演奏、演唱、表演、主持、配音、舞蹈或参与舞台呈现。'},
+      {dim:'A',aspect:'interest',q:'我喜欢为视频、戏剧、影像、活动或新媒体内容设计创意方案。'},
+      {dim:'A',aspect:'interest',q:'我喜欢创作音乐、影像、图像、文字、手工或其他原创作品。'},
+      // S 社会型（5题）
+      {dim:'S',aspect:'interest',q:'我喜欢教别人运动、技能、学习方法或生活方法，让对方掌握要领。'},
+      {dim:'S',aspect:'interest',q:'我喜欢带领儿童、同学或伙伴练习、训练、学习或完成成长任务。'},
       {dim:'S',aspect:'interest',q:'我喜欢倾听并帮助有情绪、人际、学习或生活困扰的人。'},
+      {dim:'S',aspect:'interest',q:'我喜欢帮助有特殊需要、不同背景或沟通困难的人更好地参与学习和生活。'},
       {dim:'S',aspect:'interest',q:'我喜欢为别人提供升学、求职、职业选择、学习规划或人生方向建议。'},
-      // E 企业型（1题）
+      // E 企业型（5题）
+      {dim:'E',aspect:'interest',q:'我喜欢参与投资、商业分析、资源交易、项目收益判断或市场机会判断。'},
+      {dim:'E',aspect:'interest',q:'我喜欢与他人谈判、争取合作、协调利益或促成协议。'},
       {dim:'E',aspect:'interest',q:'我喜欢管理一个团队、店铺、社团、项目、活动或线上账号的运营。'},
-      // C 常规型（2题）
+      {dim:'E',aspect:'interest',q:'我喜欢在辩论、路演、竞赛、谈判或正式场合中代表一方表达和争取。'},
+      {dim:'E',aspect:'interest',q:'我喜欢经营一个小生意、个人品牌、服务项目、社群或商业活动。'},
+      // C 常规型（5题）
       {dim:'C',aspect:'interest',q:'我喜欢使用表格、软件或系统整理数据、预算、名单、进度和记录。'},
+      {dim:'C',aspect:'interest',q:'我喜欢计算工资、费用、报销、预算、库存、绩效或其他精确数据。'},
       {dim:'C',aspect:'interest',q:'我喜欢校对表格、合同、文档、记录或材料，确保准确无误。'},
+      {dim:'C',aspect:'interest',q:'我喜欢清点物资、管理资料、维护档案，保证信息和物品有序。'},
+      {dim:'C',aspect:'interest',q:'我喜欢安装、维护或管理电脑软件、信息系统、账号权限或流程工具。'},
 
-      // === 能力模块（10题） ===
-      // R 现实型（2题）
+      // ===== 能力模块（31-60题）每类型5题 =====
+      // R 现实型（5题）
       {dim:'R',aspect:'ability',q:'我觉得自己能较快学会组装、维修或制作具体物品。'},
+      {dim:'R',aspect:'ability',q:'我觉得自己能比较顺手地操作工具、机器或设备完成实际任务。'},
+      {dim:'R',aspect:'ability',q:'我觉得自己能胜任场地搭建、布置、装修或空间改造类任务。'},
       {dim:'R',aspect:'ability',q:'我觉得自己能发现产品、设备或材料中的质量问题。'},
-      // I 研究型（1题）
+      {dim:'R',aspect:'ability',q:'我觉得自己能学习并完成电器、硬件、车辆或器材的基础修理。'},
+      // I 研究型（5题）
+      {dim:'I',aspect:'ability',q:'我觉得自己能理解并分析医学、生命科学、心理、社会或技术问题。'},
+      {dim:'I',aspect:'ability',q:'我觉得自己能通过调查和证据分析复杂问题的原因。'},
+      {dim:'I',aspect:'ability',q:'我觉得自己能研究现实问题，并提出有依据的改进方法。'},
       {dim:'I',aspect:'ability',q:'我觉得自己能建立模型、分析数据或改进预测方法。'},
-      // A 艺术型（2题）
+      {dim:'I',aspect:'ability',q:'我觉得自己能通过实验、资料查证或假设验证找到答案。'},
+      // A 艺术型（5题）
       {dim:'A',aspect:'ability',q:'我觉得自己能写出有表达力的故事、文章、剧本、文案或脚本。'},
+      {dim:'A',aspect:'ability',q:'我觉得自己能完成有美感和信息表达力的视觉设计。'},
+      {dim:'A',aspect:'ability',q:'我觉得自己在表演、主持、音乐、舞蹈或舞台呈现方面有一定能力。'},
       {dim:'A',aspect:'ability',q:'我觉得自己能为视频、戏剧、影像、活动或新媒体内容提出创意方案。'},
-      // S 社会型（1题）
+      {dim:'A',aspect:'ability',q:'我觉得自己能创作音乐、影像、图像、文字、手工或其他原创作品。'},
+      // S 社会型（5题）
+      {dim:'S',aspect:'ability',q:'我觉得自己能把一个动作、技能或方法教给别人。'},
+      {dim:'S',aspect:'ability',q:'我觉得自己能带领他人练习、训练、学习或完成成长任务。'},
+      {dim:'S',aspect:'ability',q:'我觉得自己能倾听并支持有情绪、人际、学习或生活困扰的人。'},
       {dim:'S',aspect:'ability',q:'我觉得自己能帮助不同背景或有特殊需要的人更好地参与。'},
-      // E 企业型（2题）
+      {dim:'S',aspect:'ability',q:'我觉得自己能为别人提供学习、升学、求职或职业方向建议。'},
+      // E 企业型（5题）
+      {dim:'E',aspect:'ability',q:'我觉得自己能判断项目、资源、市场或商业机会的价值。'},
       {dim:'E',aspect:'ability',q:'我觉得自己能通过沟通谈判争取合作、资源或协议。'},
       {dim:'E',aspect:'ability',q:'我觉得自己能管理团队、社团、项目、活动或线上账号。'},
-      // C 常规型（2题）
+      {dim:'E',aspect:'ability',q:'我觉得自己能在正式场合代表一方表达观点、争取支持。'},
+      {dim:'E',aspect:'ability',q:'我觉得自己能经营小生意、个人品牌、服务项目、社群或商业活动。'},
+      // C 常规型（5题）
       {dim:'C',aspect:'ability',q:'我觉得自己能熟练使用表格、软件或系统整理数据和记录。'},
       {dim:'C',aspect:'ability',q:'我觉得自己能准确计算费用、预算、库存、绩效或其他数据。'},
+      {dim:'C',aspect:'ability',q:'我觉得自己能认真校对表格、合同、文档、记录或材料。'},
+      {dim:'C',aspect:'ability',q:'我觉得自己能把资料、物资、档案或流程管理得清楚有序。'},
+      {dim:'C',aspect:'ability',q:'我觉得自己能安装、维护或管理软件、系统、账号权限或流程工具。'},
 
-      // === 回馈模块（10题） ===
-      // R 现实型（1题）
+      // ===== 回馈模块（61-90题）每类型5题 =====
+      // R 现实型（5题）
       {dim:'R',aspect:'feedback',q:'我在组装、维修、制作具体物品方面得到过认可或做出过成果。'},
-      // I 研究型（2题）
+      {dim:'R',aspect:'feedback',q:'我在操作工具、机器、设备或完成实际任务时得到过好反馈。'},
+      {dim:'R',aspect:'feedback',q:'我在场地搭建、布置、装修或空间改造类任务中有过成果。'},
+      {dim:'R',aspect:'feedback',q:'我在检查质量、发现故障或排除问题方面得到过认可。'},
+      {dim:'R',aspect:'feedback',q:'我在修理电器、硬件、车辆、器材或实物设备方面有过正向经验。'},
+      // I 研究型（5题）
       {dim:'I',aspect:'feedback',q:'我在分析学术、科学、社会或技术问题时得到过认可。'},
+      {dim:'I',aspect:'feedback',q:'我在调查原因、寻找证据或分析复杂问题方面有过成果。'},
+      {dim:'I',aspect:'feedback',q:'我在研究现实问题并提出改进方法方面得到过好反馈。'},
       {dim:'I',aspect:'feedback',q:'我在建模、数据分析、预测或研究方法方面有过成果。'},
-      // A 艺术型（2题）
+      {dim:'I',aspect:'feedback',q:'我在实验、资料查证、假设验证或研究报告方面得到过认可。'},
+      // A 艺术型（5题）
       {dim:'A',aspect:'feedback',q:'我写过的故事、文章、剧本、文案或脚本得到过认可。'},
+      {dim:'A',aspect:'feedback',q:'我做过的视觉设计、海报、PPT、展板或空间设计得到过好反馈。'},
+      {dim:'A',aspect:'feedback',q:'我在表演、主持、音乐、舞蹈或舞台呈现方面得到过认可。'},
       {dim:'A',aspect:'feedback',q:'我提出的视频、戏剧、影像、活动或新媒体创意被采纳或认可过。'},
-      // S 社会型（2题）
+      {dim:'A',aspect:'feedback',q:'我创作的音乐、影像、图像、文字、手工或其他作品有过成果展示。'},
+      // S 社会型（5题）
       {dim:'S',aspect:'feedback',q:'我教别人技能、学习方法或生活方法时得到过好反馈。'},
+      {dim:'S',aspect:'feedback',q:'我带领他人练习、训练、学习或成长时得到过认可。'},
+      {dim:'S',aspect:'feedback',q:'我倾听、陪伴或支持别人解决困扰时得到过感谢或信任。'},
       {dim:'S',aspect:'feedback',q:'我帮助不同背景或有特殊需要的人参与学习和生活时有过正向反馈。'},
-      // E 企业型（2题）
+      {dim:'S',aspect:'feedback',q:'我给别人提供升学、求职、职业选择或学习规划建议时被认可过。'},
+      // E 企业型（5题）
+      {dim:'E',aspect:'feedback',q:'我在判断商业、项目、资源或市场机会方面得到过好反馈。'},
       {dim:'E',aspect:'feedback',q:'我在谈判、争取合作、协调利益或促成协议方面有过成果。'},
       {dim:'E',aspect:'feedback',q:'我管理团队、社团、项目、活动或账号运营时得到过认可。'},
-      // C 常规型（1题）
-      {dim:'C',aspect:'feedback',q:'我在使用表格、软件或系统整理数据和记录时得到过认可。'}
+      {dim:'E',aspect:'feedback',q:'我在辩论、路演、竞赛、谈判或正式表达中得到过支持或好结果。'},
+      {dim:'E',aspect:'feedback',q:'我经营小生意、个人品牌、服务项目、社群或商业活动时有过成果。'},
+      // C 常规型（5题）
+      {dim:'C',aspect:'feedback',q:'我在使用表格、软件或系统整理数据和记录时得到过认可。'},
+      {dim:'C',aspect:'feedback',q:'我在计算费用、预算、库存、绩效或其他数据时准确可靠。'},
+      {dim:'C',aspect:'feedback',q:'我在校对表格、合同、文档、记录或材料时发现过关键问题。'},
+      {dim:'C',aspect:'feedback',q:'我在资料、物资、档案或流程管理方面被认为有条理。'},
+      {dim:'C',aspect:'feedback',q:'我在安装、维护或管理软件、系统、账号权限或流程工具方面有过成果。'}
     ],
     reverseItems: []
   },
@@ -1680,10 +1740,14 @@ function calcResults() {
       maxScore[d] = Math.round((scores[d] / (counts[d] * maxOption)) * 100);
     });
 
-    // 三维细分：每维度每方面2题，满分2×4=8
+    // 三维细分：每维度每方面5题，满分5×4=20
+    var aspCounts = {interest:{}, ability:{}, feedback:{}};
+    test.dimensions.forEach(function(d){aspCounts.interest[d]=0;aspCounts.ability[d]=0;aspCounts.feedback[d]=0;});
+    test.questions.forEach(function(q){if(q.aspect && aspCounts[q.aspect]) aspCounts[q.aspect][q.dim]++;});
     ['interest','ability','feedback'].forEach(function(asp) {
       test.dimensions.forEach(function(d) {
-        aspectScores[asp][d] = Math.round((aspectRaws[asp][d] / (2 * maxOption)) * 100);
+        var n = aspCounts[asp][d] || 1;
+        aspectScores[asp][d] = Math.round((aspectRaws[asp][d] / (n * maxOption)) * 100);
       });
     });
 
