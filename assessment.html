@@ -1944,15 +1944,15 @@ function renderHolland(scores) {
     '<table class="hl-table" style="margin-bottom:0;">'+
     '<thead><tr><th class="hl-th-dim"></th>' + headerCells + '</tr></thead>'+
     '<tbody>' +
-      buildScoreRow('您所感兴趣的活动（兴趣）', 'interest', false) +
-      buildScoreRow('您所擅长的活动（能力）', 'ability', false) +
-      buildScoreRow('您所喜欢的职业（回馈）', 'feedback', false) +
+      buildScoreRow('兴趣', 'interest', false) +
+      buildScoreRow('能力', 'ability', false) +
+      buildScoreRow('回馈', 'feedback', false) +
       buildScoreRow('总分', '', true) +
     '</tbody>'+
     '</table></div>';
 
   document.getElementById('pageBody').innerHTML =
-    '<div class="page-header"><div class="page-title">霍兰德报告</div><div class="page-subtitle">RIASEC 职业兴趣 · 能力 · 回馈综合打分</div></div>'+
+    '<div class="page-header"><div class="page-title">测评结果</div><div class="page-subtitle">RIASEC 职业兴趣 · 能力 · 回馈综合打分</div></div>'+
     '<div class="report-export-wrap" id="reportExportWrap">'+
     buildReportInfoBar()+
     '<div class="hl-hero">'+
@@ -2373,7 +2373,7 @@ function renderMbti(scores) {
   var allHtml = heroHtml + introHtml + sceneHtml + section1Html + section2Html + section3Html;
 
   document.getElementById('pageBody').innerHTML =
-    '<div class="page-header"><div class="page-title">MBTI报告</div><div class="page-subtitle">16种人格 · '+info.name+'</div></div>'+
+    '<div class="page-header"><div class="page-title">测评结果</div><div class="page-subtitle">16种人格 · '+info.name+'</div></div>'+
     '<div class="report-export-wrap mbti-report mbti-report-'+group+'" id="reportExportWrap">'+
     buildReportInfoBar()+
     allHtml +
