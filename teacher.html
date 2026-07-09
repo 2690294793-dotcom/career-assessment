@@ -131,7 +131,7 @@ body {
 .top-bar .nav-links a svg { width: 13px; height: 13px; }
 
 /* Container */
-.container { padding: 12px 14px; }
+.container { padding: 10px 10px; }
 
 /* Login */
 .login-wrap {
@@ -202,6 +202,28 @@ body {
   background: var(--card); border-radius: var(--radius-md);
   box-shadow: 0 2px 12px rgba(0,0,0,0.04); overflow-x: auto;
 }
+.assess-table { width: 100%; min-width: 0; table-layout: fixed; border-collapse: collapse; font-size: 9px; }
+.assess-table th {
+  background: #F8F9FC; padding: 5px 2px; text-align: center; font-size: 8px;
+  font-weight: 700; color: var(--text-secondary); text-transform: uppercase;
+  letter-spacing: 0.2px; border-bottom: 2px solid var(--border); white-space: nowrap;
+}
+.assess-table td { padding: 5px 2px; border-bottom: 1px solid var(--border); font-size: 9px; text-align: center; vertical-align: middle; }
+.assess-table td .badge { font-size: 8px; padding: 1px 3px; }
+.assess-table td .result-code { font-size: 10px; }
+.assess-table th.th-check, .assess-table td.td-check { width: 22px; text-align: center; }
+.assess-table th.th-name, .assess-table td.td-name { width: 50px; }
+.assess-table th.th-stuid, .assess-table td.td-stuid { width: 42px; }
+.assess-table th.th-class, .assess-table td.td-class { width: 48px; }
+.assess-table th.th-type, .assess-table td.td-type { width: 52px; }
+.assess-table th.th-result, .assess-table td.td-result { width: 38px; }
+.assess-table th.th-time, .assess-table td.td-time { width: 50px; }
+.assess-table th.th-op, .assess-table td.td-op { width: 44px; }
+.assess-table td .cell-ellipsis { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.assess-table tr:hover td { background: rgba(99,102,241,0.02); }
+.assess-table tr:last-child td { border-bottom: none; }
+.assess-table td.td-op .btn { padding: 2px 4px; font-size: 8px; }
+.assess-table .row-checkbox { width: 14px; height: 14px; }
 .toolbar {
   display: flex; align-items: center; gap: 4px; padding: 6px 8px;
   border-bottom: 1px solid var(--border); flex-wrap: wrap;
@@ -597,7 +619,7 @@ tr.selected td:not(:first-child) { background: rgba(99,102,241,0.06); }
 }
 
 @media (max-width: 768px) {
-  .container { padding: 12px 14px; }
+  .container { padding: 10px 10px; }
   .top-bar { padding: 0 16px; }
   .top-bar .nav-links a { padding: 5px 10px; font-size: 12px; }
   .tab-bar { flex-direction: row; }
@@ -660,7 +682,7 @@ tr.selected td:not(:first-child) { background: rgba(99,102,241,0.06); }
       <input type="password" id="pwdInput" placeholder="请输入密码"
         onkeydown="if(event.key==='Enter') doLogin()">
       <button onclick="doLogin()">登 录</button>
-      <div style="margin-top:16px;color:#ccc;font-size:11px;">v20260709-22</div>
+      <div style="margin-top:16px;color:#ccc;font-size:11px;">v20260709-23</div>
     </div>
   </div>
 
@@ -950,15 +972,15 @@ function renderTable(data) {
     return;
   }
 
-  var html = '<table><thead><tr>'+
-    '<th class="th-checkbox"><input type="checkbox" id="selectAllCheck" onchange="toggleSelectAll(this.checked)" title="全选/取消全选"></th>'+
-    '<th>姓名</th><th>学校</th><th>学号</th><th>班级</th><th>测评类型</th>'+
-    '<th>结果</th><th class="hide-mobile">概述</th><th class="hide-mobile">提交时间</th><th>操作</th>'+
+  var html = '<table class="assess-table"><thead><tr>'+
+    '<th class="th-check"><input type="checkbox" id="selectAllCheck" onchange="toggleSelectAll(this.checked)" title="全选/取消全选"></th>'+
+    '<th class="th-name">姓名</th><th class="th-stuid">学号</th><th class="th-class">班级</th><th class="th-type">测评</th>'+
+    '<th class="th-result">结果</th><th class="th-time">时间</th><th class="th-op">操作</th>'+
     '</tr></thead><tbody>';
 
   data.forEach(function(item, idx) {
     var testName = TEST_INFO[item.test_type] ? TEST_INFO[item.test_type].name : (item.test_name || item.test_type);
-    var time = item.created_at ? new Date(item.created_at).toLocaleString("zh-CN", {month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit"}) : "-";
+    var time = item.created_at ? new Date(item.created_at).toLocaleString("zh-CN", {month:"2-digit",day:"2-digit"}) : "-";
 
     var codeCell = esc(item.result_code||'-');
     if (item.test_type === 'holland' && item.result_code && item.result_code.length === 3) {
@@ -968,17 +990,14 @@ function renderTable(data) {
     }
 
     html += '<tr data-id="'+item.id+'">'+
-      '<td><input type="checkbox" class="row-checkbox" data-id="'+item.id+'" onchange="onRowCheckChange(this)"></td>'+
-      '<td style="font-weight:600;white-space:nowrap;">'+esc(item.name)+'</td>'+
-      '<td style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:45px;" title="'+esc(item.school||'-')+'">'+esc(item.school||'-')+'</td>'+
-      '<td>'+esc(item.student_id)+'</td>'+
-      '<td>'+esc(item.class_name)+'</td>'+
-      '<td><span class="badge badge-'+(item.test_type||'')+'">'+esc(testName)+'</span></td>'+
-      '<td>'+codeCell+'</td>'+
-      '<td class="hide-mobile" style="color:var(--text-secondary);font-size:9px;">'+esc(item.result_summary||'-')+'</td>'+
-      '<td class="hide-mobile" style="color:var(--text-light);font-size:9px;">'+time+'</td>'+
-      '<td><button class="btn" style="padding:3px 5px;font-size:9px;" onclick="showDetail('+idx+')">查看</button>'+
-      '<button class="btn btn-danger" style="padding:3px 5px;font-size:9px;margin-left:2px;" onclick="confirmDelete('+item.id+')">删除</button></td>'+
+      '<td class="td-check"><input type="checkbox" class="row-checkbox" data-id="'+item.id+'" onchange="onRowCheckChange(this)"></td>'+
+      '<td class="td-name"><span class="cell-ellipsis">'+esc(item.name)+'</span></td>'+
+      '<td class="td-stuid"><span class="cell-ellipsis">'+esc(item.student_id)+'</span></td>'+
+      '<td class="td-class"><span class="cell-ellipsis">'+esc(item.class_name)+'</span></td>'+
+      '<td class="td-type"><span class="badge badge-'+(item.test_type||'')+'">'+esc(testName)+'</span></td>'+
+      '<td class="td-result">'+codeCell+'</td>'+
+      '<td class="td-time" style="color:var(--text-light);font-size:8px;">'+time+'</td>'+
+      '<td class="td-op"><button class="btn" onclick="showDetail('+idx+')">详情</button></td>'+
     '</tr>';
   });
 
