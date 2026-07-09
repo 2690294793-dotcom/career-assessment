@@ -643,38 +643,43 @@ body {
   width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0;
 }
 
-/* ====== STRENGTH 34-theme grid (4 domains × N themes) ====== */
+/* ====== STRENGTH 34-theme grid (4 domains × N themes, Clifton-style) ====== */
 .st-grid {
   display: grid; grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
+  gap: 6px;
 }
-.st-grid-col { display: flex; flex-direction: column; gap: 8px; }
+.st-grid-col { display: flex; flex-direction: column; gap: 4px; }
 .st-grid-col-head {
-  font-size: 12px; font-weight: 700; color: #fff;
-  padding: 8px 10px; border-radius: 8px 8px 0 0;
-  text-align: center; letter-spacing: 1px;
+  font-size: 11px; font-weight: 700; color: #fff;
+  padding: 6px 4px; border-radius: 6px 6px 0 0;
+  text-align: center; letter-spacing: 0.5px;
 }
 .st-grid-cell {
-  background: #f5f5f7; border-radius: 6px;
-  padding: 10px 8px; text-align: center;
-  display: flex; flex-direction: column; gap: 2px;
+  background: #f5f5f7; border-radius: 5px;
+  padding: 5px 3px; text-align: center;
+  display: flex; flex-direction: column; gap: 1px;
   transition: all 0.2s;
+  min-height: 38px;
+  justify-content: center;
 }
-.st-grid-cell-num { font-size: 13px; font-weight: 800; }
-.st-grid-cell-name { font-size: 11px; color: var(--text-secondary); }
-.st-grid-cell.score-low { background: #f5f5f7; color: var(--text-secondary); }
-.st-grid-cell.score-low .st-grid-cell-num { color: var(--text-secondary); }
-.st-grid-cell.score-mid { background: #fef3c7; color: #92400E; }
-.st-grid-cell.score-mid .st-grid-cell-num { color: #92400E; }
-.st-grid-cell.score-high {
-  color: #fff;
-  background: var(--primary);
-}
-.st-grid-cell.score-high .st-grid-cell-num { color: #fff; }
-.st-grid-cell.score-high .st-grid-cell-name { color: rgba(255,255,255,0.85); }
+.st-grid-cell-num { font-size: 12px; font-weight: 800; line-height: 1.1; }
+.st-grid-cell-name { font-size: 10px; line-height: 1.2; color: var(--text-secondary); }
+.st-grid-cell.st-off { background: #f5f5f7; color: #c4c4c8; }
+.st-grid-cell.st-off .st-grid-cell-num { color: #c4c4c8; }
+.st-grid-cell.st-off .st-grid-cell-name { color: #d4d4d8; }
+.st-grid-cell.st-dim { color: #4b5563; }
+.st-grid-cell.st-dim .st-grid-cell-num { color: inherit; }
+.st-grid-cell.st-dim .st-grid-cell-name { color: inherit; opacity: 0.85; }
+.st-grid-cell.st-lit { box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+.st-grid-cell.st-lit .st-grid-cell-num { color: #fff; }
+.st-grid-cell.st-lit .st-grid-cell-name { color: rgba(255,255,255,0.92); }
 
 @media (max-width: 480px) {
-  .st-grid { grid-template-columns: repeat(2, 1fr); }
+  .st-grid { grid-template-columns: repeat(4, 1fr); gap: 4px; }
+  .st-grid-col-head { font-size: 10px; padding: 5px 2px; }
+  .st-grid-cell { padding: 4px 2px; min-height: 32px; }
+  .st-grid-cell-num { font-size: 11px; }
+  .st-grid-cell-name { font-size: 9px; }
 }
 
 /* Top 5 themes richer card */
@@ -2090,27 +2095,31 @@ function renderStrength(scores) {
       '<div class="disc-bar-wrap"><div class="disc-bar-fill" style="width:'+pct+'%;background:'+dColors[dom]+'"></div></div></div>';
   }).join('');
 
-  // 34-theme grid (4 columns × 1 per domain, sorted within domain)
+  // 34-theme grid (4 domains × 1 per domain, compact mobile-friendly, Clifton-style lighting)
   var rankMap = {};
   sorted.forEach(function(e, i){ rankMap[e.dim] = i + 1; });
   var stGridHtml = '<div class="st-grid">'+
     domains.map(function(dom){
+      var color = dColors[dom];
       var themes = test.domains[dom].themes
         .map(function(d){return {dim:d, score:scores[d]||0};})
         .sort(function(a,b){return b.score - a.score;});
       var cells = themes.map(function(e){
-        var color = dColors[dom];
         var name = test.dimNames[e.dim];
         var rank = rankMap[e.dim];
         var isTop5 = rank <= 5;
-        var lvl = isTop5 ? 'score-high' : (e.score >= 10 ? 'score-mid' : 'score-low');
-        return '<div class="st-grid-cell '+lvl+'" style="'+(isTop5?'background:'+color:'')+'">'+
+        var isTop10 = rank <= 10;
+        var cls = isTop5 ? 'st-lit' : (isTop10 ? 'st-dim' : 'st-off');
+        var style = '';
+        if (isTop5) style = 'background:'+color+';color:#fff;';
+        else if (isTop10) style = 'background:'+color+'30;color:'+color+';';
+        return '<div class="st-grid-cell '+cls+'" style="'+style+'">'+
           '<div class="st-grid-cell-num">'+rank+'</div>'+
           '<div class="st-grid-cell-name">'+name+'</div>'+
         '</div>';
       }).join('');
       return '<div class="st-grid-col">'+
-        '<div class="st-grid-col-head" style="background:'+dColors[dom]+'">'+dIcon[dom]+' '+dom+'</div>'+
+        '<div class="st-grid-col-head" style="background:'+color+'">'+dom+'</div>'+
         cells+
       '</div>';
     }).join('')+
