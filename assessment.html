@@ -2800,7 +2800,7 @@ function unlockFullReport(scores) {
     case 'mbti': renderMbti(scores); break;
   }
   document.getElementById('pageBody').scrollTop = 0;
-  showToast('✅ 完整报告已解锁！');
+  if (!state._viewingHistory) showToast('✅ 完整报告已解锁！');
 }
 
 // ============================================================
@@ -3143,7 +3143,7 @@ function submitToSupabase(scores) {
 // ============================================================
 //  INIT
 // ============================================================
-console.log('[DEBUG] assessment.html v20260708-23 loaded');
+console.log('[DEBUG] assessment.html v20260709-07 loaded');
 console.log('[DEBUG] TESTS available:', typeof TESTS !== 'undefined' ? Object.keys(TESTS).join(', ') : 'UNDEFINED');
 state._locking = false;
 // 调用 config.js 的 initSupabase()，设置全局 db 变量
@@ -3159,6 +3159,46 @@ try {
 }
 // 优先恢复已保存的学生信息，没有则先填写
 (function(){
+  // 检查URL参数：从"我的"页面跳转查看历史测评结果
+  var params = new URLSearchParams(window.location.search);
+  var viewParam = params.get('view');
+  var typeParam = params.get('type');
+  
+  if (viewParam === 'result' && typeParam) {
+    // 从localStorage加载历史测评结果
+    var keyMap = { holland:'holland_result', mbti:'mbti_result', bigfive:'bigfive_result', strength:'strength_result' };
+    var storageKey = keyMap[typeParam];
+    if (storageKey) {
+      try {
+        var savedResult = JSON.parse(localStorage.getItem(storageKey) || 'null');
+        if (savedResult && savedResult.scores) {
+          state.testKey = typeParam;
+          state.scores = savedResult.scores;
+          state.view = 'result';
+          state._viewingHistory = true;
+          // 恢复学生信息
+          try {
+            var savedInfo = localStorage.getItem('assessment_student_info');
+            if (savedInfo) {
+              state.studentInfo = JSON.parse(savedInfo);
+              state._schoolVerified = true;
+            }
+          } catch(e) {}
+          // 霍兰德：恢复模块分数
+          if (typeParam === 'holland' && savedResult.moduleScores) {
+            state.moduleScores = savedResult.moduleScores;
+            state.moduleRaws = savedResult.moduleRaws || {};
+          }
+          // 直接渲染报告
+          unlockFullReport(savedResult.scores);
+          return;
+        }
+      } catch(e) {
+        console.warn('加载历史测评结果失败:', e);
+      }
+    }
+  }
+  
   try {
     var saved = localStorage.getItem('assessment_student_info');
     if (saved) {
