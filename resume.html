@@ -687,9 +687,9 @@ function renderAppointmentList(appointments) {
       var hasFeedback = apt.has_feedback || apt.feedback_at || apt.student_rating > 0;
       html += '<div class="apt-actions">';
       if (!hasFeedback) {
-        html += '<a class="apt-action-btn apt-action-primary" href="consult-flow.html?apt=' + encodeURIComponent(no) + '">✍️ 提交反馈</a>';
+        html += '<a class="apt-action-btn apt-action-primary" href="consult-flow.html?apt=' + encodeURIComponent(no) + '" onclick="event.stopPropagation();">✍️ 提交反馈</a>';
       } else {
-        html += '<a class="apt-action-btn apt-action-primary" href="consult-flow.html?apt=' + encodeURIComponent(no) + '">📄 查看报告</a>';
+        html += '<a class="apt-action-btn apt-action-primary" href="consult-flow.html?apt=' + encodeURIComponent(no) + '" onclick="event.stopPropagation();">📄 查看报告</a>';
       }
       html += '</div>';
     }
@@ -732,7 +732,7 @@ function formatNotes(raw) {
 function esc(str) { if (!str) return ''; return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
 init();
-console.log('[DEBUG] resume.html v20260710-11 loaded');
+console.log('[DEBUG] resume.html v20260710-12 loaded');
 </script>
 
 </body>
