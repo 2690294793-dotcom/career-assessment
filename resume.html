@@ -572,7 +572,7 @@ function viewMyPlan(index) {
 
   var h = '<button onclick="this.parentElement.parentElement.remove()" style="position:absolute;top:12px;right:14px;width:28px;height:28px;border-radius:50%;background:#f1f5f9;border:none;cursor:pointer;font-size:16px;color:#8E8E93;display:flex;align-items:center;justify-content:center;">✕</button>';
   h += '<div style="font-size:18px;font-weight:700;color:var(--text-primary);margin-bottom:4px;">' + esc(inputs.name || '') + '的职业规划</div>';
-  h += '<div style="font-size:12px;color:var(--text-secondary);margin-bottom:16px;">' + esc(inputs.major || '') + ' · ' + esc(inputs.grade || '') + ' · ' + esc(dateStr) + '</div>';
+  h += '<div style="font-size:12px;color:#000000;margin-bottom:16px;">' + esc(inputs.major || '') + ' · ' + esc(inputs.grade || '') + ' · ' + esc(dateStr) + '</div>';
   function rs(icon, title, items) {
     var s = '<div style="margin-bottom:14px;"><div style="font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:8px;">' + icon + ' ' + title + '</div>';
     if (items && items.length) {
@@ -582,7 +582,7 @@ function viewMyPlan(index) {
         s += '<div style="display:flex;gap:8px;padding:6px 0;border-bottom:1px solid #f3f4f6;">' +
           '<div style="width:6px;height:6px;border-radius:50%;background:var(--accent);margin-top:6px;flex-shrink:0;"></div>' +
           '<div style="flex:1;"><div style="font-size:13px;font-weight:600;color:var(--text-primary);">' + esc(t) + '</div>' +
-          '<div style="font-size:12px;color:var(--text-secondary);line-height:1.5;margin-top:2px;">' + esc(desc).replace(/\n/g, '<br>') + '</div></div></div>';
+          '<div style="font-size:12px;color:#000000;line-height:1.5;margin-top:2px;">' + esc(desc).replace(/\n/g, '<br>') + '</div></div></div>';
       });
     }
     s += '</div>'; return s;
@@ -732,6 +732,7 @@ function formatNotes(raw) {
 function esc(str) { if (!str) return ''; return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
 init();
+console.log('[DEBUG] resume.html v20260710-08 loaded');
 </script>
 
 </body>
