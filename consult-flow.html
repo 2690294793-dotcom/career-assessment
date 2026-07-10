@@ -1265,8 +1265,9 @@ async function loadMentorSchedule(mentorId) {
 
     if (!mentorAccepting) {
       // 导师暂停预约
+      var mentorName = MENTOR_DATA[mentorId] ? MENTOR_DATA[mentorId].name : mentorId;
       noticeEl.style.display = 'block';
-      noticeEl.textContent = '🔒 导师暂时不接受预约，请稍后再试';
+      noticeEl.textContent = '🔒 ' + mentorName + ' 导师暂时不接受预约，请稍后再试';
       timeSection.style.display = 'none';
       selectedTime = null;
       checkStep1Ready();
