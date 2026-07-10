@@ -200,8 +200,10 @@ body {
 /* Table (测评管理) */
 .table-wrap {
   background: var(--card); border-radius: var(--radius-md);
-  box-shadow: 0 2px 12px rgba(0,0,0,0.04); overflow-x: auto;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.04); overflow: hidden;
+  display: flex; flex-direction: column;
 }
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; flex: 1; }
 .assess-table { width: 100%; min-width: 0; table-layout: fixed; border-collapse: collapse; font-size: 9px; }
 .assess-table th {
   background: #F8F9FC; padding: 5px 2px; text-align: center; font-size: 8px;
@@ -439,6 +441,27 @@ tr:last-child td { border-bottom: none; }
 }
 .modal-close:hover { background: var(--bg); }
 .modal-body { padding: 18px; }
+
+/* Custom Confirm Dialog */
+.confirm-bg {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+  z-index: 300; align-items: center; justify-content: center; padding: 24px;
+}
+.confirm-bg.show { display: flex; }
+.confirm-box {
+  background: var(--card); border-radius: var(--radius-lg); max-width: 320px;
+  width: 100%; padding: 22px; box-shadow: 0 16px 48px rgba(0,0,0,0.18);
+  animation: confirmPop 0.2s ease-out;
+}
+@keyframes confirmPop { from { transform: scale(0.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.confirm-body { font-size: 15px; color: var(--text-primary); line-height: 1.6; text-align: center; margin-bottom: 20px; }
+.confirm-actions { display: flex; gap: 10px; align-items: center; justify-content: flex-end; }
+.confirm-actions button { flex: 1; padding: 10px 0; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; transition: all 0.15s; }
+.confirm-actions .confirm-cancel { background: #F3F4F6; color: var(--text-secondary); }
+.confirm-actions .confirm-cancel:hover { background: #E5E7EB; }
+.confirm-actions .confirm-ok { background: var(--primary); color: #fff; }
+.confirm-actions .confirm-ok:hover { background: var(--primary-dark); }
+
 .detail-row {
   display: flex; padding: 10px 0; border-bottom: 1px solid var(--border);
 }
@@ -598,26 +621,26 @@ tr:last-child td { border-bottom: none; }
 tr.selected td:not(:first-child) { background: rgba(99,102,241,0.06); }
 
 .batch-bar {
-  display: none; position: sticky; bottom: 0; z-index: 50;
+  display: none; flex-shrink: 0;
   background: #fff; border-top: 2px solid var(--primary);
-  padding: 12px 18px; margin-top: 0; border-radius: 0 0 var(--radius-md) var(--radius-md);
+  padding: 10px 12px; margin-top: auto;
   align-items: center; justify-content: space-between; gap: 12px;
   box-shadow: 0 -4px 20px rgba(99,102,241,0.12);
   animation: slideUpBar 0.25s ease-out;
 }
 .batch-bar.show { display: flex; }
 @keyframes slideUpBar { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-.batch-info { font-size: 14px; font-weight: 600; color: var(--primary); }
+.batch-info { font-size: 13px; font-weight: 600; color: var(--primary); white-space: nowrap; }
 .batch-actions { display: flex; gap: 8px; align-items: center; }
 .batch-actions .btn-batch-del {
-  padding: 8px 18px; border-radius: 10px; border: none; background: var(--red);
-  color: #fff; font-size: 13px; font-weight: 700; cursor: pointer;
+  padding: 7px 12px; border-radius: 10px; border: none; background: var(--red);
+  color: #fff; font-size: 12px; font-weight: 700; cursor: pointer;
   transition: all 0.15s; white-space: nowrap;
 }
 .batch-actions .btn-batch-del:hover { background: #DC2626; transform: scale(1.02); }
 .batch-actions .btn-batch-cancel {
-  padding: 8px 14px; border-radius: 10px; border: none; background: none;
-  color: var(--text-secondary); font-size: 13px; font-weight: 500; cursor: pointer;
+  padding: 7px 12px; border-radius: 10px; border: none; background: #F3F4F6;
+  color: var(--text-secondary); font-size: 12px; font-weight: 500; cursor: pointer;
 }
 
 @media (max-width: 768px) {
@@ -684,7 +707,7 @@ tr.selected td:not(:first-child) { background: rgba(99,102,241,0.06); }
       <input type="password" id="pwdInput" placeholder="请输入密码"
         onkeydown="if(event.key==='Enter') doLogin()">
       <button onclick="doLogin()">登 录</button>
-      <div style="margin-top:16px;color:#ccc;font-size:11px;">v20260709-25</div>
+      <div style="margin-top:16px;color:#ccc;font-size:11px;">v20260709-26</div>
     </div>
   </div>
 
@@ -728,8 +751,15 @@ tr.selected td:not(:first-child) { background: rgba(99,102,241,0.06); }
         <button class="btn" onclick="exportCSV()">📄 导出CSV</button>
         <button class="btn" onclick="loadAssessments()">🔄 刷新</button>
       </div>
-      <div id="tableContent">
+      <div class="table-scroll" id="tableContent">
         <div class="loading"><div class="spinner"></div></div>
+      </div>
+      <div class="batch-bar" id="batchBar">
+        <div class="batch-info" id="batchInfo">已选 0 条</div>
+        <div class="batch-actions">
+          <button class="btn-batch-cancel" onclick="clearSelection()">取消</button>
+          <button class="btn-batch-del" onclick="batchDelete()">🗑 批量删除</button>
+        </div>
       </div>
     </div>
   </div>
@@ -839,6 +869,17 @@ tr.selected td:not(:first-child) { background: rgba(99,102,241,0.06); }
 
 <!-- Toast -->
 <div class="toast" id="toast"></div>
+
+<!-- Custom Confirm Dialog -->
+<div class="confirm-bg" id="customConfirm" onclick="if(event.target===this)cancelCustomConfirm()">
+  <div class="confirm-box">
+    <div class="confirm-body" id="customConfirmBody">确定执行此操作？</div>
+    <div class="confirm-actions">
+      <button class="confirm-cancel" onclick="cancelCustomConfirm()">取消</button>
+      <button class="confirm-ok" onclick="okCustomConfirm()">确定</button>
+    </div>
+  </div>
+</div>
 
 <!-- Notification sound (hidden audio element) -->
 <audio id="notifSound" preload="auto" style="display:none;">
@@ -1006,13 +1047,6 @@ function renderTable(data) {
   });
 
   html += '</tbody></table>';
-  html += '<div class="batch-bar" id="batchBar">'+
-    '<div class="batch-info" id="batchInfo">已选 0 条</div>'+
-    '<div class="batch-actions">'+
-      '<button class="btn-batch-cancel" onclick="clearSelection()">取消</button>'+
-      '<button class="btn-batch-del" onclick="batchDelete()">🗑 批量删除</button>'+
-    '</div>'+
-    '</div>';
   tc.innerHTML = html;
   renderBatchBar();
 }
@@ -1075,28 +1109,29 @@ function renderBatchBar() {
 
 async function batchDelete() {
   if (selectedIds.length === 0) return;
-  if (!confirm('确定删除选中的 ' + selectedIds.length + ' 条记录？此操作不可撤销。')) return;
-  var total = selectedIds.length;
-  var ok = 0, fail = 0;
-  showToast('开始批量删除 ' + total + ' 条...', 'success');
-  // 逐条删除（避免一次 in() 过大或 RLS 限制）
-  for (var i = 0; i < selectedIds.length; i++) {
-    try {
-      await deleteSubmission(selectedIds[i]);
-      ok++;
-    } catch(err) {
-      console.error('删除失败 id='+selectedIds[i], err);
-      fail++;
+  showCustomConfirm('确定删除选中的 ' + selectedIds.length + ' 条记录？<br><br>此操作不可撤销。', async function(){
+    var total = selectedIds.length;
+    var ok = 0, fail = 0;
+    showToast('开始批量删除 ' + total + ' 条...', 'success');
+    // 逐条删除（避免一次 in() 过大或 RLS 限制）
+    for (var i = 0; i < selectedIds.length; i++) {
+      try {
+        await deleteSubmission(selectedIds[i]);
+        ok++;
+      } catch(err) {
+        console.error('删除失败 id='+selectedIds[i], err);
+        fail++;
+      }
     }
-  }
-  // 清空选择
-  selectedIds = [];
-  if (fail === 0) {
-    showToast('已删除 ' + ok + ' 条记录 ✅', 'success');
-  } else {
-    showToast('删除完成：成功 ' + ok + ' 条，失败 ' + fail + ' 条', fail === total ? 'error' : 'success');
-  }
-  loadAssessments();
+    // 清空选择
+    selectedIds = [];
+    if (fail === 0) {
+      showToast('已删除 ' + ok + ' 条记录 ✅', 'success');
+    } else {
+      showToast('删除完成：成功 ' + ok + ' 条，失败 ' + fail + ' 条', fail === total ? 'error' : 'success');
+    }
+    loadAssessments();
+  });
 }
 
 function filterTable() {
@@ -1259,23 +1294,23 @@ function renderAppointments(appointments) {
 async function handleAppointment(id, status) {
   var statusName = { accepted:'已同意', rejected:'已拒绝' };
   var msg = status === 'accepted' ? '确定同意这个预约吗？\n\n同意后可以在「已同意」中填写咨询记录并完成咨询。' : '确定拒绝这个预约？';
-  if (!confirm(msg)) return;
+  showCustomConfirm(msg, async function() {
+    try {
+      await updateAppointmentStatus(id, status, statusName[status]);
+      showToast(status === 'accepted' ? '已同意预约 ✅ 请在「已同意」中填写咨询记录' : '已拒绝预约 ❌', 'success');
 
-  try {
-    await updateAppointmentStatus(id, status, statusName[status]);
-    showToast(status === 'accepted' ? '已同意预约 ✅ 请在「已同意」中填写咨询记录' : '已拒绝预约 ❌', 'success');
-
-    // 同意后自动切换到「已同意」筛选，让老师立刻看到下一步操作
-    if (status === 'accepted') {
-      aptFilter = 'accepted';
-      document.querySelectorAll(".apt-filter-chip").forEach(function(c) { c.classList.remove("active"); });
-      document.getElementById("chipAccepted").classList.add("active");
+      // 同意后自动切换到「已同意」筛选，让老师立刻看到下一步操作
+      if (status === 'accepted') {
+        aptFilter = 'accepted';
+        document.querySelectorAll(".apt-filter-chip").forEach(function(c) { c.classList.remove("active"); });
+        document.getElementById("chipAccepted").classList.add("active");
+      }
+      loadAppointments();
+    } catch(err) {
+      console.error("更新失败:", err);
+      showToast("操作失败，请重试", "error");
     }
-    loadAppointments();
-  } catch(err) {
-    console.error("更新失败:", err);
-    showToast("操作失败，请重试", "error");
-  }
+  });
 }
 
 // ============================================
@@ -1902,6 +1937,22 @@ function exportCSV() {
 // ============================================
 // UTILS
 // ============================================
+var customConfirmResolve = null;
+function showCustomConfirm(msg, onOk, onCancel) {
+  document.getElementById('customConfirmBody').innerHTML = esc(msg).replace(/\n/g, '<br>');
+  document.getElementById('customConfirm').classList.add('show');
+  customConfirmResolve = { ok: onOk, cancel: onCancel || function(){} };
+}
+function okCustomConfirm() {
+  document.getElementById('customConfirm').classList.remove('show');
+  if (customConfirmResolve && customConfirmResolve.ok) customConfirmResolve.ok();
+  customConfirmResolve = null;
+}
+function cancelCustomConfirm() {
+  document.getElementById('customConfirm').classList.remove('show');
+  if (customConfirmResolve && customConfirmResolve.cancel) customConfirmResolve.cancel();
+  customConfirmResolve = null;
+}
 function esc(str) {
   if (!str) return "";
   var d = document.createElement("div");
