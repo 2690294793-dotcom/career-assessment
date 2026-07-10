@@ -358,6 +358,35 @@ async function deleteAppointment(id) {
   return true;
 }
 
+// 取消预约（软取消，保留历史记录，status='cancelled'）
+async function cancelAppointment(id, reason) {
+  if (!id) throw new Error('缺少预约 ID');
+  if (db) {
+    const update = {
+      status: 'cancelled',
+      teacher_response: reason || '学生已取消',
+      updated_at: new Date().toISOString()
+    };
+    const { data, error } = await db
+      .from("appointments")
+      .update(update)
+      .eq("id", id)
+      .select();
+    if (error) throw error;
+    console.log("[Supabase] 预约已取消:", id);
+    return data[0];
+  }
+  var local = JSON.parse(localStorage.getItem("zt_appointments") || "[]");
+  var idx = local.findIndex(function(a) { return a.id === id || String(a.id) === String(id); });
+  if (idx >= 0) {
+    local[idx].status = 'cancelled';
+    local[idx].teacher_response = reason || '学生已取消';
+    local[idx].updated_at = new Date().toISOString();
+    localStorage.setItem("zt_appointments", JSON.stringify(local));
+  }
+  return local[idx];
+}
+
 // 按预约编号列表批量查询（学生端查询自己的预约历史）
 async function getMyAppointments(appointmentNos) {
   if (!appointmentNos || appointmentNos.length === 0) return [];
@@ -391,14 +420,14 @@ async function getAppointmentStats() {
       .from("appointments")
       .select("status");
     if (error) throw error;
-    var stats = { total: data.length, pending: 0, accepted: 0, rejected: 0, completed: 0 };
+    var stats = { total: data.length, pending: 0, accepted: 0, rejected: 0, completed: 0, cancelled: 0 };
     data.forEach(function(a) {
       if (stats[a.status] !== undefined) stats[a.status]++;
     });
     return stats;
   }
   var local = JSON.parse(localStorage.getItem("zt_appointments") || "[]");
-  var stats = { total: local.length, pending: 0, accepted: 0, rejected: 0, completed: 0 };
+  var stats = { total: local.length, pending: 0, accepted: 0, rejected: 0, completed: 0, cancelled: 0 };
   local.forEach(function(a) {
     if (stats[a.status] !== undefined) stats[a.status]++;
   });
