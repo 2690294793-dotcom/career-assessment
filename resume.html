@@ -507,7 +507,7 @@ function loadMyAssessments() {
   else document.getElementById('assessBadge').classList.remove('show');
 
   if (tests.length === 0) {
-    container.innerHTML = '<div class="apt-empty"><div class="apt-empty-icon">📝</div><p style="font-weight:500;color:var(--text-secondary);">暂无测评记录</p><p style="font-size:12px;">完成测评后，结果将同步到这里</p><a class="apt-empty-link" href="assessment.html">去测评 →</a></div>';
+    container.innerHTML = '<div class="apt-empty"><div class="apt-empty-icon">📝</div><p style="font-weight:500;color:#000000;">暂无测评记录</p><p style="font-size:12px;color:#000000;">完成测评后，结果将同步到这里</p><a class="apt-empty-link" href="assessment.html">去测评 →</a></div>';
     return;
   }
 
@@ -540,7 +540,7 @@ function loadMyPlans() {
   else document.getElementById('planBadge').classList.remove('show');
 
   if (saved.length === 0) {
-    container.innerHTML = '<div class="apt-empty"><div class="apt-empty-icon">🗺️</div><p style="font-weight:500;color:var(--text-secondary);">暂无规划方案</p><p style="font-size:12px;">去生成你的第一个职业规划方案</p><a class="apt-empty-link" href="resume-templates.html">去生成方案 →</a></div>';
+    container.innerHTML = '<div class="apt-empty"><div class="apt-empty-icon">🗺️</div><p style="font-weight:500;color:#000000;">暂无规划方案</p><p style="font-size:12px;color:#000000;">去生成你的第一个职业规划方案</p><a class="apt-empty-link" href="resume-templates.html">去生成方案 →</a></div>';
     return;
   }
   var html = '';
@@ -635,7 +635,7 @@ async function loadAppointmentHistory() {
 }
 function renderEmptyApt() {
   document.getElementById('aptList').innerHTML =
-    '<div class="apt-empty"><div class="apt-empty-icon">📋</div><p style="font-weight:500;color:var(--text-secondary);">暂无预约记录</p><p style="font-size:12px;">去预约咨询，开启你的职业规划之旅</p><a class="apt-empty-link" href="consult-flow.html">去预约咨询 →</a></div>';
+    '<div class="apt-empty"><div class="apt-empty-icon">📋</div><p style="font-weight:500;color:#000000;">暂无预约记录</p><p style="font-size:12px;color:#000000;">去预约咨询，开启你的职业规划之旅</p><a class="apt-empty-link" href="consult-flow.html">去预约咨询 →</a></div>';
 }
 function renderAppointmentList(appointments) {
   var list = document.getElementById('aptList');
@@ -732,7 +732,7 @@ function formatNotes(raw) {
 function esc(str) { if (!str) return ''; return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
 init();
-console.log('[DEBUG] resume.html v20260710-08 loaded');
+console.log('[DEBUG] resume.html v20260710-11 loaded');
 </script>
 
 </body>
