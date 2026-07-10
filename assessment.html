@@ -673,9 +673,9 @@ body {
 }
 .st-grid-cell-num { font-size: 12px; font-weight: 800; line-height: 1.1; }
 .st-grid-cell-name { font-size: 12px; line-height: 1.2; color: var(--text-secondary); }
-.st-grid-cell.st-off { background: #f5f5f7; color: #c4c4c8; }
-.st-grid-cell.st-off .st-grid-cell-num { color: #c4c4c8; }
-.st-grid-cell.st-off .st-grid-cell-name { color: #d4d4d8; }
+.st-grid-cell.st-off { background: #f5f5f7; color: #000000; }
+.st-grid-cell.st-off .st-grid-cell-num { color: #000000; }
+.st-grid-cell.st-off .st-grid-cell-name { color: #000000; }
 .st-grid-cell.st-dim { color: #000; }
 .st-grid-cell.st-dim .st-grid-cell-num { color: inherit; }
 .st-grid-cell.st-dim .st-grid-cell-name { color: inherit; opacity: 0.85; }
@@ -3196,7 +3196,7 @@ function submitToSupabase(scores) {
 // ============================================================
 //  INIT
 // ============================================================
-console.log('[DEBUG] assessment.html v20260709-18 loaded');
+console.log('[DEBUG] assessment.html v20260710-01 loaded');
 console.log('[DEBUG] TESTS available:', typeof TESTS !== 'undefined' ? Object.keys(TESTS).join(', ') : 'UNDEFINED');
 state._locking = false;
 // 调用 config.js 的 initSupabase()，设置全局 db 变量
