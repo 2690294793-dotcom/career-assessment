@@ -7,7 +7,7 @@
 <script>
 // Cache-busting: force refresh if old cached version loaded
 (function(){
-  var v = '20260710-17b';
+  var v = '20260710-18';
   if (localStorage.getItem('resume_version') !== v) {
     localStorage.setItem('resume_version', v);
     if (location.search.indexOf('v=') === -1) {
@@ -193,6 +193,7 @@ body {
 .apt-status-dot.accepted { background: var(--success); }
 .apt-status-dot.rejected { background: var(--danger); }
 .apt-status-dot.completed { background: #A78BFA; }
+.apt-status-dot.cancelled { background: #9CA3AF; }
 .apt-item-body { flex: 1; min-width: 0; }
 .apt-item-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
 .apt-item-no { font-size: 11px; color: var(--text-light); font-family: monospace; }
@@ -203,6 +204,7 @@ body {
 .apt-item-status.accepted { background: #EDF7F1; color: #065f46; }
 .apt-item-status.rejected { background: #FDF0ED; color: #991b1b; }
 .apt-item-status.completed { background: #EDE9FE; color: #5b21b6; }
+.apt-item-status.cancelled { background: #F1F5F9; color: #475569; }
 .apt-item-meta { font-size: 13px; color: var(--text-secondary); margin-bottom: 3px; }
 .apt-item-meta strong { color: var(--text-primary); }
 .apt-item-problem {
@@ -656,7 +658,7 @@ function renderEmptyApt() {
 function renderAppointmentList(appointments) {
   var list = document.getElementById('aptList');
   if (!appointments || appointments.length === 0) { renderEmptyApt(); return; }
-  var statusLabels = { pending:'待处理', accepted:'已同意', rejected:'已拒绝', completed:'已完成' };
+  var statusLabels = { pending:'待处理', accepted:'已同意', rejected:'已拒绝', completed:'已完成', cancelled:'已取消' };
   var typeNames = { career:'职业规划', resume:'简历优化', interview:'面试辅导', industry:'行业分析' };
 
   document.getElementById('aptBadge').textContent = appointments.length;
@@ -696,6 +698,16 @@ function renderAppointmentList(appointments) {
     html += '<div class="apt-detail-row"><span class="apt-detail-label">问题描述</span><span class="apt-detail-val">' + esc(problem || '-') + '</span></div>';
     if (apt.teacher_response) html += '<div class="apt-detail-row"><span class="apt-detail-label">教师回复</span><span class="apt-detail-val" style="color:var(--accent);">' + esc(apt.teacher_response) + '</span></div>';
     if (apt.consultation_notes) html += '<div style="margin-top:8px;padding:10px 12px;background:#FAF8F5;border-radius:10px;font-size:12px;color:var(--text-secondary);line-height:1.6;"><strong>📝 咨询记录</strong><br>' + formatNotes(apt.consultation_notes) + '</div>';
+    // 已评价时显示评价详情
+    if (apt.has_feedback || apt.student_rating > 0) {
+      var stars = '';
+      for (var s = 0; s < 5; s++) { stars += s < (apt.student_rating || 0) ? '★' : '☆'; }
+      var tagsHtml = '';
+      if (apt.feedback_tags && apt.feedback_tags.length > 0) {
+        tagsHtml = '<div style="margin-top:4px;">' + apt.feedback_tags.map(function(t) { return '<span style="display:inline-block;font-size:11px;padding:2px 8px;background:#F5EDF1;color:#C88EA7;border-radius:8px;margin-right:4px;margin-bottom:4px;">' + esc(t) + '</span>'; }).join('') + '</div>';
+      }
+      html += '<div style="margin-top:8px;padding:10px 12px;background:#F5EDF1;border-radius:10px;font-size:12px;color:#7a4f63;line-height:1.6;"><strong>🌟 我的评价</strong><div style="font-size:16px;color:#EAB308;margin:2px 0;">' + stars + '</div>' + (apt.feedback_text ? '<div>' + esc(apt.feedback_text) + '</div>' : '') + tagsHtml + '</div>';
+    }
     if (apt.updated_at) html += '<div class="apt-detail-row"><span class="apt-detail-label">最近更新</span><span class="apt-detail-val" style="color:var(--text-light);font-size:12px;">' + new Date(apt.updated_at).toLocaleString('zh-CN') + '</span></div>';
 
     // 待处理预约：可取消
@@ -705,12 +717,12 @@ function renderAppointmentList(appointments) {
       html += '</div>';
     }
 
-    // 已完成预约：提供反馈/查看报告入口
+    // 已完成预约：提供评价/查看报告入口
     if (status === 'completed') {
       var hasFeedback = apt.has_feedback || apt.feedback_at || apt.student_rating > 0;
       html += '<div class="apt-actions">';
       if (!hasFeedback) {
-        html += '<a class="apt-action-btn apt-action-primary" href="consult-flow.html?apt=' + encodeURIComponent(no) + '" onclick="event.stopPropagation();">✍️ 提交反馈</a>';
+        html += '<a class="apt-action-btn apt-action-primary" href="consult-flow.html?apt=' + encodeURIComponent(no) + '" onclick="event.stopPropagation();">📝 评价</a>';
       } else {
         html += '<a class="apt-action-btn apt-action-primary" href="consult-flow.html?apt=' + encodeURIComponent(no) + '" onclick="event.stopPropagation();">📄 查看报告</a>';
       }
@@ -727,27 +739,36 @@ function renderAppointmentList(appointments) {
 }
 
 async function handleCancelApt(id, no, idx) {
-  if (!confirm('确定要取消该预约吗？')) return;
+  if (!confirm('确定要取消该预约吗？取消后将保留历史记录。')) return;
   try {
-    // 如果 id 有效则调用云端删除，否则仅清理本地
     if (id && id > 0) {
-      await deleteAppointment(id);
+      // 软取消：状态变为 cancelled，保留历史记录
+      await cancelAppointment(id, '学生已取消');
+    } else {
+      // 本地记录：直接更新本地缓存为已取消
+      var localApts = JSON.parse(localStorage.getItem('zt_appointments') || '[]');
+      var pos = localApts.findIndex(function(a) { return a.appointment_no === no; });
+      if (pos >= 0) {
+        localApts[pos].status = 'cancelled';
+        localApts[pos].teacher_response = '学生已取消';
+        localApts[pos].updated_at = new Date().toISOString();
+        localStorage.setItem('zt_appointments', JSON.stringify(localApts));
+      }
     }
-    // 从本地 my_appointments 中移除该预约编号
+    // 重新加载列表，保留历史，状态变为已取消
     var ids = getMyAppointmentIds();
-    var pos = ids.indexOf(no);
-    if (pos >= 0) { ids.splice(pos, 1); localStorage.setItem('my_appointments', JSON.stringify(ids)); }
-    // 从本地 zt_appointments 缓存中也移除
-    var localApts = JSON.parse(localStorage.getItem('zt_appointments') || '[]');
-    localApts = localApts.filter(function(a) { return a.appointment_no !== no; });
-    localStorage.setItem('zt_appointments', JSON.stringify(localApts));
-    // 更新界面：移除该卡片或重新加载
-    var card = document.getElementById('apt-item-' + idx);
-    if (card) { card.style.transition = 'opacity 0.3s'; card.style.opacity = '0'; setTimeout(function() { card.remove(); }, 300); }
-    // 更新角标
-    var badge = document.getElementById('aptBadge');
-    if (badge) { var n = parseInt(badge.textContent || '0'); if (n > 0) badge.textContent = n - 1; if (n - 1 <= 0) badge.classList.remove('show'); }
-    showToast('预约已取消');
+    if (ids.length > 0) {
+      try {
+        var data = await getMyAppointments(ids);
+        renderAppointmentList(data);
+      } catch(e) {
+        var localApts = JSON.parse(localStorage.getItem('zt_appointments') || '[]');
+        renderAppointmentList(localApts.filter(function(a) { return ids.indexOf(a.appointment_no) >= 0; }));
+      }
+    } else {
+      renderEmptyApt();
+    }
+    showToast('预约已取消 ✅ 历史已保留');
   } catch (e) {
     alert('取消失败：' + (e.message || '请稍后重试'));
   }
@@ -783,7 +804,7 @@ function formatNotes(raw) {
 function esc(str) { if (!str) return ''; return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
 init();
-console.log('[DEBUG] resume.html v20260710-17b loaded');
+console.log('[DEBUG] resume.html v20260710-18 loaded');
 </script>
 
 </body>
