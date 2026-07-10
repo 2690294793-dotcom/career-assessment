@@ -208,7 +208,7 @@ body {
 <script>
 // ============================================
 // 自在生涯工作室 · 登录页（双入口）
-// v20260710-03
+// v20260710-04
 // ============================================
 
 // 教师端密码
@@ -228,11 +228,11 @@ function selectRole(role) {
   if (!document.getElementById('agreeCheck').checked) {
     alert('请先同意用户协议和隐私政策'); return;
   }
-  // 先隐藏两个表单和底部协议，清空内容，再显示目标角色表单，避免余留
-  hide('studentForm');
-  hide('teacherForm');
-  hide('roleList');
-  hide('agreementRow');
+  // 先把所有区域都隐藏，再显示目标区域，避免内容余留
+  setDisplay('studentForm', 'none');
+  setDisplay('teacherForm', 'none');
+  setDisplay('roleList', 'none');
+  setDisplay('agreementRow', 'none');
   resetStudentForm();
   resetTeacherForm();
   if (role === 'student') {
@@ -248,10 +248,10 @@ function selectRole(role) {
         }
       }
     } catch(e) {}
-    show('studentForm');
+    setDisplay('studentForm', 'flex');
   } else if (role === 'teacher') {
     document.getElementById('headerTitle').textContent = '教师端登录';
-    show('teacherForm');
+    setDisplay('teacherForm', 'flex');
     setTimeout(function() {
       var pwd = document.getElementById('tPwd');
       if (pwd) pwd.focus();
@@ -274,10 +274,10 @@ function resetTeacherForm() {
 }
 
 function backToRoleList() {
-  hide('studentForm');
-  hide('teacherForm');
-  show('roleList');
-  show('agreementRow');
+  setDisplay('studentForm', 'none');
+  setDisplay('teacherForm', 'none');
+  setDisplay('roleList', 'flex');
+  setDisplay('agreementRow', 'flex');
   document.getElementById('headerTitle').textContent = '登录';
   // 清空教师端密码与错误提示
   var pwd = document.getElementById('tPwd');
