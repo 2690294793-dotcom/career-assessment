@@ -7,6 +7,17 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>自在生涯工作室</title>
+<script>
+(function(){
+  var v = '20260710-18';
+  if (localStorage.getItem('teacher_version') !== v) {
+    localStorage.setItem('teacher_version', v);
+    if (location.search.indexOf('v=') === -1) {
+      location.replace(location.href + (location.search ? '&' : '?') + 'v=' + v);
+    }
+  }
+})();
+</script>
 <style>
 :root {
   --primary: #6366f1; --primary-dark: #4338ca; --primary-light: #EEF0FF;
@@ -310,6 +321,9 @@ tr:last-child td { border-bottom: none; }
 .apt-card-header .apt-status.accepted { background: #D1FAE5; color: #065f46; }
 .apt-card-header .apt-status.rejected { background: #FEE2E2; color: #991b1b; }
 .apt-card-header .apt-status.completed { background: #DBEAFE; color: #1e40af; }
+.apt-card-header .apt-status.cancelled { background: #F3F4F6; color: #4B5563; }
+
+.apt-card.cancelled { border-left: 4px solid #9CA3AF; }
 
 .apt-card-body { display: flex; flex-direction: column; gap: 6px; }
 .apt-row { display: flex; align-items: center; gap: 8px; font-size: 14px; flex-wrap: wrap; }
@@ -780,6 +794,9 @@ tr.selected td:not(:first-child) { background: rgba(99,102,241,0.06); }
       <div class="apt-filter-chip" onclick="filterAppointments('rejected')" id="chipRejected">
         已拒绝<span class="count" id="aptCountRejected">0</span>
       </div>
+      <div class="apt-filter-chip" onclick="filterAppointments('cancelled')" id="chipCancelled">
+        已取消<span class="count" id="aptCountCancelled">0</span>
+      </div>
       <div style="flex:1;"></div>
       <button class="btn" onclick="loadAppointments()">🔄 刷新</button>
     </div>
@@ -1171,7 +1188,7 @@ async function loadAppointments() {
 
 function renderAptStats() {
   var total = allAppointments.length;
-  var counts = { pending: 0, accepted: 0, rejected: 0, completed: 0 };
+  var counts = { pending: 0, accepted: 0, rejected: 0, completed: 0, cancelled: 0 };
   allAppointments.forEach(function(a) { if (counts[a.status] !== undefined) counts[a.status]++; });
 
   document.getElementById("aptStatsGrid").innerHTML =
@@ -1184,6 +1201,7 @@ function renderAptStats() {
   document.getElementById("aptCountPending").textContent = counts.pending;
   document.getElementById("aptCountAccepted").textContent = counts.accepted;
   document.getElementById("aptCountRejected").textContent = counts.rejected;
+  document.getElementById("aptCountCancelled").textContent = counts.cancelled;
 }
 
 function filterAppointments(status) {
@@ -1440,6 +1458,19 @@ async function loadRecords() {
     completed.sort(function(a, b) { return new Date(b.updated_at||b.created_at) - new Date(a.updated_at||a.created_at); });
     completed.forEach(function(apt) {
       var time = apt.updated_at ? new Date(apt.updated_at).toLocaleString("zh-CN") : "-";
+      // 学生评价模块
+      var feedbackHtml = '';
+      if (apt.has_feedback || apt.student_rating > 0) {
+        var stars = '';
+        for (var s = 0; s < 5; s++) { stars += s < (apt.student_rating || 0) ? '★' : '☆'; }
+        var tagsHtml = '';
+        if (apt.feedback_tags && apt.feedback_tags.length > 0) {
+          tagsHtml = '<div style="margin-top:6px;">' + apt.feedback_tags.map(function(t) { return '<span style="display:inline-block;font-size:11px;padding:2px 8px;background:#F5EDF1;color:#C88EA7;border-radius:8px;margin-right:4px;margin-bottom:4px;">' + esc(t) + '</span>'; }).join('') + '</div>';
+        }
+        feedbackHtml = '<div style="margin-top:10px;padding:12px;background:#F5EDF1;border-radius:10px;font-size:13px;color:#7a4f63;line-height:1.6;border-left:3px solid #C88EA7;"><strong>🌟 学生评价</strong><div style="font-size:18px;color:#EAB308;margin:4px 0;">' + stars + ' <span style="font-size:12px;color:#7a4f63;">(' + (apt.student_rating || 0) + '.0/5)</span></div>' + (apt.feedback_text ? '<div style="margin-top:4px;color:#5b3d50;">' + esc(apt.feedback_text) + '</div>' : '') + tagsHtml + '</div>';
+      } else {
+        feedbackHtml = '<div style="margin-top:10px;padding:12px;background:#F8F9FC;border-radius:10px;font-size:13px;color:var(--text-secondary);border-left:3px solid #D1D5DB;">⏳ 学生暂未评价</div>';
+      }
       html += '<div class="apt-card completed">'+
         '<div class="apt-card-header">'+
           '<span class="apt-no">'+esc(apt.appointment_no||apt.id)+'</span>'+
@@ -1450,6 +1481,7 @@ async function loadRecords() {
           '<div class="apt-row"><span class="label">导师</span><span class="value mentor">'+esc(apt.mentor_name)+'</span></div>'+
           '<div class="apt-row"><span class="label">类型</span><span class="value">'+esc(TYPE_NAMES[apt.consult_type]||apt.consult_type_name||'-')+'</span></div>'+
           (apt.consultation_notes ? buildNotesFieldsHTML(apt.id, parseNotes(apt.consultation_notes), false) : '<div style="margin-top:10px;padding:12px;background:#F8F9FC;border-radius:10px;font-size:13px;color:var(--text-secondary);">📝 未填写咨询记录</div>')+
+          feedbackHtml+
           '<div class="apt-row" style="margin-top:8px; color:var(--text-light); font-size:11px;">完成时间：'+time+'</div>'+
         '</div>'+
         '<div class="apt-card-actions">'+
