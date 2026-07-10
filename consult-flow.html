@@ -6,6 +6,18 @@
 <title>预约咨询 · 自在生涯工作室</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
+<script>
+// Cache-busting: force refresh if old cached version loaded
+(function(){
+  var v = '20260710-15';
+  if (localStorage.getItem('cf_version') !== v) {
+    localStorage.setItem('cf_version', v);
+    if (location.search.indexOf('v=') === -1) {
+      location.replace(location.href + (location.search ? '&' : '?') + 'v=' + v);
+    }
+  }
+})();
+</script>
 <style>
   :root {
     --primary: #7e22ce;
@@ -1777,7 +1789,7 @@ function showToast(msg) {
   clearTimeout(toastTimer);
   toastTimer = setTimeout(function() { bar.classList.remove('show'); }, 2200);
 }
-console.log('[DEBUG] consult-flow.html v20260710-14 loaded');
+console.log('[DEBUG] consult-flow.html v20260710-15 loaded');
 </script>
 </body>
 </html>
