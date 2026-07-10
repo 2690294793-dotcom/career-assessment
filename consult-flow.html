@@ -9,7 +9,7 @@
 <script>
 // Cache-busting: force refresh if old cached version loaded
 (function(){
-  var v = '20260710-15';
+  var v = '20260710-19';
   if (localStorage.getItem('cf_version') !== v) {
     localStorage.setItem('cf_version', v);
     if (location.search.indexOf('v=') === -1) {
@@ -899,11 +899,11 @@
       <div id="reportExportContent">
       <!-- Report Hero -->
       <div class="report-hero">
-        <div class="report-tag">🎓 <span id="reportTypeName">职业规划咨询报告</span></div>
-        <div class="report-title" id="reportTitle">张导师 · 个人职业发展报告</div>
+        <div class="report-tag">🎓 <span id="reportTypeName">导师反馈</span></div>
+        <div class="report-title" id="reportTitle">导师反馈</div>
         <div class="report-meta" id="reportMeta">
-          <span>📅 2026-07-01</span>
-          <span>⏱️ 约60分钟</span>
+          <span>📅 --</span>
+          <span>⏱️ --</span>
           <span>由导师撰写</span>
         </div>
       </div>
@@ -915,23 +915,9 @@
           <div class="rs-title">综合评估</div>
         </div>
         <div class="report-section-body">
-          <div class="report-score-row" id="reportScores">
-            <div class="report-score-item">
-              <div class="rs-num">83</div>
-              <div class="rs-label">竞争力评分</div>
-            </div>
-            <div class="report-score-item">
-              <div class="rs-num">A</div>
-              <div class="rs-label">简历质量</div>
-            </div>
-            <div class="report-score-item">
-              <div class="rs-num">B+</div>
-              <div class="rs-label">面试准备</div>
-            </div>
+          <div class="report-score-row" id="reportScores" style="display:none;">
           </div>
-          <div id="reportOverviewText" style="font-size:13px; color:var(--text-secondary); line-height:1.7;">
-            你的背景整体较强，CS专业基础扎实，有一段实习经历。主要短板在于缺少大厂项目亮点、面试表达需要系统训练。建议优先攻克面试关，配合简历精修，秋招成功率可提升至75%以上。
-          </div>
+          <div id="reportOverviewText" style="font-size:13px; color:var(--text-secondary); line-height:1.7;"></div>
         </div>
       </div>
 
@@ -941,11 +927,7 @@
           <div class="rs-icon" style="background:#D1FAE5;">✨</div>
           <div class="rs-title">优势亮点</div>
         </div>
-        <div class="report-section-body report-strengths" id="reportStrengths">
-          <div class="report-list-item"><div class="rli-dot"></div><span>名校CS背景，技术基础扎实，在产品岗竞争中具备差异化优势</span></div>
-          <div class="report-list-item"><div class="rli-dot"></div><span>有互联网公司实习经历，了解产品流程，简历不空洞</span></div>
-          <div class="report-list-item"><div class="rli-dot"></div><span>表达逻辑清晰，沟通能力强，适合偏策略型产品岗</span></div>
-        </div>
+        <div class="report-section-body report-strengths" id="reportStrengths"></div>
       </div>
 
       <div class="report-section" id="reportWeaknessSection">
@@ -953,38 +935,17 @@
           <div class="rs-icon" style="background:#FEF3C7;">⚠️</div>
           <div class="rs-title">待提升方向</div>
         </div>
-        <div class="report-section-body report-weakness" id="reportWeaknesses">
-          <div class="report-list-item"><div class="rli-dot"></div><span>项目数据支撑不足，建议量化每段经历的贡献（转化率/DAU/效率提升）</span></div>
-          <div class="report-list-item"><div class="rli-dot"></div><span>面试中「STAR法则」运用生疏，容易回答散乱，需专项训练</span></div>
-          <div class="report-list-item"><div class="rli-dot"></div><span>对目标公司的产品了解不深，建议深度体验并形成竞品分析</span></div>
-        </div>
+        <div class="report-section-body report-weakness" id="reportWeaknesses"></div>
       </div>
 
       <!-- 行动计划 -->
       <div class="report-section" id="reportActionSection">
         <div class="report-section-header">
           <div class="rs-icon" style="background:#f5f3ff;">🗓️</div>
-          <div class="rs-title">30天行动计划</div>
+          <div class="rs-title">行动计划</div>
         </div>
         <div class="report-section-body">
-          <div class="report-action-items" id="reportActions">
-            <div class="report-action-item">
-              <div class="rai-num">1</div>
-              <div class="rai-text"><strong>第1-7天</strong>：重写简历，每段经历加3个量化数据，参考提供的模板修改项目描述</div>
-            </div>
-            <div class="report-action-item">
-              <div class="rai-num">2</div>
-              <div class="rai-text"><strong>第8-14天</strong>：深度体验目标公司产品（腾讯/字节/美团），写一份竞品分析作为面试素材</div>
-            </div>
-            <div class="report-action-item">
-              <div class="rai-num">3</div>
-              <div class="rai-text"><strong>第15-21天</strong>：每天练习2道面试题（STAR法则），录音回放找问题</div>
-            </div>
-            <div class="report-action-item">
-              <div class="rai-num">4</div>
-              <div class="rai-text"><strong>第22-30天</strong>：内推+海投启动，优先字节/腾讯暑期实习，保底网易/京东</div>
-            </div>
-          </div>
+          <div class="report-action-items" id="reportActions"></div>
         </div>
       </div>
 
@@ -992,23 +953,18 @@
       <div class="report-section" id="reportResourceSection">
         <div class="report-section-header">
           <div class="rs-icon" style="background:#F0FDF4;">📚</div>
-          <div class="rs-title">导师推荐资源</div>
+          <div class="rs-title">推荐资源</div>
         </div>
-        <div class="report-section-body" id="reportResources">
-          <div style="display:flex; flex-direction:column; gap:8px;">
-            <div style="display:flex; align-items:center; gap:10px; padding:8px 10px; background:#F8F9FA; border-radius:10px; font-size:12px;">
-              <span>📖</span><span style="flex:1;">《腾讯产品面试100题》— 腾讯产品核心考察点全覆盖</span>
-              <span style="color:var(--primary); font-weight:600;">PDF</span>
-            </div>
-            <div style="display:flex; align-items:center; gap:10px; padding:8px 10px; background:#F8F9FA; border-radius:10px; font-size:12px;">
-              <span>🎯</span><span style="flex:1;">简历量化表达模板（导师定制版）</span>
-              <span style="color:var(--primary); font-weight:600;">腾讯文档</span>
-            </div>
-            <div style="display:flex; align-items:center; gap:10px; padding:8px 10px; background:#F8F9FA; border-radius:10px; font-size:12px;">
-              <span>🔗</span><span style="flex:1;">字节跳动产品岗内推通道（7月截止）</span>
-              <span style="color:var(--primary); font-weight:600;">链接</span>
-            </div>
-          </div>
+        <div class="report-section-body" id="reportResources"></div>
+      </div>
+
+      <!-- 学生评价 -->
+      <div class="report-section" id="reportStudentFeedbackSection" style="display:none;">
+        <div class="report-section-header">
+          <div class="rs-icon" style="background:#F5EDF1;">🌟</div>
+          <div class="rs-title">学生对本次咨询的评价</div>
+        </div>
+        <div class="report-section-body" id="reportStudentFeedback">
         </div>
       </div>
 
@@ -1628,12 +1584,12 @@ async function submitFeedback() {
 // 根据预约数据（特别是 consultation_notes）渲染报告页
 function renderReportFromAppointment(apt) {
   if (!apt) return;
-  var typeName = apt.consult_type_name || TYPE_NAMES[apt.consult_type] || '职业规划咨询';
+  var typeName = apt.consult_type_name || TYPE_NAMES[apt.consult_type] || '咨询';
   var titleEl = document.getElementById('reportTitle');
   var typeEl = document.getElementById('reportTypeName');
   var metaEl = document.getElementById('reportMeta');
-  if (titleEl) titleEl.textContent = (apt.mentor_name || '导师') + ' · ' + typeName + '报告';
-  if (typeEl) typeEl.textContent = typeName + '报告';
+  if (titleEl) titleEl.textContent = (apt.mentor_name || '导师') + ' · 咨询反馈';
+  if (typeEl) typeEl.textContent = '导师反馈';
   if (metaEl) {
     metaEl.innerHTML = '<span>📅 ' + (apt.appointment_date || '--') + '</span>' +
       '<span>⏱️ ' + (apt.appointment_time || '--') + '</span>' +
@@ -1645,10 +1601,13 @@ function renderReportFromAppointment(apt) {
     try { notes = JSON.parse(apt.consultation_notes); } catch(e) { notes = { summary: apt.consultation_notes }; }
   }
 
+  var hasAnyNote = notes.summary || notes.analysis || notes.goals || (notes.strengths && notes.strengths.length > 0) || (notes.weaknesses && notes.weaknesses.length > 0) || (notes.actions && notes.actions.length > 0) || (notes.resources && notes.resources.length > 0) || notes.solution || notes.action || notes.resource;
+
   // 综合评估
   var overviewTextEl = document.getElementById('reportOverviewText');
   var scoresEl = document.getElementById('reportScores');
   var overviewSection = document.getElementById('reportOverviewSection');
+  if (overviewSection) overviewSection.style.display = 'block';
   if (notes.summary || notes.analysis) {
     if (overviewTextEl) overviewTextEl.textContent = notes.summary || notes.analysis || '';
     if (scoresEl) scoresEl.style.display = 'none';
@@ -1659,6 +1618,7 @@ function renderReportFromAppointment(apt) {
   // 优势亮点
   var strengthEl = document.getElementById('reportStrengths');
   var strengthSection = document.getElementById('reportStrengthSection');
+  if (strengthSection) strengthSection.style.display = 'block';
   if (notes.strengths && notes.strengths.length > 0) {
     strengthEl.innerHTML = notes.strengths.map(function(s) {
       return '<div class="report-list-item"><div class="rli-dot"></div><span>' + esc(String(s)) + '</span></div>';
@@ -1672,6 +1632,7 @@ function renderReportFromAppointment(apt) {
   // 待提升方向
   var weaknessEl = document.getElementById('reportWeaknesses');
   var weaknessSection = document.getElementById('reportWeaknessSection');
+  if (weaknessSection) weaknessSection.style.display = 'block';
   if (notes.weaknesses && notes.weaknesses.length > 0) {
     weaknessEl.innerHTML = notes.weaknesses.map(function(s) {
       return '<div class="report-list-item"><div class="rli-dot"></div><span>' + esc(String(s)) + '</span></div>';
@@ -1685,6 +1646,7 @@ function renderReportFromAppointment(apt) {
   // 行动计划
   var actionEl = document.getElementById('reportActions');
   var actionSection = document.getElementById('reportActionSection');
+  if (actionSection) actionSection.style.display = 'block';
   var actions = notes.actions || notes.action || [];
   if (typeof actions === 'string') actions = [actions];
   if (actions.length > 0) {
@@ -1698,6 +1660,7 @@ function renderReportFromAppointment(apt) {
   // 推荐资源
   var resourceEl = document.getElementById('reportResources');
   var resourceSection = document.getElementById('reportResourceSection');
+  if (resourceSection) resourceSection.style.display = 'block';
   var resources = notes.resources || notes.resource || [];
   if (typeof resources === 'string') resources = [resources];
   if (resources.length > 0) {
@@ -1708,9 +1671,28 @@ function renderReportFromAppointment(apt) {
     if (resourceSection) resourceSection.style.display = 'none';
   }
 
+  // 学生评价
+  var studentFeedbackSection = document.getElementById('reportStudentFeedbackSection');
+  var studentFeedbackEl = document.getElementById('reportStudentFeedback');
+  if (apt.has_feedback || apt.student_rating > 0) {
+    if (studentFeedbackSection) studentFeedbackSection.style.display = 'block';
+    var stars = '';
+    for (var s = 0; s < 5; s++) { stars += s < (apt.student_rating || 0) ? '★' : '☆'; }
+    var tagsHtml = '';
+    if (apt.feedback_tags && apt.feedback_tags.length > 0) {
+      tagsHtml = '<div style="margin-top:6px;">' + apt.feedback_tags.map(function(t) { return '<span style="display:inline-block;font-size:11px;padding:2px 8px;background:#F5EDF1;color:#C88EA7;border-radius:8px;margin-right:4px;margin-bottom:4px;">' + esc(t) + '</span>'; }).join('') + '</div>';
+    }
+    studentFeedbackEl.innerHTML = '<div style="font-size:16px;color:#EAB308;margin:2px 0;">' + stars + '</div>' +
+      (apt.feedback_text ? '<div style="font-size:13px;color:var(--text-primary);line-height:1.6;">' + esc(apt.feedback_text) + '</div>' : '') +
+      tagsHtml;
+  } else {
+    if (studentFeedbackSection) studentFeedbackSection.style.display = 'none';
+  }
+
   // 如果没有教师填写任何咨询记录，提示学生
-  if (!notes.summary && !notes.analysis && !notes.goals && !notes.strengths && !notes.actions && !notes.resources) {
-    if (overviewTextEl) overviewTextEl.innerHTML = '<div style="background:#FEF3C7;padding:12px 14px;border-radius:10px;color:#92400E;font-size:13px;line-height:1.6;">📋 导师尚未填写详细咨询记录。本页展示的是咨询完成后的默认模板，您可以在下方下载或分享。</div>';
+  if (!hasAnyNote) {
+    if (overviewSection) overviewSection.style.display = 'block';
+    if (overviewTextEl) overviewTextEl.innerHTML = '<div style="background:#FEF3C7;padding:12px 14px;border-radius:10px;color:#92400E;font-size:13px;line-height:1.6;">📋 导师尚未填写详细咨询反馈。请耐心等待导师填写后，报告会自动更新。</div>';
     if (scoresEl) scoresEl.style.display = 'none';
   }
 }
