@@ -292,6 +292,13 @@ async function getAppointmentByNo(appointmentNo) {
     if (error) return null;
     return data;
   }
+  // SDK 未加载，尝试 fetch 直连 Supabase
+  try {
+    const arr = await fetchSupabaseJson('appointments', 'appointment_no=eq.' + encodeURIComponent(appointmentNo) + '&select=*');
+    if (arr && arr.length > 0) return arr[0];
+  } catch(fetchErr) {
+    console.warn('[Supabase] fetch 查询 appointments 失败，降级到本地:', fetchErr.message);
+  }
   var local = JSON.parse(localStorage.getItem("zt_appointments") || "[]");
   return local.find(function(a) { return a.appointment_no === appointmentNo; }) || null;
 }
@@ -362,6 +369,14 @@ async function getMyAppointments(appointmentNos) {
       .order("created_at", { ascending: false });
     if (error) throw error;
     return data || [];
+  }
+  // SDK 未加载，尝试 fetch 直连 Supabase
+  try {
+    const inList = appointmentNos.map(function(n) { return encodeURIComponent(n); }).join(',');
+    const data = await fetchSupabaseJson('appointments', 'appointment_no=in.(' + inList + ')&select=*&order=created_at.desc');
+    if (data && data.length > 0) return data;
+  } catch(fetchErr) {
+    console.warn('[Supabase] fetch 批量查询 appointments 失败，降级到本地:', fetchErr.message);
   }
   var local = JSON.parse(localStorage.getItem("zt_appointments") || "[]");
   return local
