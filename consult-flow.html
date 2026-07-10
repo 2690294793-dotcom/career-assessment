@@ -1212,6 +1212,24 @@ function expandSlotsToTimeSlots(slots) {
   return result;
 }
 
+// 判断选中的日期是否为今天
+function isSelectedDateToday(dateStr) {
+  var now = new Date();
+  var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  today.setHours(0, 0, 0, 0);
+
+  var parts = dateStr.split('-');
+  var month = parseInt(parts[0]) - 1;
+  var day = parseInt(parts[1]);
+  var year = today.getFullYear();
+  var candidate = new Date(year, month, day);
+  candidate.setHours(0, 0, 0, 0);
+  if (candidate < today) {
+    candidate = new Date(year + 1, month, day);
+  }
+  return candidate.getTime() === today.getTime();
+}
+
 // 为选中的日期渲染时间槽
 function renderTimeSlotsForDate(dateStr) {
   var container = document.getElementById('timeGridContainer');
@@ -1228,17 +1246,31 @@ function renderTimeSlotsForDate(dateStr) {
     return;
   }
 
-  var firstAvailableTime = availableTimes[0];
+  var todayFlag = isSelectedDateToday(dateStr);
+  var currentHour = new Date().getHours();
+  var firstAvailableTime = null;
+
   availableTimes.forEach(function(t) {
-    var isSelected = t === (selectedTime || firstAvailableTime);
-    html += '<div class="time-slot' + (isSelected ? ' selected' : '') + '" onclick="selectTime(\'' + t + '\', this)">' + t + '</div>';
+    var hour = parseInt(t.split(':')[0]);
+    // 当天：20:00 及之后结束预约，且当前小时及之前已过期
+    var isExpired = todayFlag && (hour >= 20 || hour <= currentHour);
+    var extraClass = isExpired ? ' unavailable' : '';
+    var isSelected = !isExpired && t === selectedTime;
+    if (!isExpired && firstAvailableTime === null) firstAvailableTime = t;
+    var clickAttr = isExpired ? '' : ' onclick="selectTime(\'' + t + '\', this)"';
+    html += '<div class="time-slot' + extraClass + (isSelected ? ' selected' : '') + '"' + clickAttr + '>' + t + '</div>';
   });
 
   container.innerHTML = html;
 
-  // 自动选中第一个可用时间
-  if (firstAvailableTime && !selectedTime) {
-    selectedTime = firstAvailableTime;
+  // 自动选中第一个可用时间，若当前选中已过期则重置
+  if (firstAvailableTime) {
+    var selectedHour = selectedTime ? parseInt(selectedTime.split(':')[0]) : -1;
+    if (!selectedTime || (todayFlag && (selectedHour >= 20 || selectedHour <= currentHour))) {
+      selectedTime = firstAvailableTime;
+    }
+  } else {
+    selectedTime = null;
   }
   checkStep1Ready();
 }
