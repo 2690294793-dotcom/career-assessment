@@ -7,7 +7,7 @@
 <script>
 // Cache-busting: force refresh if old cached version loaded
 (function(){
-  var v = '20260710-18';
+  var v = '20260710-19';
   if (localStorage.getItem('resume_version') !== v) {
     localStorage.setItem('resume_version', v);
     if (location.search.indexOf('v=') === -1) {
@@ -724,7 +724,7 @@ function renderAppointmentList(appointments) {
       if (!hasFeedback) {
         html += '<a class="apt-action-btn apt-action-primary" href="consult-flow.html?apt=' + encodeURIComponent(no) + '" onclick="event.stopPropagation();">📝 评价</a>';
       } else {
-        html += '<a class="apt-action-btn apt-action-primary" href="consult-flow.html?apt=' + encodeURIComponent(no) + '" onclick="event.stopPropagation();">📄 查看报告</a>';
+        html += '<a class="apt-action-btn apt-action-primary" href="consult-flow.html?apt=' + encodeURIComponent(no) + '" onclick="event.stopPropagation();">📝 查看老师反馈</a>';
       }
       html += '</div>';
     }
@@ -804,7 +804,7 @@ function formatNotes(raw) {
 function esc(str) { if (!str) return ''; return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
 init();
-console.log('[DEBUG] resume.html v20260710-18 loaded');
+console.log('[DEBUG] resume.html v20260710-19 loaded');
 </script>
 
 </body>
