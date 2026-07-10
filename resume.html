@@ -7,7 +7,7 @@
 <script>
 // Cache-busting: force refresh if old cached version loaded
 (function(){
-  var v = '20260710-17';
+  var v = '20260710-17b';
   if (localStorage.getItem('resume_version') !== v) {
     localStorage.setItem('resume_version', v);
     if (location.search.indexOf('v=') === -1) {
@@ -727,7 +727,6 @@ function renderAppointmentList(appointments) {
 }
 
 async function handleCancelApt(id, no, idx) {
-  event.stopPropagation();
   if (!confirm('确定要取消该预约吗？')) return;
   try {
     // 如果 id 有效则调用云端删除，否则仅清理本地
@@ -784,7 +783,7 @@ function formatNotes(raw) {
 function esc(str) { if (!str) return ''; return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
 init();
-console.log('[DEBUG] resume.html v20260710-17 loaded');
+console.log('[DEBUG] resume.html v20260710-17b loaded');
 </script>
 
 </body>
