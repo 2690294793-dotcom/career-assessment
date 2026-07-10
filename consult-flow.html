@@ -1156,7 +1156,14 @@ function initDateChips() {
     var hasSlots = getAvailableSlotsForDate(val).length > 0;
     if (hasSlots && firstAvailableIdx < 0) firstAvailableIdx = i;
   }
-  if (firstAvailableIdx < 0) firstAvailableIdx = 0; // fallback
+
+  // 如果该导师完全没有设置任何可预约时段，直接提示不可预约
+  if (firstAvailableIdx < 0) {
+    container.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:16px 0;color:var(--text-secondary);font-size:13px;width:100%;">该导师暂未开放可预约时间</div>';
+    selectedDate = null;
+    renderEmptyTimeSlots();
+    return;
+  }
 
   for (var i = 0; i < 10; i++) {
     var d = new Date(today);
@@ -1185,11 +1192,24 @@ function initDateChips() {
   renderTimeSlotsForDate(selectedDate);
 }
 
+// 时间槽为空时（导师未设置时间表）的占位提示
+function renderEmptyTimeSlots() {
+  var container = document.getElementById('timeGridContainer');
+  if (!container) return;
+  container.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:32px 16px;color:var(--text-secondary);font-size:13px;line-height:1.6;">' +
+    '<div style="font-size:32px;margin-bottom:8px;">📅</div>' +
+    '<div>该导师暂未开放预约</div>' +
+    '<div style="color:var(--text-light);font-size:12px;margin-top:4px;">请联系导师在教师端添加可预约时间段</div>' +
+    '</div>';
+  selectedTime = null;
+  checkStep1Ready();
+}
+
 // 获取某个日期的可用时间段
 function getAvailableSlotsForDate(dateStr) {
+  // 如果导师完全没设定时间表，返回空数组（学生端应提示不可预约）
   if (!mentorScheduleSlots || mentorScheduleSlots.length === 0) {
-    // 如果导师没有设定时间表，使用默认时段
-    return [{ start_time: '09:00', end_time: '21:00' }];
+    return [];
   }
   // 将 '07-08' 转为 'YYYY-MM-DD' 格式进行匹配（优先匹配今年，若跨年到明年）
   var today = new Date();
@@ -1281,13 +1301,33 @@ async function loadMentorSchedule(mentorId) {
 
     // 加载时间表
     mentorScheduleSlots = await getMentorSchedule(mentorId);
+
+    // 若导师未设置任何可预约时段，明确提示学生不可预约
+    if (!mentorScheduleSlots || mentorScheduleSlots.length === 0) {
+      var mentorName = MENTOR_DATA[mentorId] ? MENTOR_DATA[mentorId].name : mentorId;
+      noticeEl.style.display = 'block';
+      noticeEl.textContent = '📅 ' + mentorName + ' 导师暂未设置可预约时间';
+      timeSection.style.display = 'none';
+      selectedTime = null;
+      selectedDate = null;
+      checkStep1Ready();
+      return;
+    }
   } catch(err) {
     console.error('加载导师时间表失败:', err);
-    // 降级：使用默认时间表，保持预约开放
+    // 网络异常降级：按无时间表处理，避免显示错误默认可预约时段
     mentorAccepting = true;
     mentorScheduleSlots = [];
-    noticeEl.style.display = 'none';
-    timeSection.style.display = 'block';
+    var fallbackName = MENTOR_DATA[mentorId] ? MENTOR_DATA[mentorId].name : mentorId;
+    if (noticeEl) {
+      noticeEl.style.display = 'block';
+      noticeEl.textContent = '📅 ' + fallbackName + ' 导师暂未设置可预约时间';
+    }
+    if (timeSection) timeSection.style.display = 'none';
+    selectedTime = null;
+    selectedDate = null;
+    checkStep1Ready();
+    return;
   }
 
   // 重新初始化日期和时间
@@ -1304,6 +1344,17 @@ function checkStep1Ready() {
     btn.disabled = true;
     btn.textContent = '导师暂不开放预约';
     if (hint) hint.style.display = 'none';
+    return;
+  }
+
+  // 导师虽开放预约，但完全未设置任何可预约时段
+  if (!mentorScheduleSlots || mentorScheduleSlots.length === 0) {
+    btn.disabled = true;
+    btn.textContent = '导师未设置可预约时间';
+    if (hint) {
+      hint.style.display = 'block';
+      hint.textContent = '请联系导师在教师端添加可预约时间段';
+    }
     return;
   }
 
