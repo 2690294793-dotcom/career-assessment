@@ -1193,11 +1193,13 @@ function getAvailableSlotsForDate(dateStr) {
   }
   // 将 '07-08' 转为 'YYYY-MM-DD' 格式进行匹配（优先匹配今年，若跨年到明年）
   var today = new Date();
+  today.setHours(0, 0, 0, 0); // 归一化为当天零点，避免下午误判为次日
   var year = today.getFullYear();
   var parts = dateStr.split('-');
   var month = parseInt(parts[0]) - 1;
   var day = parseInt(parts[1]);
   var candidate = new Date(year, month, day);
+  candidate.setHours(0, 0, 0, 0); // 同样归一化，确保只比较日期
   if (candidate < today) {
     // 如果推算出的日期已经过去，说明跨年了
     candidate = new Date(year + 1, month, day);
