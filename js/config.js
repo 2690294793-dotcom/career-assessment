@@ -405,6 +405,13 @@ async function getMentorSchedule(mentorId) {
     if (error) throw error;
     return data;
   }
+  // SDK 未加载，尝试 fetch 直连 Supabase
+  try {
+    const data = await fetchSupabaseJson('mentor_schedule', 'mentor_id=eq.' + encodeURIComponent(mentorId) + '&select=*&order=specific_date.asc');
+    return data || [];
+  } catch (fetchErr) {
+    console.warn('[Supabase] fetch 查询 mentor_schedule 失败，降级到本地:', fetchErr.message);
+  }
   var local = JSON.parse(localStorage.getItem("zt_mentor_schedule") || "[]");
   return local.filter(function(s) { return s.mentor_id === mentorId; });
 }
@@ -456,6 +463,23 @@ async function deleteScheduleSlot(id) {
 // 6. 导师预约开关 (mentor_settings)
 // ============================================
 
+// 通用 fetch 直连 Supabase 查询（不依赖 SDK CDN，国内网络更稳定）
+async function fetchSupabaseJson(table, queryString) {
+  const url = SUPABASE_URL + '/rest/v1/' + table + (queryString ? '?' + queryString : '');
+  const resp = await fetch(url, {
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY,
+      'Content-Type': 'application/json'
+    }
+  });
+  if (!resp.ok) {
+    const text = await resp.text();
+    throw new Error('HTTP ' + resp.status + ': ' + text);
+  }
+  return await resp.json();
+}
+
 // 获取某个导师的预约开关设置
 async function getMentorSettings(mentorId) {
   if (db) {
@@ -473,6 +497,17 @@ async function getMentorSettings(mentorId) {
     }
     return data;
   }
+
+  // 如果 SDK 未加载，尝试 fetch 直连 Supabase
+  try {
+    const data = await fetchSupabaseJson('mentor_settings', 'mentor_id=eq.' + encodeURIComponent(mentorId) + '&select=*');
+    if (data && data.length > 0) return data[0];
+    // 远程没有记录，则创建默认
+    return await createMentorSettings(mentorId);
+  } catch (fetchErr) {
+    console.warn('[Supabase] fetch 查询 mentor_settings 失败，降级到本地:', fetchErr.message);
+  }
+
   var local = JSON.parse(localStorage.getItem("zt_mentor_settings") || "[]");
   var found = local.find(function(s) { return s.mentor_id === mentorId; });
   if (!found) {
