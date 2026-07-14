@@ -1,91 +1,4 @@
 // ============================================
-// 数据后端适配层（秒哒接入点）
-// ============================================
-// 切换后端只需改下面的 BACKEND_TYPE：
-//   'supabase' -> 使用现有 Supabase（默认，线上不改）
-//   'miaoda'   -> 使用秒哒后端（需先填 MIAODA 配置、并按需完善 Backend 中各方法）
-// 业务层（下方各 saveXxx / getXxx）会在最前面判断此开关，
-// 命中 'miaoda' 时转交给 Backend 对应的方法，否则走原 Supabase 逻辑。
-const BACKEND_TYPE = 'supabase';
-
-// 秒哒后端接入配置（拿到秒哒给你的 API 后填写）
-const MIAODA = {
-  baseUrl: '',   // 秒哒数据 API 基地址，如 https://api.miaoda.cn/.../tables
-  token: ''      // 鉴权 token（强烈建议放服务端代理转发，勿明文暴露在前端）
-};
-
-// 秒哒通用 REST 请求（占位实现，依秒哒实际文档调整 endpoint / 鉴权头 / 字段）
-async function miaodaRequest(method, path, body) {
-  if (!MIAODA.baseUrl) throw new Error('[Backend] 未配置 MIAODA.baseUrl');
-  const url = MIAODA.baseUrl.replace(/\/+$/, '') + path;
-  const resp = await fetch(url, {
-    method: method,
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + MIAODA.token
-    },
-    body: body ? JSON.stringify(body) : undefined
-  });
-  if (!resp.ok) {
-    const text = await resp.text();
-    throw new Error('[miaoda] HTTP ' + resp.status + ': ' + text);
-  }
-  return resp.json();
-}
-
-// 秒哒分支实现集合：每个方法对应下方一个业务函数。
-// 现阶段为通用 REST 占位，对接秒哒时按其实文档补全（endpoint / 过滤 / 字段映射）。
-const Backend = {
-  // —— submissions ——
-  async saveSubmission(data) { return miaodaRequest('POST', '/submissions', data); },
-  async getAllSubmissions() { return miaodaRequest('GET', '/submissions'); },
-  async deleteSubmission(id) { return miaodaRequest('DELETE', '/submissions/' + id); },
-  // —— report_exports ——
-  async saveReportExport(data) { return miaodaRequest('POST', '/report_exports', data); },
-  async getReportExports() { return miaodaRequest('GET', '/report_exports'); },
-  // —— appointments ——
-  async createAppointment(apt) { return miaodaRequest('POST', '/appointments', apt); },
-  async getAppointments(filter) {
-    const qs = filter && Object.keys(filter).map(function(k){ return k + '=' + encodeURIComponent(filter[k]); }).join('&');
-    return miaodaRequest('GET', '/appointments' + (qs ? '?' + qs : ''));
-  },
-  async updateAppointmentStatus(id, status, response) {
-    const patch = { status: status };
-    if (response) patch.teacher_response = response;
-    return miaodaRequest('PATCH', '/appointments/' + id, patch);
-  },
-  async saveConsultationNotes(id, notes) {
-    return miaodaRequest('PATCH', '/appointments/' + id, { consultation_notes: notes, status: 'completed' });
-  },
-  async getAppointmentByNo(no) { return miaodaRequest('GET', '/appointments?appointment_no=' + encodeURIComponent(no)); },
-  async saveFeedback(no, feedback) {
-    return miaodaRequest('PATCH', '/appointments/by-no/' + encodeURIComponent(no), {
-      student_rating: feedback.rating || 0,
-      feedback_tags: Array.isArray(feedback.tags) ? feedback.tags : [],
-      feedback_text: feedback.text || '',
-      feedback_at: new Date().toISOString(),
-      has_feedback: true
-    });
-  },
-  async deleteAppointment(id) { return miaodaRequest('DELETE', '/appointments/' + id); },
-  async cancelAppointment(id, reason) {
-    return miaodaRequest('PATCH', '/appointments/' + id, { status: 'cancelled', teacher_response: reason || '学生已取消' });
-  },
-  async getMyAppointments(nos) { return miaodaRequest('GET', '/appointments?nos=' + encodeURIComponent(nos.join(','))); },
-  async getAppointmentStats() { return miaodaRequest('GET', '/appointments/stats'); },
-  // —— mentor_schedule ——
-  async getMentorSchedule(mentorId) { return miaodaRequest('GET', '/mentor_schedule?mentor_id=' + encodeURIComponent(mentorId)); },
-  async getAllMentorSchedules() { return miaodaRequest('GET', '/mentor_schedule'); },
-  async addScheduleSlot(slot) { return miaodaRequest('POST', '/mentor_schedule', slot); },
-  async deleteScheduleSlot(id) { return miaodaRequest('DELETE', '/mentor_schedule/' + id); },
-  // —— mentor_settings ——
-  async getMentorSettings(mentorId) { return miaodaRequest('GET', '/mentor_settings?mentor_id=' + encodeURIComponent(mentorId)); },
-  async getAllMentorSettings() { return miaodaRequest('GET', '/mentor_settings'); },
-  async createMentorSettings(mentorId) { return miaodaRequest('POST', '/mentor_settings', { mentor_id: mentorId, booking_open: true }); },
-  async updateMentorSettings(mentorId, updates) { return miaodaRequest('PATCH', '/mentor_settings/' + encodeURIComponent(mentorId), updates); }
-};
-
-// ============================================
 // Supabase 配置文件
 // ============================================
 // 使用前请替换下面的 URL 和 KEY 为你自己的 Supabase 项目信息
@@ -141,7 +54,6 @@ function isDbReady() { return db !== null; }
 // ============================================
 
 async function saveSubmission(data) {
-  if (BACKEND_TYPE === 'miaoda') return Backend.saveSubmission(data);
   // 优先用 fetch 直连 Supabase REST API，不依赖 SDK CDN（国内加载不稳定）
   try {
     const resp = await fetch(SUPABASE_URL + '/rest/v1/submissions', {
@@ -187,7 +99,6 @@ async function saveSubmission(data) {
 }
 
 async function getAllSubmissions() {
-  if (BACKEND_TYPE === 'miaoda') return Backend.getAllSubmissions();
   if (db) {
     const { data, error } = await db
       .from("submissions")
@@ -200,7 +111,6 @@ async function getAllSubmissions() {
 }
 
 async function deleteSubmission(id) {
-  if (BACKEND_TYPE === 'miaoda') return Backend.deleteSubmission(id);
   if (db) {
     const { error } = await db.from("submissions").delete().eq("id", id);
     if (error) throw error;
@@ -217,7 +127,6 @@ async function deleteSubmission(id) {
 // ============================================
 
 async function saveReportExport(data) {
-  if (BACKEND_TYPE === 'miaoda') return Backend.saveReportExport(data);
   if (db) {
     const { data: result, error } = await db
       .from("report_exports")
@@ -232,7 +141,6 @@ async function saveReportExport(data) {
 }
 
 async function getReportExports() {
-  if (BACKEND_TYPE === 'miaoda') return Backend.getReportExports();
   if (db) {
     const { data, error } = await db
       .from("report_exports")
@@ -256,7 +164,6 @@ function genAppointmentNo() {
 
 // 提交预约
 async function createAppointment(data) {
-  if (BACKEND_TYPE === 'miaoda') return Backend.createAppointment(data);
   // 如果 db 为 null，尝试重新初始化（可能 CDN 延迟导致首次 init 失败）
   if (!db && typeof initSupabase === "function") {
     initSupabase();
@@ -307,7 +214,6 @@ async function createAppointment(data) {
 // 获取所有预约
 async function getAppointments(filter) {
   filter = filter || {};
-  if (BACKEND_TYPE === 'miaoda') return Backend.getAppointments(filter);
   if (db) {
     let query = db.from("appointments").select("*").order("created_at", { ascending: false });
     if (filter.status) query = query.eq("status", filter.status);
@@ -325,7 +231,6 @@ async function getAppointments(filter) {
 
 // 更新预约状态（教师同意/拒绝/完成）
 async function updateAppointmentStatus(id, status, response) {
-  if (BACKEND_TYPE === 'miaoda') return Backend.updateAppointmentStatus(id, status, response);
   if (db) {
     const update = { status: status, updated_at: new Date().toISOString() };
     if (response) update.teacher_response = response;
@@ -351,7 +256,6 @@ async function updateAppointmentStatus(id, status, response) {
 
 // 教师填写咨询记录
 async function saveConsultationNotes(id, notes) {
-  if (BACKEND_TYPE === 'miaoda') return Backend.saveConsultationNotes(id, notes);
   if (db) {
     const { data, error } = await db
       .from("appointments")
@@ -379,7 +283,6 @@ async function saveConsultationNotes(id, notes) {
 
 // 按预约编号查询
 async function getAppointmentByNo(appointmentNo) {
-  if (BACKEND_TYPE === 'miaoda') return Backend.getAppointmentByNo(appointmentNo);
   if (db) {
     const { data, error } = await db
       .from("appointments")
@@ -403,7 +306,6 @@ async function getAppointmentByNo(appointmentNo) {
 // 保存学生反馈（在 consult-flow.html 或我的预约中调用）
 async function saveFeedback(appointmentNo, feedback) {
   feedback = feedback || {};
-  if (BACKEND_TYPE === 'miaoda') return Backend.saveFeedback(appointmentNo, feedback);
   if (!appointmentNo) {
     throw new Error('缺少预约编号');
   }
@@ -445,7 +347,6 @@ async function saveFeedback(appointmentNo, feedback) {
 
 // 删除预约
 async function deleteAppointment(id) {
-  if (BACKEND_TYPE === 'miaoda') return Backend.deleteAppointment(id);
   if (db) {
     const { error } = await db.from("appointments").delete().eq("id", id);
     if (error) throw error;
@@ -460,7 +361,6 @@ async function deleteAppointment(id) {
 // 取消预约（软取消，保留历史记录，status='cancelled'）
 async function cancelAppointment(id, reason) {
   if (!id) throw new Error('缺少预约 ID');
-  if (BACKEND_TYPE === 'miaoda') return Backend.cancelAppointment(id, reason);
   if (db) {
     const update = {
       status: 'cancelled',
@@ -490,7 +390,6 @@ async function cancelAppointment(id, reason) {
 // 按预约编号列表批量查询（学生端查询自己的预约历史）
 async function getMyAppointments(appointmentNos) {
   if (!appointmentNos || appointmentNos.length === 0) return [];
-  if (BACKEND_TYPE === 'miaoda') return Backend.getMyAppointments(appointmentNos);
   if (db) {
     const { data, error } = await db
       .from("appointments")
@@ -516,7 +415,6 @@ async function getMyAppointments(appointmentNos) {
 
 // 统计
 async function getAppointmentStats() {
-  if (BACKEND_TYPE === 'miaoda') return Backend.getAppointmentStats();
   if (db) {
     const { data, error } = await db
       .from("appointments")
@@ -542,7 +440,6 @@ async function getAppointmentStats() {
 
 // 获取某个导师的时间表
 async function getMentorSchedule(mentorId) {
-  if (BACKEND_TYPE === 'miaoda') return Backend.getMentorSchedule(mentorId);
   if (db) {
     const { data, error } = await db
       .from("mentor_schedule")
@@ -565,7 +462,6 @@ async function getMentorSchedule(mentorId) {
 
 // 获取所有导师的时间表
 async function getAllMentorSchedules() {
-  if (BACKEND_TYPE === 'miaoda') return Backend.getAllMentorSchedules();
   if (db) {
     const { data, error } = await db
       .from("mentor_schedule")
@@ -579,7 +475,6 @@ async function getAllMentorSchedules() {
 
 // 添加时间段
 async function addScheduleSlot(slot) {
-  if (BACKEND_TYPE === 'miaoda') return Backend.addScheduleSlot(slot);
   if (db) {
     const { data, error } = await db
       .from("mentor_schedule")
@@ -597,7 +492,6 @@ async function addScheduleSlot(slot) {
 
 // 删除时间段
 async function deleteScheduleSlot(id) {
-  if (BACKEND_TYPE === 'miaoda') return Backend.deleteScheduleSlot(id);
   if (db) {
     const { error } = await db.from("mentor_schedule").delete().eq("id", id);
     if (error) throw error;
@@ -632,7 +526,6 @@ async function fetchSupabaseJson(table, queryString) {
 
 // 获取某个导师的预约开关设置
 async function getMentorSettings(mentorId) {
-  if (BACKEND_TYPE === 'miaoda') return Backend.getMentorSettings(mentorId);
   if (db) {
     const { data, error } = await db
       .from("mentor_settings")
@@ -671,7 +564,6 @@ async function getMentorSettings(mentorId) {
 
 // 获取所有导师的预约开关设置
 async function getAllMentorSettings() {
-  if (BACKEND_TYPE === 'miaoda') return Backend.getAllMentorSettings();
   if (db) {
     const { data, error } = await db
       .from("mentor_settings")
@@ -684,7 +576,6 @@ async function getAllMentorSettings() {
 
 // 创建导师设置（如果不存在）
 async function createMentorSettings(mentorId) {
-  if (BACKEND_TYPE === 'miaoda') return Backend.createMentorSettings(mentorId);
   var setting = {
     mentor_id: mentorId,
     booking_open: true
@@ -706,7 +597,6 @@ async function createMentorSettings(mentorId) {
 
 // 更新导师预约开关（不存在则自动创建）
 async function updateMentorSettings(mentorId, updates) {
-  if (BACKEND_TYPE === 'miaoda') return Backend.updateMentorSettings(mentorId, updates);
   if (db) {
     const payload = { ...updates, updated_at: new Date().toISOString() };
 
